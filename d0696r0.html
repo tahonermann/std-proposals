@@ -100,10 +100,10 @@ blockquote.code
 
 <h1 id="introduction">Introduction</h1>
 
-<p>The abbreviated function and template introducer syntax defined in the
-Concepts TS <sup><a href="#ref_concepts">[Concepts]</a></sup>.
-have proven to be controversial features as evidenced by
-discussion within the committee reflectors
+<p>The abbreviated function and template introducer syntax features defined
+in the Concepts TS <sup><a href="#ref_concepts">[Concepts]</a></sup>
+have proven to be controversial as evidenced by discussion within the
+committee reflectors
 <sup><a href="#ref_exp_concepts">[ExploringConcepts]</a></sup>
 and the
 <a title="P0587R0: Concepts TS revisited"
@@ -112,23 +112,74 @@ P0587R0</a>
 <sup><a title="P0587R0: Concepts TS revisited"
         href="#ref_p0587r0">
 [P0587R0]</a></sup>
-paper submission.  This paper proposes removing these features from the
+and <a title="P0464R2: Revisiting the meaning of <tt>foo(ConceptName,ConceptName)</tt>"
+   href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0464r2.html">
+P0464R2</a>
+<sup><a title="P0587R0: Revisiting the meaning of <tt>foo(ConceptName,ConceptName)</tt>"
+        href="#ref_p0464r2">
+[P0464R2]</a></sup>
+paper submissions.  This paper proposes removing these features from the
 Concepts TS with the goal of increasing consensus on adopting the remaining
 Concepts TS functionality into the current working paper.
 </p>
 
-<p>This paper does not propose removing support for declaring parameters of
-generic lambdas with <em>constrained-type-specifier</em>s, nor does it
-reflect the changes proposed in
-<a title="P0464R2: Revisiting the meaning of <tt>foo(ConceptName,ConceptName)</tt>"
-   href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0464r2.html">
-P0464R2</a>
-<sup><a title="P0464R2: Revisiting the meaning of <tt>foo(ConceptName,ConceptName)</tt>"
-        href="#ref_p0464r2">
-[P0464R2]</a></sup>
-to alter the interpretation of multiple generic lambda parameters declared with
-<em>constrained-type-specifier</em>s that introduce equivalent
-<em>constraint-expressions</em>.
+<p>Removal of support for abbreviated functions means that the following
+example that is currently well-defined by the Conepts TS will no longer be
+valid:
+<blockquote class="code">
+<tt><pre>
+template&lt;typename&gt; concept bool C = true;
+
+void af1(auto);      <em>// Previously ok; declares an abbreviated function (template)</em>
+                     <em>// with a single function parameter with an unconstrained type.</em>
+                     <em>// Now ill-formed.</em>
+void af2(C);         <em>// Previously ok; declares an abbreviated function (template)</em>
+                     <em>// with a single function parameter with a constrained type.</em>
+                     <em>// Now ill-formed.</em>
+</pre></tt>
+</blockquote>
+This paper does <strong>not</strong> propose removing support for declaring
+functions and function templates with return types containing placeholders.
+The following examples retain their current behavior under the Concepts TS:
+<blockquote class="code">
+<tt><pre>
+template&lt;typename, typename&gt; class ct {};
+
+ct&lt;auto,auto&gt; f1();  <em>// Ok; declares a function with a return type</em>
+                     <em>// that requires the template arguments of <tt>ct</tt></em>
+                     <em>// to be deduced from a return statement.</em>
+ct&lt;C,C&gt; f2();        <em>// Ok; declares a function with a return type</em>
+                     <em>// that requires the template arguments of <tt>ct</tt></em>
+                     <em>// to be deduced from a return statement, to be deduced</em>
+                     <em>// to the same type, and to satisfy <tt>C</tt>.</em>
+</pre></tt>
+</blockquote>
+Removal of support for template introducers means that the following examples
+that are currently well-defined by the Conepts TS will no longer be valid:
+<blockquote class="code">
+<tt><pre>
+C{T} void ft1(T);    <em>// Previously ok; declares a function template</em>
+                     <em>// with a single constrained type template parameter.</em>
+                     <em>// Now ill-formed.</em>
+C{T} class ct1;      <em>// Previously ok; declares a class template</em>
+                     <em>// with a single constrained type template parameter.</em>
+                     <em>// Now ill-formed.</em>
+</pre></tt>
+</blockquote>
+</p>
+
+<p>This paper does <strong>not</strong> propose removing support for declaring
+parameters of generic lambdas with <em>constrained-type-specifier</em>s, nor
+does it alter the current requirement that the same types be deduced for
+equivalently constrained parameters.  The following examples retain their
+current behavior under the Concepts TS:
+<blockquote class="code">
+<tt><pre>
+auto gl1 = [](C,C) { return 1; };
+auto v1 = gl1(0,0);   <em>// Ok</em>
+auto v2 = gl1(0,'c'); <em>// Ill-formed; different types deduced for <tt>C</tt></em>
+</pre></tt>
+</blockquote>
 </p>
 
 <h1 id="motivation">Motivation</h1>
