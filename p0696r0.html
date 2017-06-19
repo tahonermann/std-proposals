@@ -1,0 +1,1329 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+
+<head>
+
+<title>Remove abbreviated functions and template-introduction syntax from the Concepts TS</title>
+
+<style type="text/css">
+table#header th,
+table#header td
+{
+    text-align: left;
+}
+table#references th,
+table#references td
+{
+    vertical-align: top;
+}
+blockquote.code
+{
+    background-color: #F1F1F1;
+    border: 1px solid #D1D1D1;
+}
+
+ins, ins * { text-decoration:none; font-weight:bold; background-color:#A0FFA0 }
+del, del * { text-decoration:line-through; background-color:#FFA0A0 }
+#hidedel:checked ~ * del, #hidedel:checked ~ * del * { display:none; visibility:hidden }
+
+blockquote
+{
+    color: #000000;
+    background-color: #F1F1F1;
+    border: 1px solid #D1D1D1;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+}
+blockquote.stdins
+{
+    text-decoration: underline;
+    color: #000000;
+    background-color: #C8FFC8;
+    border: 1px solid #B3EBB3;
+    padding: 0.5em;
+}
+blockquote.stddel
+{
+    text-decoration: line-through;
+    color: #000000;
+    background-color: #FFEBFF;
+    border: 1px solid #ECD7EC;
+    padding-left: 0.5empadding-right: 0.5em;
+}
+
+blockquote.code
+{
+    background-color: #F1F1F1;
+    border: 1px solid #D1D1D1;
+}
+</style>
+
+</head>
+
+
+<body>
+
+<table id="header">
+  <tr>
+    <th>Document Number:</th>
+    <td>P0696R0</td>
+  </tr>
+  <tr>
+    <th>Date:</th>
+    <td>2017-06-19</td>
+  </tr>
+  <tr>
+    <th>Audience:</th>
+    <td>Evolution Working Group</td>
+  </tr>
+  <tr>
+    <th>Reply-to:</th>
+    <td>Tom Honermann &lt;tom@honermann.net&gt;</td>
+  </tr>
+</table>
+
+<h1>Remove abbreviated functions and template-introduction syntax from the
+    Concepts TS</h1>
+
+<ul>
+  <li><a href="#introduction">
+      Introduction</a></li>
+  <li><a href="#motivation">
+      Motivation</a></li>
+  <li><a href="#wording">
+      Wording</a></li>
+  <li><a href="#acknowledgements">
+      Acknowledgements</a></li>
+  <li><a href="#references">
+      References</a></li>
+</ul>
+
+<h1 id="introduction">Introduction</h1>
+
+<p>The abbreviated function and template introducer syntax features defined
+in the Concepts TS <sup><a href="#ref_concepts">[Concepts]</a></sup>
+have proven to be controversial as evidenced by discussion within the
+committee reflectors
+<sup><a href="#ref_exp_concepts">[ExploringConcepts]</a></sup>
+and the
+<a title="P0587R0: Concepts TS revisited"
+   href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0587r0.pdf">
+P0587R0</a>
+<sup><a title="P0587R0: Concepts TS revisited"
+        href="#ref_p0587r0">
+[P0587R0]</a></sup>
+and <a title="P0464R2: Revisiting the meaning of <tt>foo(ConceptName,ConceptName)</tt>"
+   href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0464r2.html">
+P0464R2</a>
+<sup><a title="P0587R0: Revisiting the meaning of <tt>foo(ConceptName,ConceptName)</tt>"
+        href="#ref_p0464r2">
+[P0464R2]</a></sup>
+paper submissions.  This paper proposes removing these features from the
+Concepts TS with the goal of increasing consensus on adopting the remaining
+Concepts TS functionality into the current working paper.
+</p>
+
+<p>Removal of support for abbreviated functions means that the following
+example that is currently well-defined by the Concepts TS will no longer be
+valid:
+<blockquote class="code">
+<tt><pre>
+template&lt;typename&gt; concept bool C = true;
+
+void af1(auto);      <em>// Previously ok; declares an abbreviated function (template)</em>
+                     <em>// with a single function parameter with an unconstrained type.</em>
+                     <em>// Now ill-formed.</em>
+void af2(C);         <em>// Previously ok; declares an abbreviated function (template)</em>
+                     <em>// with a single function parameter with a constrained type.</em>
+                     <em>// Now ill-formed.</em>
+</pre></tt>
+</blockquote>
+This paper does <strong>not</strong> propose removing support for declaring
+functions and function templates with return types containing placeholders.
+The following examples retain their current behavior under the Concepts TS:
+<blockquote class="code">
+<tt><pre>
+template&lt;typename, typename&gt; class ct {};
+
+ct&lt;auto,auto&gt; f1();  <em>// Ok; declares a function with a return type</em>
+                     <em>// that requires the template arguments of <tt>ct</tt></em>
+                     <em>// to be deduced from a return statement.</em>
+ct&lt;C,C&gt; f2();        <em>// Ok; declares a function with a return type</em>
+                     <em>// that requires the template arguments of <tt>ct</tt></em>
+                     <em>// to be deduced from a return statement, to be deduced</em>
+                     <em>// to the same type, and to satisfy <tt>C</tt>.</em>
+</pre></tt>
+</blockquote>
+Removal of support for template introducers means that the following examples
+that are currently well-defined by the Conepts TS will no longer be valid:
+<blockquote class="code">
+<tt><pre>
+C{T} void ft1(T);    <em>// Previously ok; declares a function template</em>
+                     <em>// with a single constrained type template parameter.</em>
+                     <em>// Now ill-formed.</em>
+C{T} class ct1;      <em>// Previously ok; declares a class template</em>
+                     <em>// with a single constrained type template parameter.</em>
+                     <em>// Now ill-formed.</em>
+</pre></tt>
+</blockquote>
+</p>
+
+<p>This paper does <strong>not</strong> propose removing support for declaring
+parameters of generic lambdas with <em>constrained-type-specifier</em>s, nor
+does it alter the current requirement that the same types be deduced for
+equivalently constrained parameters.  The following examples retain their
+current behavior under the Concepts TS:
+<blockquote class="code">
+<tt><pre>
+auto gl1 = [](C,C) { return 1; };
+auto v1 = gl1(0,0);   <em>// Ok</em>
+auto v2 = gl1(0,'c'); <em>// Ill-formed; different types deduced for <tt>C</tt></em>
+</pre></tt>
+</blockquote>
+</p>
+
+<h1 id="motivation">Motivation</h1>
+
+<p>The abbreviated function and template introducer syntax defined by the
+Concepts TS is intended to reduce boilerplate, improve readability, and
+ultimately, make generic programming more accessible as elaborated in
+<a title="P0557R0: Concepts: The Future of Generic Programming"
+   href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0557r0.pdf">
+P0557R0</a>
+<sup><a title="P0557R0: Concepts: The Future of Generic Programming"
+        href="#ref_p0557r0">
+[P0557R0]</a></sup>.
+These are laudible goals and ones the author is in favor of continued pursuit.
+However, the features currently defined in the Concepts TS raise concerns
+regarding mutation of code undergoing maintenance and difficulties programmers
+may face in navigating the differences in requirements and behaviors exhibited
+by functions and function templates that are made more subtle by the current
+design.
+</p>
+
+<p>
+Consider the following function declaration.  Does it declare a function or
+a function template?
+<blockquote class="code">
+<tt><pre>
+void f(X x) {}
+</pre></tt>
+</blockquote>
+Prior to the Concepts TS, this unambiguously declares a non-template function.
+However, if <tt>X</tt> names a concept, then <tt>f</tt> is an abbreviated
+function equivalent to the following function template:
+<blockquote class="code">
+<tt><pre>
+template&lt;X T&gt; void f(T x) {}
+</pre></tt>
+</blockquote>
+This is exactly the intent as described in
+<a title="P0557R0: Concepts: The Future of Generic Programming"
+   href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0557r0.pdf">
+P0557R0</a>
+<sup><a title="P0557R0: Concepts: The Future of Generic Programming"
+        href="#ref_p0557r0">
+[P0557R0]</a></sup>; one may now write generic functions as familiar to any
+<tt>C</tt> programmer without the boilerplate currently required to author a
+function template!
+</p>
+
+<p>The problem is, this simplicity is an illusion that dissolves under further
+inspection as illustrated in the following examples.
+</p>
+
+<blockquote class="code">
+<tt><pre>
+void f1(X&amp;&amp; x) {}
+</pre></tt>
+</blockquote>
+If <tt>X</tt> names a concept, then parameter <tt>x</tt> is a forwarding
+reference; otherwise, it is an rvalue reference and <tt>f1</tt> may only be
+called with an rvalue argument.
+
+<blockquote class="code">
+<tt><pre>
+int f2(X x) {
+  static int invocation_count;
+  return ++invocation_count;
+}
+</pre></tt>
+</blockquote>
+<tt>f2</tt> maintains a count of either every invocation of <tt>f2</tt>, or
+every invocation of an instantiated specialization of <tt>f2</tt> depending
+on whether <tt>X</tt> names a concept or a type.
+
+<blockquote class="code">
+<tt><pre>
+void f3(X x) {}
+</pre></tt>
+</blockquote>
+<tt>f3</tt> may be moved from a primary source file to a header if <tt>X</tt>
+names a concept, but doing so risks introducing multiple definition errors if
+<tt>X</tt> names a type.
+
+<blockquote class="code">
+<tt><pre>
+void f4(int i) {}
+</pre></tt>
+</blockquote>
+If <tt>f4</tt> were modified to:
+<blockquote class="code">
+<tt><pre>
+void f4(int i, X x) {}
+</pre></tt>
+</blockquote>
+then its definition will change from a non-template function to a template
+function if <tt>X</tt> names a concept, but will remain a function if <tt>X</tt>
+names a type.
+
+<blockquote class="code">
+<tt><pre>
+void f5(Ziggle z, Piddle p) {
+  Ziggle::type x1;                <em>// Ok if Ziggle is a type, ill-formed if it's a concept.</em>
+  decltype(p)::type x2;           <em>// Ok if Piddle is a type, needs typename if it is a concept.</em>
+  typename decltype(z)::type x3;  <em>// Ok if Ziggle is a concept, ill-formed if it is a type.</em>
+}
+</pre></tt>
+</blockquote>
+<tt>f5</tt> illustrates the increased subtlety in determining when
+<tt>typename</tt> disambiguation is required.  The presence of a
+<em>template-parameter-list</em> enables such determination without having
+to be familiar with the particular identifiers:
+
+<blockquote class="code">
+<tt><pre>
+template&lt;Ziggle Z&gt;
+void f5(Z z, Piddle p) {
+  Ziggle::type x1;                <em>// Ill-formed; Ziggle is a concept.</em>
+  decltype(p)::type x2;           <em>// Ok; <tt>decltype(p)</tt> is not dependent.</em>
+  typename decltype(z)::type x3;  <em>// Ok; <tt>decltype(z)</tt> is dependent.</em>
+}
+</pre></tt>
+</blockquote>
+
+Abbreviated functions have the behavior that placeholders specified within
+the declared return type of the function that match a
+<em>constrained-type-specifier</em> used in a parameter type are not deduced,
+but are rather replaced by the deduced type for the matching parameter(s).
+However, this behavior doesn't hold if the same return type is specified as a
+<em>trailing-return-type</em>: [ <em>Note:</em> It is not clear that this is
+the intent of the Concepts TS, but this is the behavior exhibited by gcc.
+&mdash; <em>end note</em> ]
+<blockquote class="code">
+<tt><pre>
+template&lt;typename&gt; concept bool C = true;
+template&lt;typename&gt; class ct {};
+
+ct&lt;C&gt; f6(C) { return ct&lt;int&gt;{}; }
+auto f7(C) -&gt; ct&lt;C&gt; { return ct&lt;int&gt;{}; }
+
+f6('c'); <em>// Ill-formed; different types deduced for each <tt>C</tt></em>
+         <em>// and <tt>ct&lt;int&gt;</tt> is not convertible to <tt>ct&lt;char&gt;</tt>.</em>
+f7('c'); <em>// Ok; <tt>C</tt> in the parameter list deduced as <tt>char</tt></em>
+         <em>// from the function call argument; <tt>C</tt> in the trailing</em>
+         <em>// return type deduced as <tt>int</tt> from the return statement.</em>
+</pre></tt>
+</blockquote>
+A semantic difference based on whether the return type of a function is
+specified in the declared return type as opposed to a
+<em>trailing-return-type</em> is novel and introduces the possibility of subtle
+defects being introduced due to a change a programmer expects to be purely
+stylistic.  Similarly, this behavior introduces the possibility that a change
+to the declaration of a function parameter may alter the meaning of the return
+type: [ <em>Note:</em> gcc 6.2-7.1 rejects both of the following cases as it
+(presumably erroneously) replaces <tt>C</tt> in the return type with the
+invented template parameter for the first parameter regardless of whether the
+first parameter is declared with a matching <em>constrained-type-specifier</em>.
+&mdash; <em>end note</em> ]
+<blockquote class="code">
+<tt><pre>
+ct&lt;C&gt; f8(auto) { return ct&lt;int&gt;{}; }
+ct&lt;C&gt; f9(C) { return ct&lt;int&gt;{}; }
+
+f8('c'); <em>// Ok; <tt>C</tt> deduced as <tt>int</tt> from the return statement.</em>
+f9('c'); <em>// Ill-formed; <tt>C</tt> deduced as <tt>char</tt> from the function</em>
+         <em>// argument and <tt>ct&lt;int&gt;</tt> is not convertible to ct&lt;char&gt;.</em>
+</pre></tt>
+</blockquote>
+</p>
+
+<p>The template introduction syntax does not suffer concerns like those above.
+The primary concern with it is aesthetic; that it lacks cohesiveness with the
+rest of the language as described in
+<a title="P0587R0: Concepts TS revisited"
+   href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0587r0.pdf">
+P0587R0</a>
+<sup><a title="P0587R0: Concepts TS revisited"
+        href="#ref_p0587r0">
+[P0587R0]</a></sup>.  The choice to remove it as proposed in this paper is
+based on a perception that an alternate syntax to replace abbreviated function
+syntax might also encompass the goals of template introductions.
+</p>
+
+<p>Few of the concerns raised above are applicable to every template
+declaration and it has not been claimed that either of the terse syntaxes
+is the best fit for all template declarations.  Is it not therefore
+reasonable for the use of these syntaxes to be a matter of code style?  Do
+tools such as IDEs that provide semantic markup not help to counteract these
+concerns?
+</p>
+
+<p>The examples above suggest that guidelines for the usage of abbreviated
+function syntax can be crafted.  A simple guideline might look like:
+<blockquote>
+Write a function template instead of an abbreviated function when:
+<ul>
+  <li>parameters declared with <tt>&amp;&amp;</tt> are present.</li>
+  <li>the parameter list consists of non-dependent user declared types
+      and constrained types.</li>
+  <li>dependent member type access is needed.</li>
+  <li>static local variables are present.</li>
+</ul>
+Write abbreviated functions that have return types containing placeholders
+using a <em>trailing-return-type</em>.
+</blockquote>
+Whether the concerns presented in this paper rise above a level adequately
+addressed by guidelines and coding standards is a matter of judgement and
+no arguments are presented here to attempt to establish a litmus test.
+</p>
+
+<p>IDEs and other tools that provide semantic markup are certainly helpful.
+However, not all programmers use IDEs and most of us use tools that lack
+semantic awareness; particularly for tools used for code review, diffing,
+and merging.  Relying on semantic awareness to help elucidate code is likely
+to result in disappointment in various parts of our collective work flows
+for the forseeable future.
+</p>
+
+<h1 id="wording">Wording</h1>
+
+<input type="checkbox" id="hidedel">Hide deleted text</input>
+
+<p>These changes are relative to
+<!--
+<a title="Working Draft, C++ extensions for Concepts"
+   href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/nFIXME.pdf">
+-->
+a draft of the Concepts TS working paper being prepared for the 2017 Toronto
+pre-meeting mailing<!--</a>-->
+<sup><a title="Working Draft, C++ extensions for Concepts"
+        href="#ref_concepts_wp">
+[ConceptsWP]</a></sup></p>
+
+<p>Change the added paragraph 6 inserted in 8.1.4.2 [expr.prim.id.qual]:
+<!-- TODO: gcc does not yet implement this functionality -->
+<blockquote>
+In a <em>nested-name-specifier</em> of the form <tt>auto::</tt> or <tt>C::</tt>,
+where <tt>C</tt> is a <em>constrained-type-name</em>, that
+<em>nested-name-specifier</em> designates a placeholder that will be replaced
+later according to the rules for placeholder deduction in 10.1.7.4. If a
+placeholder designated by a <em>constrained-type-specifier</em> is not a
+placeholder type, the program is ill-formed.  [ <em>Note:</em> A
+<em>constrained-type-specifier</em> can designate a placeholder for a non-type
+or template (10.1.7.4.2).  &mdash; <em>end note</em> ] The replacement type
+deduced for a placeholder shall be a class or enumeration type. [
+<em>Example:</em>
+<blockquote class="code">
+<tt><pre>
+template&lt;typename T&gt; concept bool C = sizeof(T) == sizeof(int);
+template&lt;int N&gt; concept bool D = true;
+
+struct S1 { int n; };
+struct S2 { char c; };
+struct S3 { struct X { using Y = int; }; };
+
+int auto::* p1 = &amp;S1::n; <em>// <tt>auto</tt> deduced as <tt>S1</tt></em>
+int D::* p2 = &amp;S1::n;    <em>// error: <tt>D</tt> does not designate a placeholder type</em>
+int C::* p3 = &amp;S1::n;    <em>// OK: <tt>C</tt> deduced as <tt>S1</tt></em>
+char C::* p4 = &amp;S2::c;   <em>// error: deduction fails because constraints are not satisfied</em>
+
+<del>void f(typename auto::X::Y);
+f(S1()); <em>// error: <tt>auto</tt> cannot be deduced from <tt>S1()</tt>
+f&lt;S3&gt;(0); <em>// OK</em></del>
+</pre></tt>
+</blockquote>
+<del>In the declaration of <tt>f</tt>, the placeholder appears in a non-deduced
+context (17.8.2.5). It may be replaced later through the explicit specification
+of template arguments.</del>
+&mdash; <em>end example</em> ]
+</blockquote>
+</p>
+
+<p>Change in 8.1.5.1 [expr.prim.lambda.closure]:
+<blockquote>
+Modify paragraph 3 so that the meaning of a generic lambda is defined in terms
+of its <del>abbreviated</del> member function template call operator.
+<blockquote>
+[&hellip;] The closure type for a generic lambda has a public inline function
+call operator member template that is <del>an abbreviated</del><ins>a</ins>
+function template whose parameters and return type are derived from the
+<em>lambda-expression</em>'s <em>parameter-declaration-clause</em> and
+<em>trailing-return-type</em> according to the rules in
+<del>(11.3.5)</del><ins>(10.1.7.4.1)</ins>.
+</blockquote>
+Add the following example after those in paragraph 3 in the C++ Standard.
+<blockquote>
+<em>[ Example:</em>
+<blockquote class="code">
+<!-- TODO: If it is decided that each parameter declared with the same
+     constrained-type-specifier is to be deduced independently, than this
+     member function template will have to be updated to declare multiple
+     constrained template type parameters. -->
+<tt><pre>
+  template&lt;typename T&gt; concept bool C = true;
+
+  auto gl = [](C&amp; a, C* b) { a = *b; }; <em>// OK: denotes a generic lambda</em>
+
+  struct Fun {
+    <ins>template&lt;C T&gt;</ins> auto operator()(<del>C</del><ins>T</ins>&amp; a, <del>C</del><ins>T</ins>* b) const { a = *b; }
+  } fun;
+</pre></tt>
+</blockquote>
+<tt>C</tt> is a <em>constrained-type-specifier</em>, signifying that the
+lambda is generic. The generic lambda <tt>gl</tt> and the function object
+<tt>fun</tt> have equivalent behavior when called with the same arguments.<br/>
+<em>&mdash; end example ]</em>
+</blockquote>
+</blockquote>
+</p>
+
+<p>Change in 8.1.7.3 [expr.prim.req.compound] paragraph 1 near the end of the
+example:
+<blockquote>
+[&hellip;]<br/>
+<blockquote class="code">
+<tt><pre>
+template&lt;typename T&gt; concept bool C() { return true; }
+
+template&lt;typename T&gt; concept bool C5 =
+  requires(T x) {
+    {f(x)} -&gt; const C&amp;;
+  };
+</pre></tt>
+</blockquote>
+The <em>compound-requirement</em> in <tt>C5</tt> introduces two constraints:
+an expression constraint for <tt>f(x)</tt>, and a deduction constraint
+requiring that overload resolution succeeds for the call <tt>g(f(x))</tt>
+where <tt>g</tt> is the following invented <del>abbreviated</del> function
+template.
+<blockquote class="code">
+<tt><pre>
+<ins>template&lt;C T&gt; </ins>void g(const <del>C</del><ins>T</ins>&amp;);
+</pre></tt>
+</blockquote>
+&mdash; <em>end example</em> ]
+</blockquote>
+</p>
+
+<p>Change within the replacement text in 10.1.7.4 [dcl.spec.auto] paragraph 1:
+<blockquote>
+Replace paragraph 1 with the text below.
+<blockquote>
+[&hellip;] The <em>type-specifier</em>s <tt>auto</tt> and
+<tt>decltype(auto)</tt> and <em>constrained-type-specifier</em>s designate a
+placeholder (type, non-type, or template) that will be replaced later, either
+through deduction or an explicit specification. The <tt>auto</tt> and
+<tt>decltype(auto)</tt> <em>type-specifier</em>s designate placeholder types;
+a <em>constrained-type-specifier</em> can also designate placeholders for
+values and templates. [ <em>Note:</em> The deduction of placeholders is done
+through the invention of template parameters as described in 10.1.7.4.1
+<del>and 11.3.5</del>.  &mdash; <em>end note</em> ] Placeholders are also used
+to signify that a lambda is a generic lambda (8.1.5)<del>, that a function
+declaration is an abbreviated function template (11.3.5)</del>, or that a
+<em>trailing-return-type</em> in a <em>compound-requirement</em> (8.1.7.3)
+introduces an argument deduction constraint (17.10.1.6). The <tt>auto</tt>
+<em>type-specifier</em> is also <ins>used to</ins> introduce a function
+type having a <em>trailing-return-type</em> or to introduce a structured
+binding declaration 11.5. [ <em>Note:</em> A <em>nested-name-specifier</em>
+can also include placeholders (8.1). Replacements for those placeholders
+are determined according to the rules in this section.
+&mdash; <em>end note</em> ]
+</blockquote>
+</blockquote>
+</p>
+
+<p>Remove the allowance for placeholders appearing in the parameter type of
+a function declaration in the added text in 10.1.7.4 [dcl.spec.auto]
+paragraph 3:
+<blockquote>
+[&hellip;]<br/>
+&mdash; <em>end example</em> ] <del>Similarly, if a placeholder appears in
+a parameter type of a function declaration, the function declaration declares
+an abbreviated function template (11.3.5). [ <em>Example:</em></del>
+<blockquote class="code">
+<tt><pre>
+<del>void f(const auto&amp;, int); <em>// OK: an abbreviated function template</em></del>
+</pre></tt>
+</blockquote>
+<del>&mdash; <em>end example</em> ]</del>
+</blockquote>
+</p>
+
+<p>Remove the added paragraph 4 inserted in 10.1.7.4 [dcl.spec.auto]:
+<blockquote>
+<del>Add the following after paragraph 3 to describe when
+<em>constrained-type-specifier</em>s in the return type refer to template
+parameters.</del>
+<blockquote>
+<del>A <em>constrained-type-specifier</em> <tt>C1</tt> within the declared
+return type of an abbreviated function template declaration does not designate
+a placeholder if its introduced <em>constraint-expression</em> (10.1.7.4.2)
+is determined to be equivalent, using the rules in 17.6.5.1 for comparing
+expressions, to the introduced <em>constraint-expression</em> for a
+<em>constrained-type-specifier</em> <tt>C2</tt> in the
+<em>parameter-declaration-clause</em> of that function declaration. Instead,
+<tt>C1</tt> is replaced by the template parameter invented for <tt>C2</tt>
+(11.3.5). [ <em>Example:</em></del>
+<blockquote class="code">
+<tt><pre><del>
+template&lt;typename T&gt; concept bool C = true;
+
+template&lt;typename... T&gt; struct Tuple;
+
+C const&amp; f1(C); <em>// has one template parameter and no deduced return type</em>
+Tuple&lt;C...&gt; f2(C); <em>// has one template parameter and a deduced return type</em>
+</del></pre></tt>
+</blockquote>
+<del>In the declaration <tt>f1</tt>, the <em>constraint-expression</em>
+introduced by the <em>constrained-type-specifier</em>s in the
+<em>parameter-declaration-clause</em> and return type are equivalent<del> </del>;
+they would both introduce the expression <tt>C&lt;T&gt;</tt>, for some invented
+template parameter <tt>T</tt>. In <tt>f2</tt>, the use of <tt>C</tt> in the
+return type would introduce the <em>constraint-expression</em>
+<tt>(C&lt;T&gt; &amp;l&amp;l ...)</tt>, which is distinct from the
+<em>constraint-expression</em> <tt>C&lt;T&gt;</tt> introduced by the invented
+<em>constrained-parameter</em> (17.1) for the
+<em>constrained-type-specifier</em> in the
+<em>parameter-declaration-clause</em> according to the rules in 11.3.5.
+&mdash; <em>end example</em></del>
+</blockquote>
+</blockquote>
+</p>
+
+<p>Renumber the added paragraphs 5 and 6 added to 10.1.7.4 [dcl.spec.auto] to
+4 and 5 respectively.
+</p>
+
+<p>Replace the changes to 10.1.7.4.1 [dcl.spec.auto.deduct] paragraph 2
+with the following:
+<blockquote>
+A type <tt>T</tt> containing a <del>placeholder type</del><ins>placeholders</ins>,
+and a corresponding initializer <tt>e</tt>, are determined as follows:
+<blockquote>
+(2.1) &mdash; for a non-discarded <tt>return</tt> statement that occurs in a
+function declared with a return type that contains <del>a placeholder type</del>
+<ins>placeholders</ins>, <tt>T</tt> is the declared return type and <tt>e</tt>
+is the operand of the <tt>return</tt> statement. If the <tt>return</tt>
+statement has no operand, then <tt>e</tt> is <tt>void()</tt>;
+</blockquote>
+<blockquote>
+(2.2) &mdash; for a variable declared with a type that contains
+<del>a placeholder type</del><ins>placeholders</ins>, <tt>T</tt> is the
+declared type of the variable and <tt>e</tt> is the initializer.  If the
+initialization is <em>direct-list-initialization</em>, the initializer shall
+be a <em>braced-init-list</em> containing only a single
+<em>assignment-expression</em> and <tt>e</tt> is the
+<em>assignment-expression</em>;
+</blockquote>
+<blockquote>
+(2.3) &mdash; for a non-type template parameter declared with a type that
+contains <del>a placeholder type</del><ins>placeholders</ins>, <tt>T</tt>
+is the declared type of the non-type template parameter and <tt>e</tt>
+is the corresponding template argument<del>.</del><ins>;</ins>
+</blockquote>
+<blockquote>
+<ins>(2.4) &mdash; for a parameter of a generic <em>lambda-expression</em>
+declared with a type that contains placeholders, <tt>T</tt> is the declared
+type of the parameter and <tt>e</tt> is the corresponding argument in an
+invocation of the generic lambda's function call operator template;</ins>
+</blockquote>
+<blockquote>
+<ins>(2.5) &mdash; for an <em>argument deduction constraint</em> (17.10.1.6),
+<tt>T</tt> is the <em>trailing-return-type</em>, and <tt>e</tt> is the
+<em>expression</em> of the corresponding <em>compound-requirement</em>.</ins>
+</blockquote>
+In the case of a <tt>return</tt> statement with no operand or with an operand
+of type <tt>void</tt>, <tt>T</tt> shall be either <tt>decltype(auto)</tt>
+<del>or</del><ins>,</ins> <em>cv</em> <tt>auto</tt><ins>, or a
+<em>constrained-type-specifier</em></ins>.
+</blockquote>
+</p>
+
+<p>Correct the changes to 10.1.7.4.1 [dcl.spec.auto.deduct] paragraph 3 to
+reference paragraph 4 from the <tt>C++</tt> standard.
+</p>
+
+<p>Replace the changes to 10.1.7.4.1 [dcl.spec.auto.deduct] paragraph 4
+with the following:
+<blockquote>
+If the <del>placeholder is</del><ins>placeholders include</ins> the
+<tt>auto</tt> <em>type-specifier</em> <ins>or a
+<em>constrained-type-specifier</em>, </ins>the deduced type <tt>T'</tt>
+replacing <tt>T</tt> is determined using the rules for template argument
+deduction.  <ins>If <tt>T</tt> corresponds to the type of a parameter of a
+generic <em>lambda-expression</em>, then template argument deduction is
+performed for all parameter types containing placeholders together.</ins>
+<del>Obtain <tt>P</tt> from <tt>T</tt> by replacing the
+occurrences of <tt>auto</tt> with either a new invented type template
+parameter <tt>U</tt> or, if the initialization is
+<em>copy-list-initialization,</em> with
+<tt>std::initializer_list&lt;U&gt;</tt>.</del>  <ins>Obtain a type
+<tt>P</tt> from <tt>T</tt> by replacing each placeholder as follows:</ins>
+<blockquote>
+<ins>(4.1) &mdash; if the initialization is a <em>copy-list-initialization</em>
+and a placeholder is a <em>decl-specifier</em> of the
+<em>decl-specifier-seq</em> of the variable declaration, replace that
+occurrence of the placeholder with <tt>std::initializer_list&lt;U&gt;</tt>
+where <tt>U</tt> is an invented type template parameter;</ins>
+</blockquote>
+<blockquote>
+<ins>(4.2) &mdash; otherwise, if the placeholder is designated by the
+<tt>auto</tt> <em>type-specifier</em>, replace the occurrence with a new
+invented type <em>template-parameter</em> or, if <tt>T</tt> corresponds to
+a <em>function parameter pack</em>, with a new invented type
+<em>template parameter pack</em>;</ins>
+</blockquote>
+<blockquote>
+<ins>(4.3) &mdash; otherwise, the placeholder is designated by a
+<em>constrained-type-specifier</em>.  If a placeholder in <tt>T</tt> or,
+for parameters of generic <em>lambda-expression</em>s, any preceding
+parameter, has already been replaced by an invented
+<tt>constrained-parameter</tt> (17.1) with <em>constraint-expression</em>s
+(17.1) equivalent according to the rules for comparing <em>expression</em>s
+in 17.6.5.1 to a <em>constrained-parameter</em> whose
+<em>qualified-concept-name</em> is that of the
+<em>constrained-type-specifier</em>, then replace the occurrence with the
+existing invented <tt>constrained-parameter</tt>.  Otherwise, replace the
+occurrence with a new invented <tt>constrained-parameter</tt> whose
+<em>qualified-concept-name</em> is that of the
+<em>constrained-type-specifier</em>.
+</blockquote>
+Deduce a value for <del><tt>U</tt></del><ins>each invented template
+parameter</ins> using the rules of template argument deduction from a
+function call (17.8.2.1), where <tt>P</tt> is a function template parameter
+type and the corresponding argument is <tt>e</tt>.  <ins>[ <em>Note:</em>
+multiple function template parameters will be present when deducing types
+for generic <em>lambda-expression</em>s with multiple parameters with
+types containing placeholders. &mdash; <em>end note</em> ]</ins>  If the
+deduction fails, the declaration is ill-formed.  <ins>If any placeholders
+in the declared type were introduced by a <em>constrained-type-specifier</em>,
+then define <tt>C</tt> to be a <em>constraint-expression</em> as follows:</ins>
+</blockquote>
+<blockquote>
+<blockquote>
+<ins>(4.4) &mdash; if there is a single <em>constrained-type-specifier</em>,
+then <tt>C</tt> is the <em>constraint-expression</em> introduced by the
+invented template <em>constrained-parameter</em> (17.1) corresponding to that
+<em>constrained-type-specifier</em>;</ins>
+</blockquote>
+<blockquote>
+<ins>(4.5) &mdash; otherwise, <tt>C</tt> is the <em>logical-and-expression</em>
+(8.14) whose operands are the <em>constraint-expression</em>s introduced by the
+invented template <em>constrained-parameter</em>s corresponding to each
+<em>constrained-type-specifier</em>, in order of appearance.</ins>
+</blockquote>
+<ins>If the normalized constraint for <tt>C</tt> (17.10.2) is not satisfied
+by the deduced values, the declaration is ill-formed.</ins> Otherwise,
+<tt>T'</tt> is obtained by substituting the deduced <del><tt>U</tt></del>
+<ins>values for the invented type template parameters</ins> into <tt>P</tt>.
+<br/>
+[ <em>Example:</em>
+<blockquote class="code">
+<tt><pre>
+auto x1 = { 1, 2 };   <em>// <tt>decltype(x1)</tt> is <tt>std::initializer_list&lt;int&gt;</tt></em>
+auto x2 = { 1, 2.0 }; <em>// error: cannot deduce element type</em>
+auto x3{ 1, 2 };      <em>// error: not a single element</em>
+auto x4 = { 3 };      <em>// <tt>decltype(x4)</tt> is <tt>std::initializer_list&lt;int&gt;</tt></em>
+auto x5{ 3 };         <em>// <tt>decltype(x5)</tt> is int
+
+<ins>template&lt;typename T&gt; struct Vec { };
+template&lt;typename T&gt; Vec&lt;T&gt; make_vec(std::initializer_list&lt;T&gt;) { return Vec&lt;T&gt;{}; }
+
+template&lt;typename... Ts&gt; struct Tuple { };
+template&lt;typename... Ts&gt; auto make_tup(Ts... args) { return Tuple&lt;Ts...&gt;{}; }
+
+auto&amp; x3 = *x1.begin();               <em>// OK: <tt>decltype(x3)</tt> is <tt>int&amp;</tt></em>
+const auto* p = &amp;x3;                  <em>// OK: <tt>decltype(p)</tt> is <tt>const int*</tt></em>
+Vec&lt;auto&gt; v1 = make_vec({1, 2, 3});   <em>// OK: <tt>decltype(v1)</tt> is <tt>Vec&lt;int&gt;</tt></em>
+Vec&lt;auto&gt; v2 = {1, 2, 3};             <em>// error: type deduction fails</em>
+Tuple&lt;auto...&gt; v3 = make_tup(0, ’a’); <em>// OK: <tt>decltype(v3)</tt> is <tt>Tuple&lt;int, char&gt;</tt></em></ins>
+</pre></tt>
+</blockquote>
+&mdash; <em>end example</em> ]<br/>
+[ <em>Example:</em>
+<blockquote class="code">
+<tt><pre>
+const auto &amp;i = expr;
+</pre></tt>
+</blockquote>
+The type of <tt>i</tt> is the deduced type of the parameter <tt>u</tt>
+in the call <tt>f(expr)</tt> of the following invented function template:
+<blockquote class="code">
+<tt><pre>
+template &lt;class U&gt; void f(const U&amp; u);
+</pre></tt>
+</blockquote>
+&mdash; <em>end example</em> ]<br/>
+<ins>[ <em>Example:</em>
+<blockquote class="code">
+<tt><pre>
+template&lt;typename F, typename S&gt; struct Pair;
+template&lt;typename T, typename U&gt; Pair&lt;T, U&gt; make_pair(T, U);
+
+struct S { void mfn(bool); } s;
+int fn(char, double);
+
+Pair&lt;auto (*)(auto, auto), auto (auto::*)(auto)&gt; p = make_pair(fn, &amp;S::mfn);
+</pre></tt>
+</blockquote>
+The declared type of <tt>p</tt> is the deduced type of the parameter
+<tt>x</tt> in the call of <tt>g(make_pair(fn, &amp;S::mfn))</tt> of the
+following invented function template:
+<blockquote class="code">
+<tt><pre>
+template&lt;class T1, class T2, class T3, class T4, class T5, class T6&gt;
+void g(Pair&lt; T1(*)(T2, T3), T4 (T5::*)(T6)&gt; x);
+</pre></tt>
+</blockquote>
+&mdash; <em>end example</em> ]<br/>
+<ins>[ <em>Example:</em>
+<blockquote class="code">
+<tt><pre>
+template&lt;typename T&gt; concept bool C = true;
+
+const C* cv = expr;
+</pre></tt>
+</blockquote>
+The type of <tt>cv</tt> is deduced from the parameter <tt>p1</tt> in the call
+<tt>f1(expr)</tt> of the following invented function:
+<blockquote class="code">
+<tt><pre>
+template&lt;C T&gt; void f1(const T* p1);
+</pre></tt>
+</blockquote>
+&mdash; <em>end example</em> ]<br/>
+<ins>[ <em>Example:</em>
+<blockquote class="code">
+<tt><pre>
+auto cf(int) -&gt; Pair&lt;C, C&gt; { return expr; }
+</pre></tt>
+</blockquote>
+The return type of <tt>cf</tt> is deduced from the parameter <tt>p2</tt>
+in the call <tt>f2(expr)</tt> of the following invented function:
+<blockquote class="code">
+<tt><pre>
+template&lt;C T&gt; void f2(Pair&lt;T, T&gt;);
+</pre></tt>
+</blockquote>
+Both <em>constrained-type-specifier</em>s in the return type of <tt>cf</tt>
+correspond to the same invented template parameter.
+<br/>&mdash; <em>end example</em> ]<br/>
+<ins>[ <em>Example:</em>
+<blockquote class="code">
+<tt><pre>
+namespace N {
+  template&lt;typename T&gt; concept bool C = true;
+}
+template&lt;typename T&gt; concept bool C = true;
+template&lt;typename T, int&gt; concept bool D = true;
+template&lt;typename, int = 0&gt; concept bool E = true;
+
+auto gl1 = [](C, D&lt;0&gt;) {};
+</pre></tt>
+</blockquote>
+The <em>constrained-type-specifier</em>s <tt>C</tt> and <tt>D&lt;0&gt;</tt>
+correspond to distinct invented template parameters in the declaration of the
+function call operator template of the closure type.
+<blockquote class="code">
+<tt><pre>
+auto gl2 = [](C a, C b) {};
+</pre></tt>
+</blockquote>
+The types of <tt>a</tt> and <tt>b</tt> are the same invented template type
+parameter.
+<blockquote class="code">
+<tt><pre>
+auto gl3 = [](C&amp; a, C* b) {};
+</pre></tt>
+</blockquote>
+The type of <tt>a</tt> is a reference to an invented template type parameter
+<tt>T</tt>, and the type of <tt>b</tt> is a <em>pointer</em> to <tt>T</tt>.
+<blockquote class="code">
+<tt><pre>
+auto gl4 = [](N::C a, C b) {};
+auto gl5 = [](D&lt;0&gt; a, D&lt;1&gt; b) {};
+</pre></tt>
+</blockquote>
+In both <em>lambda-expression</em>s, the parameters <tt>a</tt> and <tt>b</tt>
+have different invented template type parameters.
+<blockquote class="code">
+<tt><pre>
+auto gl6 = [](E a, E&lt;&gt; b, E&lt;0&gt; c) {};
+</pre></tt>
+</blockquote>
+The types of <tt>a</tt>, <tt>b</tt>, and <tt>c</tt> are the same because the
+<em>constrained-type-specifier</em>s <tt>E</tt>, <tt>E&lt;&gt;</tt>, and
+<tt>E&lt;0&gt;</tt> all associate the <em>constraint-expression</em>
+<tt>E&lt;T, 0&gt;</tt>, where <tt>T</tt> is an invented template type parameter.
+<blockquote class="code">
+<tt><pre>
+auto gl7 = [](C head, C... tail) {};
+</pre></tt>
+</blockquote>
+The types of <tt>head</tt> and <tt>tail</tt> are different. Their respective
+introduced <em>constraint-expression</em>s are <tt>C&lt;T&gt; and
+<tt>(C&lt;U&gt; &amp;&amp; ...)</tt>, where <tt>T</tt> is the template
+parameter invented for <tt>head</tt> and <tt>U</tt> is the template parameter
+invented for <tt>tail</tt> (17.1).
+<br/>&mdash; <em>end example</em> ]<br/>
+</ins></blockquote>
+</p>
+
+<p>Change the example in 10.1.7.4.2 [dcl.spec.auto.constr] paragraph 1:
+<blockquote>
+[&hellip;]<br/>
+[ <em>Example:</em>
+<blockquote class="code">
+<tt><pre>
+template&lt;typename T&gt; concept bool C1 = false;
+template&lt;int N&gt; concept bool C2 = false;
+template&lt;template&lt;typename&gt; class X&gt; concept bool C3 = false;
+
+template&lt;typename T, int N&gt; class Array { };
+template&lt;typename T, template&lt;typename&gt; class A&gt; class Stack { };
+template&lt;typename T&gt; class Alloc { };
+
+<del>void f1(C1);              <em>// <tt>C1</tt> designates a placeholder type</em>
+void f2(Array&lt;auto, C2&gt;); <em>// <tt>C2</tt> designates a placeholder for an integer value</em>
+void f3(Stack&lt;auto, C3&gt;); <em>// <tt>C3</tt> designates a placeholder for a class template</em></del>
+<ins>C1 f1();              <em>// <tt>C1</tt> designates a placeholder type</em>
+Array&lt;auto, C2&gt; f2(); <em>// <tt>C2</tt> designates a placeholder for an integer value</em>
+Stack&lt;auto, C3&gt; f3(); <em>// <tt>C3</tt> designates a placeholder for a class template</em></ins>
+</pre></tt>
+</blockquote>
+&mdash; <em>end example</em>
+</blockquote>
+</p>
+
+<p>Change in 10.1.7.4.2 [dcl.spec.auto.constr] paragraph 2:
+<blockquote>
+An identifier is a <em>concept-name</em> if it refers to a set of concept
+definitions (10.1.8). [ <em>Note:</em> The set of concepts has multiple members
+only when referring to a set of overloaded function concepts.  There is at most
+one member of this set when a <em>concept-name</em> refers to a variable
+concept.  <em>&mdash; end note</em> ] [ <em>Example:</em>
+<blockquote class="code">
+<tt><pre>
+template&lt;typename T&gt; concept bool C() { return true; }             <em>// #1</em>
+template&lt;typename T, typename U&gt; concept bool C() { return true; } <em>// #2</em>
+template&lt;typename T&gt; concept bool D = true;                        <em>// #3</em>
+
+<ins>template&lt;C T&gt; </ins>void f(<del>C</del><ins>T</ins>); <em>// OK: the set of concepts referred to by C includes both #1 and #2;</em>
+                          <em>// concept resolution (17.10.4) selects #1.</em>
+<ins>template&lt;D T&gt; </ins>void g(<del>D</del><ins>T</ins>); <em>// OK: the concept-name <tt>D</tt> refers only to #3
+</pre></tt>
+</blockquote>
+<em>&mdash; end example</em> ]
+</blockquote>
+</p>
+
+<p>Change in 10.1.7.4.2 [dcl.spec.auto.constr] paragraph 3:
+<blockquote>
+A <em>partial-concept-id</em> is a <em>concept-name</em> followed by a sequence
+of <em>template-argument</em>s. [ <em>Example:</em>
+<blockquote class="code">
+<tt><pre>
+template&lt;typename T, int N = 0&gt; concept bool Seq = true;
+
+<ins>template&lt;Seq&lt;3&gt; T&gt; </ins>void f1(<del>Seq&lt;3&gt;</del><ins>T</ins>); <em>// OK</em>
+<ins>template&lt;Seq&lt;&gt; T&gt; </ins>void f2(<del>Seq&lt;&gt;</del><ins>T</ins>);   <em>// OK</em>
+</pre></tt>
+</blockquote>
+<em>&mdash; end example</em> ]
+</blockquote>
+</p>
+
+<p>Change in 10.1.7.4.2 [dcl.spec.auto.constr] paragraph 5:
+<blockquote>
+[&hellip;] The rules for inventing template parameters corresponding to
+placeholders in the <em>parameter-declaration-clause</em> of a
+<em>lambda-expression</em> (8.1.2)<del> or function declaration (11.3.5)</del>
+are described in <del>11.3.5</del><ins>10.1.7.4.1</ins> [&hellip;]
+</blockquote>
+</p>
+
+<p>Remove the added paragraphs 18-21 inserted in 11.3.5 [dcl.fct]:
+<blockquote>
+<del>Add the following paragraphs after paragraph 17.</del>
+<blockquote>
+<del>18 An <em>abbreviated function template</em> is a function declaration</del>
+[&hellip;]
+<del>&mdash; <em>end note</em> ]</del>
+</blockquote>
+<blockquote>
+<del>19 Each template parameter is invented as follows.</del><br/>
+[&hellip;]<br/>
+<del>where <tt>T</tt> is the template parameter invented for <tt>head</tt> and
+<tt>U</tt> is the <em>template parameter</em> invented for <tt>tail</tt> (14.1).</del>
+</blockquote>
+<blockquote>
+<del>20 The adjusted function parameters of an abbreviated function template
+are derived</del> [&hellip;]<br/>
+[&hellip;]<br/>
+<del>&mdash; <em>end example</em> ]</del>
+</blockquote>
+<blockquote>
+<del>19 A function template can be an abbreviated function template.</del> [&hellip;]</br>
+[&hellip;]<br/>
+<del>&mdash; <em>end example</em> ]</del>
+</blockquote>
+</blockquote>
+</p>
+
+<p>Change in 17 [temp]:
+<blockquote>
+Modify the <em>template-declaration</em> grammar in paragraph 1 to allow a
+template declaration <del>introduced by a concept</del><ins> to specify a
+<em>requires-clause</em></ins>.
+</blockquote>
+</p>
+
+<p>Change in 17 [temp] paragraph 1:
+<blockquote>
+<blockquote class="code">
+<tt><pre>
+<em>template-declaration:</em>
+    <tt>template</tt> <tt>&lt;</tt> <em>template-parameter-list</em> <tt>&gt;</tt> <em>requires-clause</em><sub>opt</sub> <em>declaration</em>
+    <del><em>template-introduction</em> <em>declaration</em></del>
+<em>requires-clause:</em>
+    <tt>requires</tt> <em>constraint-expression</em>
+</pre></tt>
+</blockquote>
+</blockquote>
+</p>
+
+<p>Change in the added 17 [temp] paragraph 7:
+<blockquote>
+A <em>template-declaration</em> is written in terms of its template parameters.
+These parameters are declared explicitly in a <em>template-parameter-list</em>
+(14.1)<del>, or they are introduced by a
+<em>template-introduction</em> (14.2)</del>. The optional
+<em>requires-clause</em> following a <em>template-parameter-list</em>
+allows the specification of constraints (14.10.2) on template arguments (14.4).
+</blockquote>
+</p>
+
+<p>Remove the added 17.2 [temp.intro]:
+<blockquote>
+<del>Add this section after 17.1.</del>
+<blockquote>
+<del>1 A <em>template-introduction</em></del> [&hellip;]
+</blockquote>
+<blockquote>
+<del>2 The concept designated by</del> [&hellip;]
+</blockquote>
+<blockquote>
+<del>3 A concept referred to</del> [&hellip;]
+</blockquote>
+<blockquote>
+<del>4 An introduced template parameter</del> [&hellip;]
+</blockquote>
+<blockquote>
+<del>5 A <em>template-introduction</em> introduces</del> [&hellip;]
+</blockquote>
+<blockquote>
+<del>6 A template declared by a <em>template-introduction</em></del> [&hellip;]
+</blockquote>
+</blockquote>
+</p>
+
+<p>Change in 17.10.1.6 [temp.constr.deduct] paragraph 2:
+<blockquote>
+To determine if an argument deduction constraint is satisfied, invent
+<del>an abbreviated</del><ins>a</ins> function template <tt>f</tt> with
+one parameter whose type is <tt>T</tt> <del>(11.3.5)</del><ins>(10.1.7.4.1)</ins>
+The constraint is satisfied if the resolution of the function call
+<tt>f(E)</tt> succeeds (16.3).  [ <em>Note:</em> Overload resolution
+succeeds when values are deduced for all invented template parameters
+in <tt>f</tt> that correspond to the placeholders in <tt>T</tt>, and the
+constraints associated by any <em>constrained-type-specifier</em>s are
+satisfied.  <em>&mdash; end note</em> ] [ <em>Example:</em>
+<blockquote class="code">
+<tt><pre>
+template&lt;typename T, typename U&gt; struct Pair;
+
+template&lt;typename T&gt;
+  concept bool C1() { return true; }
+
+template&lt;typename T&gt;
+  concept bool C2() { return requires(T t) { {*t} -&gt; Pair&lt;C1&amp;, auto&gt;; }; }
+
+template&lt;C2 T&gt; void g(T);
+
+g((int*)nullptr); <em>// error: constraints not satisfied.</em>
+</pre></tt>
+</blockquote>
+The invented <del>abbreviated </del>function template <tt>f</tt> for the
+<em>compound-requirement</em> in <tt>C2</tt> is:
+<blockquote class="code">
+<tt><pre>
+<ins>template&lt;C1 T1, typename T2&gt; </ins>void f(Pair&lt;<del>C1</del><ins>T1</ins>&amp;, <del>auto</del><ins>T2</ins>&gt;);
+</pre></tt>
+</blockquote>
+In the call <tt>g((int*)nullptr)</tt>, the constraints are not satisfied
+because no values can be deduced for the placeholders <tt>C1</tt> and
+<tt>auto</tt> from the expression <tt>*t</tt> when <tt>t</tt> has type
+“pointer-to-int”.  <em>&mdash; end example</em> ]
+</blockquote>
+</p>
+
+<p>Change in 17.10.2 [temp.constr.decl] paragraph 2:
+<blockquote>
+Constraints can also be associated with a declaration through the use of
+<del><em>template-introduction</em>s, </del><em>constrained-parameter</em>s
+in a <em>template-parameter-list</em><del>, and
+<em>constrained-type-specifier</em>s in the <em>parameter-type-list</em>
+of a function template</del>.  Each of these forms introduces additional
+<em>constraint-expression</em>s that are used to constrain the declaration.
+A template’s <em>associated constraints</em> are defined as a single
+<em>constraint-expression</em> derived from the introduced
+<em>constraint-expression</em>s using the following rules.
+<blockquote>
+(2.1) &mdash; If there are no introduced <em>constraint-expression</em>s,
+the declaration is unconstrained.
+</blockquote>
+<blockquote>
+(2.2) &mdash; If there is a single introduced <em>constraint-expression</em>,
+that is the associated constraint.
+</blockquote>
+<blockquote>
+(2.3) &mdash; Otherwise, the associated constraints are formed as a logical AND
+expression (8.14) whose operands are in the following order:
+<blockquote>
+<del>(2.3.1) &mdash; the <em>constraint-expression</em> introduced by a
+<em>template-introduction</em> (17.2), and</del>
+</blockquote>
+<blockquote>
+(2.3.<del>2</del><ins>1</ins>) &mdash; the <em>constraint-expression</em>
+introduced by each <em>constrained-parameter</em> (17.1) in the declaration's
+<em>template-parameter-list</em>, in order of appearance, and
+</blockquote>
+<blockquote>
+(2.3.<del>3</del><ins>2</ins>) &mdash; the <em>constraint-expression</em>
+introduced by a <em>requires-clause</em> following a
+<em>template-parameter-list</em> (Clause 17), and
+</blockquote>
+<blockquote>
+<del>(2.3.4) &mdash; the <em>constraint-expression</em> introduced by each
+<em>constrained-type-specifier</em> (10.1.7.4.2) in the type of a
+<em>parameter-declaration</em> in a function declaration (11.3.5), in order of
+appearance, and</del>
+</blockquote>
+<blockquote>
+(2.3.<del>5</del><ins>3</ins>) &mdash; the <em>constraint-expression</em>
+of a trailing <em>requires-clause</em> (Clause 11) of a function declaration
+(11.3.5).
+</blockquote>
+</blockquote>
+The formation of the associated constraints for a template declaration
+establishes the order in which the normalized constraints (defined below) will
+be compared for equivalence (to determine when one template redeclares
+another), and the order in which constraints are instantiated when checking for
+satisfaction (17.10.1). The <em>constraint-expression</em>s introduced by
+<em>constrained-type-specifier</em>s in a variable type or in the declared
+return type of a function are not included in the associated constraints of a
+template declaration. [ <em>Note:</em> These constraints are checked during
+the instantiation of the declaration.  &mdash; <em>end note</em> ] A program
+containing two declarations whose associated constraints are functionally
+equivalent but not equivalent (14.6.6.1) is ill-formed, no diagnostic required.
+[ <em>Example:</em>
+<blockquote class="code">
+<tt><pre>
+template&lt;typename T&gt; concept bool C = true;
+
+<del>void f1(C);</del>
+template&lt;C T&gt; void f1(T);
+<del>C{T} void f1(T);</del>
+template&lt;typename T&gt; requires C&lt;T&gt; void f1(T);
+template&lt;typename T&gt; void f1(T) requires C&lt;T&gt;;
+</pre></tt>
+</blockquote>
+All declarations of <tt>f1</tt> declare the same function.
+<blockquote class="code">
+<tt><pre>
+template&lt;typename T&gt; concept bool C1 = true;
+template&lt;typename T&gt; concept bool C2 = sizeof(T) &gt; 0;
+
+template&lt;C1 T&gt; void f2(T) requires C2&lt;T&gt;;                <em>// #1</em>
+template&lt;typename T&gt; requires C1&lt;T&gt; &amp;&amp; C2&lt;T&gt; void f2(T); <em>// #2, redeclaration of #1</em>
+</pre></tt>
+</blockquote>
+The associated constraints of #1 are <tt>C1&lt;T&gt; &amp;&amp; C2&lt;T&gt;</tt>,
+and those of #2 are also <tt>C1&lt;T&gt; &amp;&amp; C2&lt;T&gt;</tt>.
+<blockquote class="code">
+<tt><pre>
+template&lt;C1 T&gt; requires C2&lt;T&gt; void f3();
+template&lt;C2 T&gt; requires C1&lt;T&gt; void f3(); <em>// error: constraints are functionally</em>
+                                         <em>// equivalent but not equivalent</em>
+</pre></tt>
+</blockquote>
+The associated constraints of the first declaration are
+<tt>C1&lt;T&gt; &amp;&amp; C2&lt;T&gt;</tt>, and those of the second are
+<tt>C2&lt;T&gt; &amp;&amp; C1&lt;T&gt;.  &mdash; <em>end example</em> ]
+</blockquote>
+</p>
+
+<p>Change in 17.10.4 [temp.constr.resolve] paragraph 1:
+<blockquote>
+<em>Concept resolution</em> is the process of selecting a concept from a set of
+concept definitions referred to by a <em>qualified-concept-name</em>, or from a
+set of declarations including one or more concept definitions referred to by a
+<em>simple-template-id</em> or a <em>qualified-id</em> whose
+<em>unqualified-id</em> is a <em>simple-template-id</em>. Concept resolution
+is performed when such a name appears
+<blockquote>
+(1.1) &mdash; as a <em>constrained-type-specifier</em> (10.1.7.4.2),
+</blockquote> <blockquote> (1.2) &mdash; in a <em>constrained-parameter</em> (17.1),
+</blockquote>
+<blockquote>
+<del>(1.3) &mdash; in a <em>template-introduction</em> (17.2), or</del>
+</blockquote>
+<blockquote>
+(1.<del>4</del><ins>3</ins>) &mdash; within a <em>constraint-expression</em>
+(17.10.2).
+</blockquote>
+Within such a name, let <tt>C</tt> be the <em>concept-name</em> or
+<em>template-name</em> that refers to the set of concept definitions.
+</blockquote>
+</p>
+
+<p>Change in 17.10.4 [temp.constr.resolve] paragraph 3:
+<blockquote>
+The method for determining the concept argument list depends on the context in
+which <tt>C</tt> appears.
+<blockquote>
+(3.1) &mdash; If <tt>C</tt> is part of a <em>constrained-type-specifier</em>
+or <em>constrained-parameter</em>, then
+<blockquote>
+(3.1.1) &mdash; if <tt>C</tt> is a <em>constrained-type-name</em>, the concept
+argument list is comprised of a single wildcard, or
+</blockquote>
+<blockquote>
+(3.1.2) &mdash; if <tt>C</tt> is the <em>concept-name</em> of a
+<em>partial-concept-id</em>, the concept argument list is comprised of a single
+wildcard followed by the <em>template-argument</em>s of that
+<em>partial-concept-id</em>.
+</blockquote>
+</blockquote>
+<blockquote>
+<del>(3.2) &mdash; If <tt>C</tt> is the <em>concept-name</em> in a
+<em>template-introduction</em>. the concept argument list is a sequence of
+wildcards of the same length as the <em>introduction-list</em> of the
+<em>template-introduction</em>.</del>
+</blockquote>
+<blockquote>
+(3.<del>3</del><ins>2</ins>) &mdash; If <tt>C</tt> appears as a
+<em>template-name</em> of a <em>simple-template-id</em>, the concept argument
+list is the sequence of <em>template-argument</em>s of that
+<em>simple-template-id</em>.
+</blockquote>
+</blockquote>
+</p>
+
+<p>Change the example in in 17.10.4 [temp.constr.resolve] paragraph 4 to
+replace the use of abbreviated functions and template introducers with
+function template declarations:
+<!-- TODO: gcc does not implement suport for variadic concepts as constrained
+     template parameters without an ellipsis. -->
+<blockquote>
+[&hellip;]<br/>
+If any concept arguments do not match a corresponding template parameter, the
+concept <tt>CC</tt> is not a viable selection. The concept selected by concept
+resolution shall be the single viable selection in the set of concepts referred
+by <tt>C</tt>. [ <em>Example:</em>
+<blockquote class="code">
+<tt><pre>
+template&lt;typename T&gt; concept bool C1() { return true; }             <em>// #1</em>
+template&lt;typename T, typename U&gt; concept bool C1() { return true; } <em>// #2</em>
+template&lt;typename T&gt; concept bool C2() { return true; }
+template&lt;int T&gt; concept bool C2() { return true; }
+template&lt;typename... Ts&gt; concept bool C3 = true;
+
+<ins>template&lt;C1 T&gt; </ins>void f1(const <del>C1</del><ins>T</ins>*);       <em>// OK: <tt>C1</tt> selects #1</em>
+<ins>template&lt;C1&lt;char&gt; T&gt; </ins>void f2(<del>C1&lt;char&gt;</del><ins>T</ins>);  <em>// OK: <tt>C1&lt;char&gt;</tt> selects #2</em>
+
+template&lt;C2&lt;0&gt; T&gt; struct S1; <em>// error: no matching concept for <tt>C2&lt;0&gt;</tt>,</em>
+                             <em>// mismatched template arguments</em>
+template&lt;C2 T&gt; struct S2;    <em>// error: resolution of <tt>C2</tt> is ambiguous,</em>
+                             <em>// both concepts are viable</em>
+
+<del>C3{...Ts}</del><ins>template&lt;C3... Ts&gt; </ins>void q1(); <em>// OK: selects <tt>C3</tt></em>
+<del>C3{T}</del><ins>template&lt;C3 T&gt; </ins>void q2();         <em>// OK: selects <tt>C3</tt></em>
+</pre></tt>
+</blockquote>
+&mdash; <em>end example</em> ]
+</blockquote>
+</p>
+
+<h1 id="acknowledgements">Acknowledgements</h1>
+
+<p>The author would like to thank Andrew Sutton for his continued dedication to
+progressing the adoption of Concepts into the C++ working paper.
+</p>
+
+<h1 id="references">References</h1>
+
+<table id="references">
+  <tr>
+    <td id="ref_concepts"><sup>[Concepts]</sup></td>
+    <td>
+      "C++ Extensions for concepts", ISO/IEC technical specification 19217:2015.<br/>
+      <a href="http://www.iso.org/iso/home/store/catalogue_tc/catalogue_detail.htm?csnumber=64031">
+      http://www.iso.org/iso/home/store/catalogue_tc/catalogue_detail.htm?csnumber=64031</a></td>
+  </tr>
+  <tr>
+    <td id="ref_concepts_wp"><sup>[ConceptsWP]</sup></td>
+    <td>
+      "Working Draft, C++ Extensions for concepts"<br/>
+<!--
+      <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/nFIXME.pdf">
+      http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/nFIXME.pdf</a>
+-->
+    </td>
+  </tr>
+  <tr>
+    <td id="ref_p0464r2"><sup>[P0464R2]</sup></td>
+    <td>
+      "Revisiting the meaning of <tt>foo(ConceptName,ConceptName)</tt>"<br/>
+      <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0464r2.html">
+      http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0464r2.html</a>
+    </td>
+  </tr>
+  <tr>
+    <td id="ref_p0557r0"><sup>[P0557R0]</sup></td>
+    <td>
+      "Concepts: The Future of Generic Programming"<br/>
+      <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0557r0.pdf">
+      http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0557r0.pdf</a>
+    </td>
+  </tr>
+  <tr>
+    <td id="ref_p0587r0"><sup>[P0587R0]</sup></td>
+    <td>
+      "Concepts TS revisited"<br/>
+      <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0587r0.pdf">
+      http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0587r0.pdf</a>
+    </td>
+  </tr>
+  <tr>
+    <td id="ref_exp_concepts"><sup>[ExploringConcepts]</sup></td>
+    <td>
+      "Exploring Concepts"<br/>
+      <a href="http://lists.isocpp.org/ext/2017/02/2000.php">
+      http://lists.isocpp.org/ext/2017/02/2000.php</a>
+    </td>
+  </tr>
+</table>
+
+</body>
