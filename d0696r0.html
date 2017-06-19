@@ -70,7 +70,7 @@ blockquote.code
   </tr>
   <tr>
     <th>Date:</th>
-    <td>2017-06-18</td>
+    <td>2017-06-19</td>
   </tr>
   <tr>
     <th>Audience:</th>
@@ -124,7 +124,7 @@ Concepts TS functionality into the current working paper.
 </p>
 
 <p>Removal of support for abbreviated functions means that the following
-example that is currently well-defined by the Conepts TS will no longer be
+example that is currently well-defined by the Concepts TS will no longer be
 valid:
 <blockquote class="code">
 <tt><pre>
@@ -193,9 +193,12 @@ P0557R0</a>
 <sup><a title="P0557R0: Concepts: The Future of Generic Programming"
         href="#ref_p0557r0">
 [P0557R0]</a></sup>.
-This is a laudible goal and one the author is in favor of continued pursuit.
+These are laudible goals and ones the author is in favor of continued pursuit.
 However, the features currently defined in the Concepts TS raise concerns
-regarding mutation of code undergoing maintenance.
+regarding mutation of code undergoing maintenance and difficulties programmers
+may face in navigating the differences in requirements and behaviors exhibited
+by functions and function templates that are made more subtle by the current
+design.
 </p>
 
 <p>
@@ -214,115 +217,196 @@ function equivalent to the following function template:
 template&lt;X T&gt; void f(T x) {}
 </pre></tt>
 </blockquote>
-This is exactly the intent as described in P0557R0
+This is exactly the intent as described in
+<a title="P0557R0: Concepts: The Future of Generic Programming"
+   href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0557r0.pdf">
+P0557R0</a>
 <sup><a title="P0557R0: Concepts: The Future of Generic Programming"
         href="#ref_p0557r0">
 [P0557R0]</a></sup>; one may now write generic functions as familiar to any
-<tt>C</tt> developer without the expert level boilerplate currently required
-to author a function template!
+<tt>C</tt> programmer without the boilerplate currently required to author a
+function template!
 </p>
 
-<p>The problem is, this simplicity is an illusion that rapidly dissolves.
+<p>The problem is, this simplicity is an illusion that dissolves under further
+inspection as illustrated in the following examples.
 </p>
 
-<p>Consider this declaration:
 <blockquote class="code">
 <tt><pre>
-void f(X&amp;&amp; x) {}
+void f1(X&amp;&amp; x) {}
 </pre></tt>
 </blockquote>
-if <tt>X</tt> names a concept, then parameter <tt>x</tt> is a forwarding
-reference; otherwise, it is an rvalue reference and the function may only be
+If <tt>X</tt> names a concept, then parameter <tt>x</tt> is a forwarding
+reference; otherwise, it is an rvalue reference and <tt>f1</tt> may only be
 called with an rvalue argument.
-</p>
 
-<p>This function:
 <blockquote class="code">
 <tt><pre>
-int f(X x) {
-  static int invoke_count;
-  return ++invoke_count;
+int f2(X x) {
+  static int invocation_count;
+  return ++invocation_count;
 }
 </pre></tt>
 </blockquote>
-will maintain a count of either every invocation of <tt>f</tt> or every
-invocation of an instantiation of <tt>f</tt> depending on whether <tt>X</tt>
-names a concept or a type.
-</p>
+<tt>f2</tt> maintains a count of either every invocation of <tt>f2</tt>, or
+every invocation of an instantiated specialization of <tt>f2</tt> depending
+on whether <tt>X</tt> names a concept or a type.
 
-<p>This function:
 <blockquote class="code">
 <tt><pre>
-void f(X x) {}
+void f3(X x) {}
 </pre></tt>
 </blockquote>
-may be moved from a primary source file to a header if <tt>X</tt> names a
-concept, but not if <tt>X</tt> names a  type.
-</p>
+<tt>f3</tt> may be moved from a primary source file to a header if <tt>X</tt>
+names a concept, but doing so risks introducing multiple definition errors if
+<tt>X</tt> names a type.
 
-<p>This function:
 <blockquote class="code">
 <tt><pre>
-void f(X x) {
-  X::type t;
+void f4(int i) {}
+</pre></tt>
+</blockquote>
+If <tt>f4</tt> were modified to:
+<blockquote class="code">
+<tt><pre>
+void f4(int i, X x) {}
+</pre></tt>
+</blockquote>
+then its definition will change from a non-template function to a template
+function if <tt>X</tt> names a concept, but will remain a function if <tt>X</tt>
+names a type.
+
+<blockquote class="code">
+<tt><pre>
+void f5(Ziggle z, Piddle p) {
+  Ziggle::type x1;                <em>// Ok if Ziggle is a type, ill-formed if it's a concept.</em>
+  decltype(p)::type x2;           <em>// Ok if Piddle is a type, needs typename if it is a concept.</em>
+  typename decltype(z)::type x3;  <em>// Ok if Ziggle is a concept, ill-formed if it is a type.</em>
 }
 </pre></tt>
 </blockquote>
-will require the <tt>typename</tt> keyword to access the member <tt>type</tt>
-of <tt>X</tt> if <tt>X</tt> names a concept, but will prohibit it if <tt>X</tt>
-does not.
+<tt>f5</tt> illustrates the increased subtlety in determining when
+<tt>typename</tt> disambiguation is required.  The presence of a
+<em>template-parameter-list</em> enables such determination without having
+to be familiar with the particular identifiers:
+
+<blockquote class="code">
+<tt><pre>
+template&lt;Ziggle Z&gt;
+void f5(Z z, Piddle p) {
+  Ziggle::type x1;                <em>// Ill-formed; Ziggle is a concept.</em>
+  decltype(p)::type x2;           <em>// Ok; <tt>decltype(p)</tt> is not dependent.</em>
+  typename decltype(z)::type x3;  <em>// Ok; <tt>decltype(z)</tt> is dependent.</em>
+}
+</pre></tt>
+</blockquote>
+
+Abbreviated functions have the behavior that placeholders specified within
+the declared return type of the function that match a
+<em>constrained-type-specifier</em> used in a parameter type are not deduced,
+but are rather replaced by the deduced type for the matching parameter(s).
+However, this behavior doesn't hold if the same return type is specified as a
+<em>trailing-return-type</em>: [ <em>Note:</em> It is not clear that this is
+the intent of the Concepts TS, but this is the behavior exhibited by gcc.
+&mdash; <em>end note</em> ]
+<blockquote class="code">
+<tt><pre>
+template&lt;typename&gt; concept bool C = true;
+template&lt;typename&gt; class ct {};
+
+ct&lt;C&gt; f6(C) { return ct&lt;int&gt;{}; }
+auto f7(C) -&gt; ct&lt;C&gt; { return ct&lt;int&gt;{}; }
+
+f6('c'); <em>// Ill-formed; different types deduced for each <tt>C</tt></em>
+         <em>// and <tt>ct&lt;int&gt;</tt> is not convertible to <tt>ct&lt;char&gt;</tt>.</em>
+f7('c'); <em>// Ok; <tt>C</tt> in the parameter list deduced as <tt>char</tt></em>
+         <em>// from the function call argument; <tt>C</tt> in the trailing</em>
+         <em>// return type deduced as <tt>int</tt> from the return statement.</em>
+</pre></tt>
+</blockquote>
+A semantic difference based on whether the return type of a function is
+specified in the declared return type as opposed to a
+<em>trailing-return-type</em> is novel and introduces the possibility of subtle
+defects being introduced due to a change a programmer expects to be purely
+stylistic.  Similarly, this behavior introduces the possibility that a change
+to the declaration of a function parameter may alter the meaning of the return
+type: [ <em>Note:</em> gcc 6.2-7.1 rejects both of the following cases as it
+(presumably erroneously) replaces <tt>C</tt> in the return type with the
+invented template parameter for the first parameter regardless of whether the
+first parameter is declared with a matching <em>constrained-type-specifier</em>.
+&mdash; <em>end note</em> ]
+<blockquote class="code">
+<tt><pre>
+ct&lt;C&gt; f8(auto) { return ct&lt;int&gt;{}; }
+ct&lt;C&gt; f9(C) { return ct&lt;int&gt;{}; }
+
+f8('c'); <em>// Ok; <tt>C</tt> deduced as <tt>int</tt> from the return statement.</em>
+f9('c'); <em>// Ill-formed; <tt>C</tt> deduced as <tt>char</tt> from the function</em>
+         <em>// argument and <tt>ct&lt;int&gt;</tt> is not convertible to ct&lt;char&gt;.</em>
+</pre></tt>
+</blockquote>
 </p>
 
-<p>This function:
-<blockquote class="code">
-<tt><pre>
-void f(int i) {}
-</pre></tt>
-</blockquote>
-if modified to:
-<blockquote class="code">
-<tt><pre>
-void f(int i, X x) {}
-</pre></tt>
-</blockquote>
-will change from a non-template function to a template function if <tt>X</tt>
-names a concept.
+<p>The template introduction syntax does not suffer concerns like those above.
+The primary concern with it is aesthetic; that it lacks cohesiveness with the
+rest of the language as described in
+<a title="P0587R0: Concepts TS revisited"
+   href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0587r0.pdf">
+P0587R0</a>
+<sup><a title="P0587R0: Concepts TS revisited"
+        href="#ref_p0587r0">
+[P0587R0]</a></sup>.  The choice to remove it as proposed in this paper is
+based on a perception that an alternate syntax to replace abbreviated function
+syntax might also encompass the goals of template introductions.
 </p>
 
-<p>In addition to the above, abbreviated functions have the behavior that
-placeholders specified within (not as) the declared return type of the
-function that match a <em>constrained-type-specifier</em>s used in a parameter
-type are not deduced and are required to match the deduced type for the
-matching parameter(s).  However, this behavior doesn't hold if the same
-return type is specified as a <em>trailing-return-type</em>.
-For example:
-<blockquote class="code">
-<tt><pre>
+<p>Few of the concerns raised above are applicable to every template
+declaration and it has not been claimed that either of the terse syntaxes
+is the best fit for all template declarations.  Is it not therefore
+reasonable for the use of these syntaxes to be a matter of code style?  Do
+tools such as IDEs that provide semantic markup not help to counteract these
+concerns?
+</p>
 
-</pre></tt>
+<p>The examples above suggest that guidelines for the usage of abbreviated
+function syntax can be crafted.  A simple guideline might look like:
+<blockquote>
+Write a function template instead of an abbreviated function when:
+<ul>
+  <li>parameters declared with <tt>&amp;&amp;</tt> are present.</li>
+  <li>the parameter list consists of non-dependent user declared types
+      and constrained types.</li>
+  <li>dependent member type access is needed.</li>
+  <li>static local variables are present.</li>
+</ul>
+Write abbreviated functions that have return types containing placeholders
+using a <em>trailing-return-type</em>.
 </blockquote>
+Whether the concerns presented in this paper rise above a level adequately
+addressed by guidelines and coding standards is a matter of judgement and
+no arguments are presented here to attempt to establish a litmus test.
+</p>
 
-This is confusing since c1 and c2 have the same type, but that type may differ from the return type.
-    template<typename> bool concept C = true;
-    C f(C c1, C c2) {}
-
-
-A constrained-type-specifier in an abbreviated function return type is a constraint on the type deduced from return statements unless
-the same constrained-type-specifier is used in a parameter declaration.  This is problematic under maintenance:
-  C f(X); // Ok, C constrains the return type to some type that satisfies C.
-  C f(X,C c); // Uh oh, now c and the return type must be the same type!
+<p>IDEs and other tools that provide semantic markup are certainly helpful.
+However, not all programmers use IDEs and most of us use tools that lack
+semantic awareness; particularly for tools used for code review, diffing,
+and merging.  Relying on semantic awareness to help elucidate code is likely
+to result in disappointment in various parts of our collective work flows
+for the forseeable future.
+</p>
 
 <h1 id="wording">Wording</h1>
 
 <input type="checkbox" id="hidedel">Hide deleted text</input>
 
-<p>These changes are relative to
-<a title="NFIXME: Working Draft, C++ extensions for Concepts"
+<p>These changes are relative to the current
+<a title="Working Draft, C++ extensions for Concepts"
    href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/nFIXME.pdf">
-N<font style="background-color: red">FIXME</font></a>
-<sup><a title="NFIXME: Working Draft, C++ extensions for Concepts"
-        href="#ref_concepts">
-[N<font style="background-color: red">FIXME</font>]</a></sup></p>
+Concepts TS working paper
+<sup><a title="Working Draft, C++ extensions for Concepts"
+        href="#ref_concepts_wp">
+[ConceptsWP]</a></sup></p>
 
 <p>Change the added paragraph 6 inserted in 8.1.4.2 [expr.prim.id.qual]:
 <!-- TODO: gcc does not yet implement this functionality -->
@@ -609,7 +693,7 @@ in 17.6.5.1 to a <em>constrained-parameter</em> whose
 <em>constrained-type-specifier</em>, then replace the occurrence with the
 existing invented <tt>constrained-parameter</tt>.  Otherwise, replace the
 occurrence with a new invented <tt>constrained-parameter</tt> whose
-<em>qualified-concept-name</em> is that of the 
+<em>qualified-concept-name</em> is that of the
 <em>constrained-type-specifier</em>.
 </blockquote>
 Deduce a value for <del><tt>U</tt></del><ins>each invented template
@@ -1196,10 +1280,9 @@ progressing the adoption of Concepts into the C++ working paper.
       http://www.iso.org/iso/home/store/catalogue_tc/catalogue_detail.htm?csnumber=64031</a></td>
   </tr>
   <tr>
-    <td id="ref_nFIXME"><sup>[NFIXME]</sup></td>
+    <td id="ref_concepts_wp"><sup>[ConceptsWP]</sup></td>
     <td>
       "Working Draft, C++ Extensions for concepts"<br/>
-      <font style="background-color: red">FIXME</font>
       <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/nFIXME.pdf">
       http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/nFIXME.pdf</a>
     </td>
