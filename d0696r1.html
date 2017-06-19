@@ -439,7 +439,7 @@ int C::* p3 = &amp;S1::n;    <em>// OK: <tt>C</tt> deduced as <tt>S1</tt></em>
 char C::* p4 = &amp;S2::c;   <em>// error: deduction fails because constraints are not satisfied</em>
 
 <del>void f(typename auto::X::Y);
-f(S1()); <em>// error: <tt>auto</tt> cannot be deduced from <tt>S1()</tt>
+f(S1()); <em>// error: <tt>auto</tt> cannot be deduced from <tt>S1()</tt></em>
 f&lt;S3&gt;(0); <em>// OK</em></del>
 </pre></tt>
 </blockquote>
@@ -735,7 +735,7 @@ auto x1 = { 1, 2 };   <em>// <tt>decltype(x1)</tt> is <tt>std::initializer_list&
 auto x2 = { 1, 2.0 }; <em>// error: cannot deduce element type</em>
 auto x3{ 1, 2 };      <em>// error: not a single element</em>
 auto x4 = { 3 };      <em>// <tt>decltype(x4)</tt> is <tt>std::initializer_list&lt;int&gt;</tt></em>
-auto x5{ 3 };         <em>// <tt>decltype(x5)</tt> is int
+auto x5{ 3 };         <em>// <tt>decltype(x5)</tt> is int</em>
 
 <ins>template&lt;typename T&gt; struct Vec { };
 template&lt;typename T&gt; Vec&lt;T&gt; make_vec(std::initializer_list&lt;T&gt;) { return Vec&lt;T&gt;{}; }
@@ -872,7 +872,7 @@ auto gl7 = [](C head, C... tail) {};
 </pre></tt>
 </blockquote>
 The types of <tt>head</tt> and <tt>tail</tt> are different. Their respective
-introduced <em>constraint-expression</em>s are <tt>C&lt;T&gt; and
+introduced <em>constraint-expression</em>s are <tt>C&lt;T&gt;</tt> and
 <tt>(C&lt;U&gt; &amp;&amp; ...)</tt>, where <tt>T</tt> is the template
 parameter invented for <tt>head</tt> and <tt>U</tt> is the template parameter
 invented for <tt>tail</tt> (17.1).
@@ -921,7 +921,7 @@ template&lt;typename T&gt; concept bool D = true;                        <em>// 
 
 <ins>template&lt;C T&gt; </ins>void f(<del>C</del><ins>T</ins>); <em>// OK: the set of concepts referred to by C includes both #1 and #2;</em>
                           <em>// concept resolution (17.10.4) selects #1.</em>
-<ins>template&lt;D T&gt; </ins>void g(<del>D</del><ins>T</ins>); <em>// OK: the concept-name <tt>D</tt> refers only to #3
+<ins>template&lt;D T&gt; </ins>void g(<del>D</del><ins>T</ins>); <em>// OK: the concept-name <tt>D</tt> refers only to #3</em>
 </pre></tt>
 </blockquote>
 <em>&mdash; end example</em> ]
@@ -1170,7 +1170,7 @@ template&lt;C2 T&gt; requires C1&lt;T&gt; void f3(); <em>// error: constraints a
 </blockquote>
 The associated constraints of the first declaration are
 <tt>C1&lt;T&gt; &amp;&amp; C2&lt;T&gt;</tt>, and those of the second are
-<tt>C2&lt;T&gt; &amp;&amp; C1&lt;T&gt;.  &mdash; <em>end example</em> ]
+<tt>C2&lt;T&gt; &amp;&amp; C1&lt;T&gt;</tt>.  &mdash; <em>end example</em> ]
 </blockquote>
 </p>
 
