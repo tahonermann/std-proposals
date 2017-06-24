@@ -70,7 +70,7 @@ blockquote.code
   </tr>
   <tr>
     <th>Date:</th>
-    <td>2017-06-19</td>
+    <td>2017-06-24</td>
   </tr>
   <tr>
     <th>Audience:</th>
@@ -86,6 +86,8 @@ blockquote.code
     Concepts TS</h1>
 
 <ul>
+  <li><a href="#changes_since_p0696r0">
+      Changes Since P0696R0</a></li>
   <li><a href="#introduction">
       Introduction</a></li>
   <li><a href="#motivation">
@@ -96,6 +98,14 @@ blockquote.code
       Acknowledgements</a></li>
   <li><a href="#references">
       References</a></li>
+</ul>
+
+<h1 id="changes_since_p0696r0">Changes Since P0696R0</h1>
+
+<ul>
+  <li>Corrected example <tt>f5</tt> to reflect that changes in C++11 now permit
+      <tt>typename</tt> to be used outside of a template.  Thanks to Barry
+      Revzin for pointing out the error.</li>
 </ul>
 
 <h1 id="introduction">Introduction</h1>
@@ -282,7 +292,7 @@ names a type.
 void f5(Ziggle z, Piddle p) {
   Ziggle::type x1;                <em>// Ok if Ziggle is a type, ill-formed if it's a concept.</em>
   decltype(p)::type x2;           <em>// Ok if Piddle is a type, needs typename if it is a concept.</em>
-  typename decltype(z)::type x3;  <em>// Ok if Ziggle is a concept, ill-formed if it is a type.</em>
+  typename decltype(z)::type x3;  <em>// typename required if Ziggle is a concept, optional if it is a type.</em>
 }
 </pre></tt>
 </blockquote>
@@ -297,7 +307,7 @@ template&lt;Ziggle Z&gt;
 void f5(Z z, Piddle p) {
   Ziggle::type x1;                <em>// Ill-formed; Ziggle is a concept.</em>
   decltype(p)::type x2;           <em>// Ok; <tt>decltype(p)</tt> is not dependent.</em>
-  typename decltype(z)::type x3;  <em>// Ok; <tt>decltype(z)</tt> is dependent.</em>
+  typename decltype(z)::type x3;  <em>// typename required; <tt>decltype(z)</tt> is dependent.</em>
 }
 </pre></tt>
 </blockquote>
@@ -1271,6 +1281,12 @@ template&lt;C2 T&gt; struct S2;    <em>// error: resolution of <tt>C2</tt> is am
 <p>The author would like to thank Andrew Sutton for his continued dedication to
 progressing the adoption of Concepts into the C++ working paper.
 </p>
+
+<p>Thanks also to the following kind folks for providing feedback on this paper.
+<ul>
+  <li>Davis Herring</li>
+  <li>Barry Revzin</li>
+</ul>
 
 <h1 id="references">References</h1>
 
