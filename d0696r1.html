@@ -106,6 +106,23 @@ blockquote.code
   <li>Corrected example <tt>f5</tt> to reflect that changes in C++11 now permit
       <tt>typename</tt> to be used outside of a template.  Thanks to Barry
       Revzin for pointing out the error.</li>
+  <li>Removed the examples previously named <tt>f6</tt> and <tt>f7</tt> that
+      illustrated a semantic difference in behavior based on whether the return
+      type for an abbreviated function was specified in a
+      <em>trailing-return-type</em> or not.  Further discussion clarified that
+      the described behavior is a gcc issue now tracked by
+      <a title="[concepts] Same type constraints not enforced for constrained-type specifiers specified in trailing return types of abbreviated functions"
+         href="https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81198">
+      gcc bug 81198</a>
+      <sup>
+      <a title="[concepts] Same type constraints not enforced for constrained-type specifiers specified in trailing return types of abbreviated functions"
+         href="#ref_gcc_bug_81198">
+      [GccBug81198]</a></sup>.
+  </li>
+  <li>Updated the <tt>f6</tt> and <tt>f7</tt> examples (previously named
+      <tt>f8</tt> and <tt>f9</tt>) to reference a gcc bug filed to track the
+      noted issue.
+  </li>
 </ul>
 
 <h1 id="introduction">Introduction</h1>
@@ -316,43 +333,28 @@ Abbreviated functions have the behavior that placeholders specified within
 the declared return type of the function that match a
 <em>constrained-type-specifier</em> used in a parameter type are not deduced,
 but are rather replaced by the deduced type for the matching parameter(s).
-However, this behavior doesn't hold if the same return type is specified as a
-<em>trailing-return-type</em>: [ <em>Note:</em> It is not clear that this is
-the intent of the Concepts TS, but this is the behavior exhibited by gcc.
+This behavior introduces the possibility that a change to the declaration of
+a function parameter may alter the meaning of the return type:
+[ <em>Note:</em> gcc 6.2-7.1 erroneously rejects both of the following cases
+due to an issue tracked by
+<a title="Non-deduced return type in abbreviated function template"
+   href="https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81139">
+gcc bug 81139</a>
+<sup>
+<a title="Non-deduced return type in abbreviated function template"
+   href="#ref_gcc_bug_81139">
+[GccBug81139]</a></sup>.
 &mdash; <em>end note</em> ]
 <blockquote class="code">
 <tt><pre>
 template&lt;typename&gt; concept bool C = true;
 template&lt;typename&gt; class ct {};
 
-ct&lt;C&gt; f6(C) { return ct&lt;int&gt;{}; }
-auto f7(C) -&gt; ct&lt;C&gt; { return ct&lt;int&gt;{}; }
+ct&lt;C&gt; f6(auto) { return ct&lt;int&gt;{}; }
+ct&lt;C&gt; f7(C) { return ct&lt;int&gt;{}; }
 
-f6('c'); <em>// Ill-formed; different types deduced for each <tt>C</tt></em>
-         <em>// and <tt>ct&lt;int&gt;</tt> is not convertible to <tt>ct&lt;char&gt;</tt>.</em>
-f7('c'); <em>// Ok; <tt>C</tt> in the parameter list deduced as <tt>char</tt></em>
-         <em>// from the function call argument; <tt>C</tt> in the trailing</em>
-         <em>// return type deduced as <tt>int</tt> from the return statement.</em>
-</pre></tt>
-</blockquote>
-A semantic difference based on whether the return type of a function is
-specified in the declared return type as opposed to a
-<em>trailing-return-type</em> is novel and introduces the possibility of subtle
-defects being introduced due to a change a programmer expects to be purely
-stylistic.  Similarly, this behavior introduces the possibility that a change
-to the declaration of a function parameter may alter the meaning of the return
-type: [ <em>Note:</em> gcc 6.2-7.1 rejects both of the following cases as it
-(presumably erroneously) replaces <tt>C</tt> in the return type with the
-invented template parameter for the first parameter regardless of whether the
-first parameter is declared with a matching <em>constrained-type-specifier</em>.
-&mdash; <em>end note</em> ]
-<blockquote class="code">
-<tt><pre>
-ct&lt;C&gt; f8(auto) { return ct&lt;int&gt;{}; }
-ct&lt;C&gt; f9(C) { return ct&lt;int&gt;{}; }
-
-f8('c'); <em>// Ok; <tt>C</tt> deduced as <tt>int</tt> from the return statement.</em>
-f9('c'); <em>// Ill-formed; <tt>C</tt> deduced as <tt>char</tt> from the function</em>
+f6('c'); <em>// Ok; <tt>C</tt> deduced as <tt>int</tt> from the return statement.</em>
+f7('c'); <em>// Ill-formed; <tt>C</tt> deduced as <tt>char</tt> from the function</em>
          <em>// argument and <tt>ct&lt;int&gt;</tt> is not convertible to ct&lt;char&gt;.</em>
 </pre></tt>
 </blockquote>
@@ -389,9 +391,9 @@ Write a function template instead of an abbreviated function when:
       and constrained types.</li>
   <li>dependent member type access is needed.</li>
   <li>static local variables are present.</li>
+  <li>constrained types are present in the return type and in at least one
+      parameter type.</li>
 </ul>
-Write abbreviated functions that have return types containing placeholders
-using a <em>trailing-return-type</em>.
 </blockquote>
 Whether the concerns presented in this paper rise above a level adequately
 addressed by guidelines and coding standards is a matter of judgement and
@@ -1338,6 +1340,23 @@ progressing the adoption of Concepts into the C++ working paper.
       "Exploring Concepts"<br/>
       <a href="http://lists.isocpp.org/ext/2017/02/2000.php">
       http://lists.isocpp.org/ext/2017/02/2000.php</a>
+    </td>
+  </tr>
+  <tr>
+    <td id="ref_gcc_bug_81139"><sup>[GccBug81139]</sup></td>
+    <td>
+      "Non-deduced return type in abbreviated function template"<br/>
+      <a href="https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81139">
+      https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81139</a>
+    </td>
+  </tr>
+  <tr>
+    <td id="ref_gcc_bug_81198"><sup>[GccBug81198]</sup></td>
+    <td>
+      "[concepts] Same type constraints not enforced for constrained-type
+      specifiers specified in trailing return types of abbreviated functions"<br/>
+      <a href="https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81198">
+      https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81198</a>
     </td>
   </tr>
 </table>
