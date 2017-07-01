@@ -88,6 +88,8 @@ blockquote.code
 <ul>
   <li><a href="#introduction">
       Introduction</a></li>
+  <li><a href="#terminology">
+      Terminology</a></li>
   <li><a href="#motivation">
       Motivation</a></li>
   <li><a href="#wording">
@@ -209,6 +211,66 @@ ct&lt;C,C&gt; v4 = ct&lt;int,char&gt;{},  <em>// Previously ill-formed; differen
 </blockquote>
 </p>
 
+
+<h1 id="terminology">Terminology</h1>
+
+<p>Some of these terms have been adopted from
+<a title="P0694R0: Function declarations using concepts"
+   href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0694r0.pdf">
+P0694R0</a>
+<sup><a title="P0694R0: Function declarations using concepts"
+        href="#ref_p0694r0">
+[P0694R0]</a></sup>.
+</p>
+
+<ul>
+  <li><strong>Consistent resolution</strong><br/>
+      <em>Consistent resolution</em> describes the current behavior of the
+      Concepts TS in which repeated use of a <em>constrained-type-specifier</em>
+      within a declaration requires that the same type be deduced for each
+      occurrence.  That is, given <tt>ct&lt;C,C&gt;</tt> from the introduction,
+      a call to the following invented function template must succeed.
+<blockquote class="code">
+<tt><pre>
+template&lt;C T&gt; void ft(ct&lt;T,T&gt;);
+</pre></tt>
+</blockquote>
+  </li>
+  <li><strong>Independent resolution</strong><br/>
+      <em>Independent resolution</em> describes the alternate behavior proposed
+      in this paper in which repeated use of a <em>constrained-type-specifier</em>
+      within a declaration allows each occurrence to be deduced to the same or
+      a different type.  That is, given <tt>ct&lt;C,C&gt;</tt> from the
+      introduction, a call to the following invented function template must
+      succeed.
+<blockquote class="code">
+<tt><pre>
+template&lt;C T1, C T2&gt; void ft(ct&lt;T1,T2&gt;);
+</pre></tt>
+</blockquote>
+  </li>
+  <li><strong>Matched resolution</strong><br/>
+      <em>Matched resolution</em> describes behavior not currently available
+      (outside a function template declaration) in which a type or portion
+      thereof can be specified as the type deduced for a
+      <em>constrained-type-specifier</em> present in some deducible context
+      within the declaration.  The extensions proposed in
+<a title="N3878: Extensions to the Concept Introduction Syntax in Concepts Lite"
+   href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n3878.pdf">
+N3878</a>
+<sup><a title="N3878: Extensions to the Concept Introduction Syntax in Concepts Lite"
+        href="#ref_n3878">
+[N3878]</a></sup> provides such support.  Given <tt>ct&lt;C{T},T&gt;</tt>, a
+      call to the following invented function template must succeed.
+<blockquote class="code">
+<tt><pre>
+template&lt;typename T&gt; using identity = T;
+template&lt;C T&gt; void ft(ct&lt;T, identity&lt;T&gt;&gt;);
+</pre></tt>
+</blockquote>
+  </li>
+</ul>
+
 <h1 id="motivation">Motivation</h1>
 
 <p>
@@ -226,14 +288,15 @@ constraints.
 </p>
 
 <p>The requirement for types specified by <em>constrained-type-specifier</em>s
-to be deduced to the same type was introduced based on an expectation that
-same-type requirements would be frequently desired and that non-abbreviated
+to be deduced to the same type within a declaration
+(<em>consistent resolution</em>) was introduced based on an expectation that
+such resolution would be frequently desired and that non-abbreviated
 declarations could be used when not desired.  While certainly true that
-same-type requirements are often desired, it is also true that such
-requirements are often not desired.  Use of non-abbreviated declarations
-does allow precise specification, but only for function template declarations;
-there is currently only one syntax available for variable declarations,
-non-template function declarations, and deduction constraints.
+<em>consistent resolution</em> is often desired, it is also true that is is
+often not desired.  Use of non-abbreviated declarations does allow precise
+specification, but only for function template declarations; there is currently
+only one syntax available for variable declarations, non-template function
+declarations, and deduction constraints.
 </p>
 
 <p>Consider the following variable declaration copied from the introduction.
@@ -241,7 +304,7 @@ The declaration is currently ill-formed because the deduced types for both
 occurrences of <tt>C</tt> do not match.
 <blockquote class="code">
 <tt><pre>
-ct&lt;C,C&gt; v1 = ct&lt;int,char&gt;{};
+ct&lt;C,C&gt; v1 = ct&lt;int,char&gt;{}; <em>// Currently ill-formed.</em>
 </pre></tt>
 </blockquote>
 There are several solutions available for making this well-formed such that
@@ -249,13 +312,13 @@ each of the arguments to <tt>ct</tt> are individually deduced, but still
 required to satisfy <tt>C</tt>.  For example:
 <blockquote class="code">
 <tt><pre>
-template&lt;C T1, C T2&gt; void satisfies_ct_allowing_different_types(ct&lt;T1,T2&gt;);
+template&lt;C T1, C T2&gt; void ctCC_with_independent_resolution(ct&lt;T1,T2&gt;);
 template&lt;typename T&gt; concept bool ctCC =
   requires (T t) {
-    satisfies_ctCC_allowing_different_types(t);
+    ctCC_with_independent_resolution(t);
   };
 
-ctCC v1 = ct&lt;int,char&gt;{}; // Ok.
+ctCC v1 = ct&lt;int,char&gt;{}; <em>// Ok; <tt>ctCC</tt> allows independent resolution.</em>
 </pre></tt>
 </blockquote>
 <a title="P0694R0: Function declarations using concepts"
@@ -264,27 +327,28 @@ P0694R0</a>
 <sup><a title="P0694R0: Function declarations using concepts"
         href="#ref_p0694r0">
 [P0694R0]</a></sup> suggests introducing additional names for the same concept
-to enable expressing deduction relationships.  For example:
+to enable <em>independent resolution</em>.  For example:
 <blockquote class="code">
 <tt><pre>
-template&lt;typename T&gt; concept bool C2 = C&lt;T&gt;;
+template&lt;typename T&gt; concept bool C2 = C&lt;T&gt;; <em>// A duplicated concept definition.</em>
 
-ct&lt;C,C2&gt; v1 = ct&lt;int,char&gt;{}; // Ok.
+ct&lt;C,C2&gt; v1 = ct&lt;int,char&gt;{}; <em>// Ok; independent resolution</em>
 </pre></tt>
 </blockquote>
 Neither of these solutions is satisfactory.  Of course, should the behavior
-be changed as proposed in this paper, then attempting to preserve the current
-behavior is equally unsatisfactory (though necessary only if it is desired to
+be changed to <em>independent resolution</em> as proposed in this paper, then
+enabling <em>consistent resolution</em> to preserve the current behavior is
+equally unsatisfactory (though necessary only if it is desired to
 explicitly reject deduction of different types):
 <blockquote class="code">
 <tt><pre>
-template&lt;C T&gt; void satisfies_ctCC_requiring_same_type(ct&lt;T,T&gt;);
+template&lt;C T&gt; void ctCC_with_consistent_resolution(ct&lt;T,T&gt;);
 template&lt;typename T&gt; concept bool ctCC =
   requires (T t) {
-    satisfies_ctCC_requiring_same_type(t);
+    ctCC_with_consistent_resolution(t);
   };
 
-ctCC v1 = ct&lt;int,char&gt;{}; <em>// Ill-formed (as intended); <tt>ct&lt;int,char&gt;</tt> doesn't satisfy <tt>ctCC</tt>.</em>
+ctCC v1 = ct&lt;int,char&gt;{}; <em>// Ill-formed (as intended); <tt>ctCC</tt> requires consistent resolution.</em>
 </pre></tt>
 </blockquote>
 
@@ -319,24 +383,25 @@ P0694R0</a>
         href="#ref_p0694r0">
 [P0694R0]</a></sup> would be needed to enable expressing:
 <ul>
-  <li>Different deduced type constraints.</li>
+  <li>Consistent resolution:
 <blockquote class="code">
 <tt><pre>
-ct&lt;C,C&gt; v1 = ...;    <em>// Such that each <tt>C</tt> is independently deduced.</em>
+ct&lt;C{T},C{T}&gt; v1 = ...; <em>// Such that both occurrences of <tt>C</tt> require matching deduced types.</em>
 </pre></tt>
 </blockquote>
-  <li>Same deduced type constraints.</li>
+  </li>
+  <li>Independent resolution:
 <blockquote class="code">
 <tt><pre>
-ct&lt;C,C{1}&gt; v1 = ...; <em>// Such that both occurrences of <tt>C</tt> require matching deduced types.</em>
+ct&lt;C,C&gt; v1 = ...;       <em>// Such that each <tt>C</tt> is independently deduced.</em>
 </pre></tt>
 </blockquote>
-  <li>Some deduced types with others declared to match a deduced type
-      (enabling conversions).
+  </li>
+  <li>Matched resolution (enabling conversions):
 <blockquote class="code">
 <tt><pre>
-ct&lt;C{T},T&gt; v1 = ...; <em>// Such that <tt>C</tt> is deduced from the first template argument,</em>
-                     <em>// but not the second.</em>
+ct&lt;C{T},T&gt; v1 = ...;    <em>// Such that <tt>C</tt> is deduced from the first template argument,</em>
+                        <em>// but not the second.</em>
 </pre></tt>
 </blockquote>
   </li>
@@ -344,14 +409,14 @@ ct&lt;C{T},T&gt; v1 = ...; <em>// Such that <tt>C</tt> is deduced from the first
 </p>
 
 <p>The above examples are illustrated with variable declarations, but the
-same concerns apply to <em>constrained-type-specifier</em>s in deduction
-constraints as well.  Consider the following example constraint written to
-require an expression to have a type requiring <tt>std::tuple</tt> with a
-specific arity, but constrained element types.  With the changes proposed in
-this paper, this will allow the element types to be deduced to the same or
-different types.  If an additional same-type constraint is desired, then that
-condition can be added with the (admittedly unsatisfactory) techniques
-discussed earlier.
+same concerns apply to <em>constrained-type-specifier</em>s in function return
+types and deduction constraints as well.  Consider the following example
+constraint written to require an expression to have a type requiring
+<tt>std::tuple</tt> with a specific arity, but constrained element types.
+With the changes proposed in this paper, <em>independent resolution</em> will
+allow the element types to be deduced to the same or different types.  If
+<em>consistent resolution</em> is is desired, then that additional requirement
+can be added with the (admittedly unsatisfactory) techniques discussed earlier.
 <blockquote class="code">
 <tt><pre>
 template&lt;typename T&gt; concept bool V =
@@ -386,18 +451,26 @@ C af4(auto p1, C p2);
 then the change to the parameter list will result in the return type matching
 the deduced type for <tt>C</tt> from the parameter list rather than being
 deduced from return statements in the function definition.  Such an effect is
-subtle and may be made unintentionally.
+subtle and may be made unintentionally.  Extensions like those discussed above
+would enable making these relationships explicit when desired:
+<blockquote class="code">
+<tt><pre>
+auto af4(auto p1, C{T} p2) -&gt; T; <em>// The return type matches the type deduced</em>
+                                 <em>// for parameter <tt>p2</tt>.</em>
+</pre></tt>
+</blockquote>
 </p>
 
-<p>The examples above illustrate cases where the author feels the same-type
-requirement results in rejection of code that should be well-formed.  Further,
-when the desire to restrict deduction to the same type is present, the author
-feels such constraints should be explicitly specified separately from general
-satisfaction of a concept.  Finally, since the need to specify all of
-same-type, independent-type, and matched-type deduction constraints exists,
-the author feels more work is needed.  In the mean-time, relaxing the same
-deduced type requirement will enable more code to be well-formed without
-having to resort to the current unstatisfactory workarounds.
+<p>The examples above illustrate cases where the author feels <em>consistent
+resolution</em> results in rejection of code that should be well-formed.
+Further, when the desire for <em>consistent resolution</em> is present, the
+author feels such constraints should be explicitly specified separately from
+general satisfaction of a concept.  Finally, since the need to specify all of
+<em>consistent resolution</em>, <em>independent resolution</em>, and
+<em>matched resolution</em> requirements exists, the author feels more work
+is needed.  In the mean-time, relaxing the requirement for <em>consistent
+resolution</em> will enable more code to be well-formed without having to
+resort to the current unstatisfactory workarounds.
 </p>
 
 <h1 id="wording">Wording</h1>
@@ -596,6 +669,9 @@ invented for <tt>tail</tt> (17.1).
 
 <p>The author would like to thank Andrew Sutton for his continued dedication to
 progressing the adoption of Concepts into the C++ working paper.
+</p>
+
+<p>Thanks to Botond Ballo for initial draft review and feedback.
 </p>
 
 <h1 id="references">References</h1>
