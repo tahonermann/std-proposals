@@ -1,0 +1,773 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+
+<head>
+
+<title>Remove the requirement for constrained-type-specifiers to be deduced to the same type from the Concepts TS</title>
+
+<style type="text/css">
+table#header th,
+table#header td
+{
+    text-align: left;
+}
+table#references th,
+table#references td
+{
+    vertical-align: top;
+}
+blockquote.code
+{
+    background-color: #F1F1F1;
+    border: 1px solid #D1D1D1;
+}
+
+ins, ins * { text-decoration:none; font-weight:bold; background-color:#A0FFA0 }
+del, del * { text-decoration:line-through; background-color:#FFA0A0 }
+#hidedel:checked ~ * del, #hidedel:checked ~ * del * { display:none; visibility:hidden }
+
+blockquote
+{
+    color: #000000;
+    background-color: #F1F1F1;
+    border: 1px solid #D1D1D1;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+}
+blockquote.stdins
+{
+    text-decoration: underline;
+    color: #000000;
+    background-color: #C8FFC8;
+    border: 1px solid #B3EBB3;
+    padding: 0.5em;
+}
+blockquote.stddel
+{
+    text-decoration: line-through;
+    color: #000000;
+    background-color: #FFEBFF;
+    border: 1px solid #ECD7EC;
+    padding-left: 0.5empadding-right: 0.5em;
+}
+
+blockquote.code
+{
+    background-color: #F1F1F1;
+    border: 1px solid #D1D1D1;
+}
+</style>
+
+</head>
+
+
+<body>
+
+<table id="header">
+  <tr>
+    <th>Document Number:</th>
+    <td>P0725R0</td>
+  </tr>
+  <tr>
+    <th>Date:</th>
+    <td>2017-07-03</td>
+  </tr>
+  <tr>
+    <th>Audience:</th>
+    <td>Evolution Working Group</td>
+  </tr>
+  <tr>
+    <th>Reply-to:</th>
+    <td>Tom Honermann &lt;tom@honermann.net&gt;</td>
+  </tr>
+</table>
+
+<h1>Remove the requirement for constrained-type-specifiers to be deduced to
+    the same type from the Concepts TS</h1>
+
+<ul>
+  <li><a href="#introduction">
+      Introduction</a></li>
+  <li><a href="#terminology">
+      Terminology</a></li>
+  <li><a href="#motivation">
+      Motivation</a></li>
+  <li><a href="#wording">
+      Wording</a></li>
+  <li><a href="#acknowledgements">
+      Acknowledgements</a></li>
+  <li><a href="#references">
+      References</a></li>
+</ul>
+
+<h1 id="introduction">Introduction</h1>
+
+<p>The requirement that each occurrence of a <em>constrained-type-specifier</em>
+appearing in the type of a variable declaration, return type of a function
+declaration, type of a parameter in an abbreviated function declaration or
+generic lambda expression, or the type of a deduction constraint be deduced
+to the same type has been controversial as evidenced by various discussions
+within the committee reflectors, positions stated by committee members in
+advance of the Toronto 2017 meeting, and the
+<a title="P0464R2: Revisiting the meaning of <tt>foo(ConceptName,ConceptName)</tt>"
+   href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0464r2.html">
+P0464R2</a>
+<sup><a title="P0464R2: Revisiting the meaning of <tt>foo(ConceptName,ConceptName)</tt>"
+        href="#ref_p0464r2">
+[P0464R2]</a></sup> and
+<a title="P0691R0: Integrating Concepts: “Open” items for consideration"
+   href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0691r0.pdf">
+P0691R0</a>
+<sup><a title="P0691R0: Integrating Concepts: “Open” items for consideration"
+        href="#ref_p0691r0">
+[P0691R0]</a></sup>
+paper submissions.  This paper proposes removing the same type deduction
+requirement from the Concepts TS with the goal of increasing consensus on
+adopting the remaining Concepts TS functionality into the current working
+paper.
+</p>
+
+<p>Removal of support for the same type deduction requirement means that the
+following examples that are currently ill-formed according to the Concepts TS
+will now be well-formed.
+<blockquote class="code">
+<tt><pre>
+template&lt;typename&gt; concept bool C = true;
+template&lt;typename, typename&gt; class ct {};
+
+ct&lt;C,C&gt; v1 = ct&lt;int,char&gt;{};     <em>// Previously ill-formed; each occurence of <tt>C</tt> is</em>
+                                 <em>// not deduced to the same type.  Now ok.</em>
+
+ct&lt;C,C&gt; f1() {
+  return ct&lt;int,char&gt;{};         <em>// Previously ill-formed; each occurence of <tt>C</tt> is</em>
+                                 <em>// not deduced to the same type.  Now ok.</em>
+}
+
+ct&lt;C,C&gt; af1(C) {
+  return ct&lt;int,char&gt;{};
+}
+auto v2 = af1(0L);               <em>// Previously results in an instantiation error due</em>
+                                 <em>// to <tt>C</tt> being deduced to <tt>long</tt> from the function</em>
+                                 <em>// argument and <tt>ct&lt;int,char&gt;</tt> not being convertible</em>
+                                 <em>// to <tt>ct&lt;long,long&gt;</tt>.  Now ok; the return type is</em>
+                                 <em>// deduced to <tt>ct&lt;int,char&gt;</tt>.</em>
+
+auto gl1 = [](C,C){};
+auto v3 = gl1(0,'c');            <em>// Previously results in an instantiation error due</em>
+                                 <em>// to different types being deduced for each occurence</em>
+                                 <em>// of <tt>C</tt></em> in the generic lambda expression's parameter</em>
+                                 <em>// list.  Now ok.</em>
+
+template&lt;typename T&gt; concept bool X =
+  requires (T t) {
+    { t } -&gt; ct&lt;C,C&gt;;
+  };
+static_assert(X&lt;ct&lt;int,char&gt;&gt;);  <em>// Previously fails; <tt>ct&lt;int,char&gt;</tt> doesn't satisfy</em>
+                                 <em>// the deduction constraint.  Now ok.</em>
+</pre></tt>
+</blockquote>
+</p>
+
+<p>This change would affect, perhaps siliently, the behavior of existing code.
+Consider the following example:
+<blockquote class="code">
+<tt><pre>
+C af2(int i, C) {             <em>// Previously, the return type was deduced from the function</em>
+  return i;                   <em>// argument.  Now, it is deduced from the return statement.</em>
+}
+auto v3 = af2(0, 0L);         <em>// Previously resulted in <tt>v3</tt> having type <tt>long</tt>.</em>
+                              <em>// Now <tt>v3</tt> is deduced to have type <tt>int</tt>.</em>
+</pre></tt>
+</blockquote>
+</p>
+
+<p>Additionally, the following code would become ill-formed due to the return
+type no longer being deducible.
+<blockquote class="code">
+<tt><pre>
+C af3(C) {                    <em>// Previously ok; the return type matches the deduced type</em>
+  return {};                  <em>// for the function argument.  Now ill-formed since the</em>
+}                             <em>// return type is not deducible from the return statement.</em>
+</pre></tt>
+</blockquote>
+</p>
+
+<p>This paper does <strong>not</strong> propose changing the requirement that
+the same type be deduced when multiple declarators are present
+[ <em>Note:</em> gcc 7.1.0 and earlier fail to diagnose differently deduced
+types for each declarator when the declared type includes
+<em>constrained-type-specifiers</em>.  See
+<a title="[concepts] ill-formed code with a constrained variable declaration with multiple declarators with different deduced types not rejected"
+   href="https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81270">
+gcc bug 81270</a>
+<sup><a title="[concepts] ill-formed code with a constrained variable declaration with multiple declarators with different deduced types not rejected"
+        href="#ref_gccbug81270">
+[GccBug81270]</a></sup> &mdash; <em>end note</em> ]:
+<blockquote class="code">
+<tt><pre>
+ct&lt;C,C&gt; v4 = ct&lt;int,char&gt;{},  <em>// Previously ill-formed; different types are deduced</em>
+        v5 = ct&lt;int,long&gt;{};  <em>// for the types of <tt>v4</tt> and <tt>v5</tt>.  Remains ill-formed.</em>
+</pre></tt>
+</blockquote>
+</p>
+
+
+<h1 id="terminology">Terminology</h1>
+
+<p>Some of these terms have been adopted from
+<a title="P0694R0: Function declarations using concepts"
+   href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0694r0.pdf">
+P0694R0</a>
+<sup><a title="P0694R0: Function declarations using concepts"
+        href="#ref_p0694r0">
+[P0694R0]</a></sup>.
+</p>
+
+<ul>
+  <li><strong>Consistent resolution</strong><br/>
+      <em>Consistent resolution</em> describes the current behavior of the
+      Concepts TS in which repeated use of a <em>constrained-type-specifier</em>
+      within a declaration requires that the same type be deduced for each
+      occurrence.  That is, given <tt>ct&lt;C,C&gt;</tt> from the introduction,
+      a call to the following invented function template must succeed.
+<blockquote class="code">
+<tt><pre>
+template&lt;C T&gt; void ft(ct&lt;T,T&gt;);
+</pre></tt>
+</blockquote>
+  </li>
+  <li><strong>Independent resolution</strong><br/>
+      <em>Independent resolution</em> describes the alternate behavior proposed
+      in this paper in which repeated use of a <em>constrained-type-specifier</em>
+      within a declaration allows each occurrence to be deduced to the same or
+      a different type.  That is, given <tt>ct&lt;C,C&gt;</tt> from the
+      introduction, a call to the following invented function template must
+      succeed.
+<blockquote class="code">
+<tt><pre>
+template&lt;C T1, C T2&gt; void ft(ct&lt;T1,T2&gt;);
+</pre></tt>
+</blockquote>
+  </li>
+  <li><strong>Matched resolution</strong><br/>
+      <em>Matched resolution</em> describes behavior not currently available
+      (outside a function template declaration) in which a type or portion
+      thereof can be specified as the type deduced for a
+      <em>constrained-type-specifier</em> present in some deducible context
+      within the declaration.  The extensions proposed in
+<a title="N3878: Extensions to the Concept Introduction Syntax in Concepts Lite"
+   href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n3878.pdf">
+N3878</a>
+<sup><a title="N3878: Extensions to the Concept Introduction Syntax in Concepts Lite"
+        href="#ref_n3878">
+[N3878]</a></sup> provides such support.  Given <tt>ct&lt;C{T},T&gt;</tt>, a
+      call to the following invented function template must succeed.
+<blockquote class="code">
+<tt><pre>
+template&lt;typename T&gt; using identity = T;
+template&lt;C T&gt; void ft(ct&lt;T, identity&lt;T&gt;&gt;);
+</pre></tt>
+</blockquote>
+  </li>
+</ul>
+
+<h1 id="motivation">Motivation</h1>
+
+<p>
+<a title="P0464R2: Revisiting the meaning of <tt>foo(ConceptName,ConceptName)</tt>"
+   href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0464r2.html">
+P0464R2</a>
+<sup><a title="P0464R2: Revisiting the meaning of <tt>foo(ConceptName,ConceptName)</tt>"
+        href="#ref_p0464r2">
+[P0464R2]</a></sup> provides motivation for removing the same-type deduction
+requirement (<em>consistent resolution</em>) for abbreviated functions in
+favor of allowing different-type deduction (<em>independent resolution</em>).
+That motivation is acknowledged and little further motivation with respect to
+abbreviated functions is provided here.  The following discusses additional
+motivation relative to the types of variable declarations, return types of
+non-abbreviated functions, and deduction constraints.
+</p>
+
+<p>The requirement for types specified by <em>constrained-type-specifier</em>s
+to be deduced to the same type within a declaration
+(<em>consistent resolution</em>) was introduced based on an expectation that
+such resolution would be frequently desired and that non-abbreviated
+declarations could be used when not desired.  While certainly true that
+<em>consistent resolution</em> is often desired, it is also true that is is
+often not desired.  Use of non-abbreviated declarations does allow precise
+specification, but only for function template declarations; there is currently
+only one syntax available for variable declarations, non-template function
+declarations, and deduction constraints.
+</p>
+
+<p>Consider the following variable declaration copied from the introduction.
+The declaration is currently ill-formed because the deduced types for both
+occurrences of <tt>C</tt> do not match.
+<blockquote class="code">
+<tt><pre>
+ct&lt;C,C&gt; v1 = ct&lt;int,char&gt;{}; <em>// Currently ill-formed.</em>
+</pre></tt>
+</blockquote>
+There are several solutions available for making this well-formed such that
+each of the arguments to <tt>ct</tt> are individually deduced, but still
+required to satisfy <tt>C</tt>.  For example:
+<blockquote class="code">
+<tt><pre>
+template&lt;C T1, C T2&gt; void ctCC_with_independent_resolution(ct&lt;T1,T2&gt;);
+template&lt;typename T&gt; concept bool ctCC =
+  requires (T t) {
+    ctCC_with_independent_resolution(t);
+  };
+
+ctCC v1 = ct&lt;int,char&gt;{}; <em>// Ok; <tt>ctCC</tt> allows independent resolution.</em>
+</pre></tt>
+</blockquote>
+<a title="P0694R0: Function declarations using concepts"
+   href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0694r0.pdf">
+P0694R0</a>
+<sup><a title="P0694R0: Function declarations using concepts"
+        href="#ref_p0694r0">
+[P0694R0]</a></sup> suggests introducing additional names for the same concept
+to enable <em>independent resolution</em>.  For example:
+<blockquote class="code">
+<tt><pre>
+template&lt;typename T&gt; concept bool C2 = C&lt;T&gt;; <em>// A duplicated concept definition.</em>
+
+ct&lt;C,C2&gt; v1 = ct&lt;int,char&gt;{}; <em>// Ok; independent resolution</em>
+</pre></tt>
+</blockquote>
+Neither of these solutions is satisfactory.  Of course, should the behavior
+be changed to <em>independent resolution</em> as proposed in this paper, then
+enabling <em>consistent resolution</em> to preserve the current behavior is
+equally unsatisfactory (though necessary only if it is desired to
+explicitly reject deduction of different types):
+<blockquote class="code">
+<tt><pre>
+template&lt;C T&gt; void ctCC_with_consistent_resolution(ct&lt;T,T&gt;);
+template&lt;typename T&gt; concept bool ctCC =
+  requires (T t) {
+    ctCC_with_consistent_resolution(t);
+  };
+
+ctCC v1 = ct&lt;int,char&gt;{}; <em>// Ill-formed (as intended); <tt>ctCC</tt> requires consistent resolution.</em>
+</pre></tt>
+</blockquote>
+
+<p>The extensions proposed in
+<a title="N3878: Extensions to the Concept Introduction Syntax in Concepts Lite"
+   href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n3878.pdf">
+N3878</a>
+<sup><a title="N3878: Extensions to the Concept Introduction Syntax in Concepts Lite"
+        href="#ref_n3878">
+[N3878]</a></sup> provide additional flexibility, but do not provide the full
+range of expression needed.  For example:
+<blockquote class="code">
+<tt><pre>
+ct&lt;C{T},T&gt; v1 = ct&lt;int,char&gt;{};   <em>// Not proposed; syntax from N3878.</em>
+                                  <em>// Ill-formed (as intended); <tt>C</tt> is deduced to be <tt>int</tt> for the</em>
+                                  <em>// first template argument, the second argument is declared</em>
+                                  <em>// to match the deduced type for the first argument,</em>
+                                  <em>// and <tt>ct&lt;int,char&gt;</tt> is not convertible to <tt>ct&lt;int,int&gt;</tt>.</em>
+</pre></tt>
+</blockquote>
+For full genericity, it appears extensions like those proposed in both
+<a title="N3878: Extensions to the Concept Introduction Syntax in Concepts Lite"
+   href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n3878.pdf">
+N3878</a>
+<sup><a title="N3878: Extensions to the Concept Introduction Syntax in Concepts Lite"
+        href="#ref_n3878">
+[N3878]</a></sup> and
+<a title="P0694R0: Function declarations using concepts"
+   href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0694r0.pdf">
+P0694R0</a>
+<sup><a title="P0694R0: Function declarations using concepts"
+        href="#ref_p0694r0">
+[P0694R0]</a></sup> would be needed to enable expressing:
+<ul>
+  <li>Consistent resolution:
+<blockquote class="code">
+<tt><pre>
+ct&lt;C{T},C{T}&gt; v1 = ...; <em>// Such that both occurrences of <tt>C</tt> require matching deduced types.</em>
+</pre></tt>
+</blockquote>
+  </li>
+  <li>Independent resolution:
+<blockquote class="code">
+<tt><pre>
+ct&lt;C,C&gt; v1 = ...;       <em>// Such that each occurrence of <tt>C</tt> is independently deduced.</em>
+</pre></tt>
+</blockquote>
+  </li>
+  <li>Matched resolution (enabling conversions):
+<blockquote class="code">
+<tt><pre>
+ct&lt;C{T},T&gt; v1 = ...;    <em>// Such that <tt>C</tt> is deduced from the first template argument,</em>
+                        <em>// but not the second.</em>
+</pre></tt>
+</blockquote>
+  </li>
+</ul>
+</p>
+
+<p>The above examples are illustrated with variable declarations, but the
+same concerns apply to <em>constrained-type-specifier</em>s in function return
+types and deduction constraints as well.  Consider the following example
+constraint written to require an expression to have a type requiring
+<tt>std::tuple</tt> with a specific arity, but constrained element types.
+With the changes proposed in this paper, <em>independent resolution</em> will
+allow the element types to be deduced to the same or different types.  If
+<em>consistent resolution</em> is is desired, then that additional requirement
+can be added with the (admittedly unsatisfactory) techniques discussed earlier.
+<blockquote class="code">
+<tt><pre>
+template&lt;typename T&gt; concept bool V =
+  requires (T t) {
+    { t } -&gt; std::tuple&lt;C,C,C&gt;;
+  };
+</pre></tt>
+</blockquote>
+</p>
+
+<p>Abbreviated functions have the behavior that
+<em>constrained-type-specifier</em>s specified within the return type of the
+function that match a <em>constrained-type-specifier</em> used in a parameter
+type are not deduced from non-discarded return statements from the body of the
+function (as is the case when the return type is <tt>auto</tt> or
+<tt>decltype(auto)</tt>), but are rather replaced by the deduced type for the
+matching parameter(s).  This behavior introduces the possibility that a change
+to the function's parameter list may alter the meaning of the return type.
+For example, if this function:
+<blockquote class="code">
+<tt><pre>
+C af4(auto p1);
+</pre></tt>
+</blockquote>
+is modified to add a parameter <tt>p2</tt> with the
+<em>constrained-type-specifier</em> <tt>C</tt>:
+<blockquote class="code">
+<tt><pre>
+C af4(auto p1, C p2);
+</pre></tt>
+</blockquote>
+then the change to the parameter list will result in the return type matching
+the deduced type for <tt>C</tt> from the parameter list rather than being
+deduced from return statements in the function definition.  Such an effect is
+subtle and may be made unintentionally.  Extensions like those discussed above
+would enable making these relationships explicit when desired:
+<blockquote class="code">
+<tt><pre>
+auto af4(auto p1, C{T} p2) -&gt; T; <em>// The return type matches the type deduced</em>
+                                 <em>// for parameter <tt>p2</tt>.</em>
+</pre></tt>
+</blockquote>
+</p>
+
+<p>
+<a title="P0694R0: Function declarations using concepts"
+   href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0694r0.pdf">
+P0694R0</a>
+<sup><a title="P0694R0: Function declarations using concepts"
+        href="#ref_p0694r0">
+[P0694R0]</a></sup> argues that <em>consistent resolution</em> should be the
+default for variables declared with equivalent <em>constrained-type-specifier</em>s
+within the same scope and provides the following example (where <tt>Number</tt>
+names a concept):
+<blockquote class="code">
+<tt><pre>
+Number operator+(Number,Number);
+
+template&lt;typename T&gt; concept bool Number2 = requires Number&lt;T&gt;;
+
+void f()
+{
+  Number   x = 1+2;     <em>// OK</em>
+  Number   y = 1.0+2.0; <em>// error: different type bound to same concept in a single scope</em>
+  Number2  y = 1.0+2.0; <em>// OK</em>
+}
+</pre></tt>
+</blockquote>
+However, <em>consistent reslution</em> as portrayed in this example seems
+unworkable as a default for variable declarations at namespace scope since
+the first variable declaration would lock in the deduced type associated with
+the <em>concept-type-specifier</em> for the remainder of the translation
+unit.  An exception could, of course, be made for variables declared at
+namespace scope, but such a variance in the rules would be surprising and
+potentially problematic for code refactoring.  Consider replacing several
+namespace scope variables with static local variables.
+</p>
+
+<p>The examples above illustrate cases where the author feels <em>consistent
+resolution</em> results in rejection of code that should be well-formed.
+Further, when the desire for <em>consistent resolution</em> is present, the
+author feels such constraints should be explicitly specified separately from
+general satisfaction of a concept.  Finally, since the need to specify all of
+<em>consistent resolution</em>, <em>independent resolution</em>, and
+<em>matched resolution</em> requirements exists, the author feels more work
+is needed.  In the mean-time, relaxing the requirement for <em>consistent
+resolution</em> will enable more code to be well-formed without having to
+resort to the current unstatisfactory workarounds.
+</p>
+
+<h1 id="wording">Wording</h1>
+
+<input type="checkbox" id="hidedel">Hide deleted text</input>
+
+<p>These changes are relative to
+<a title="Working Draft, C++ extensions for Concepts"
+   href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/n4674.pdf">
+N4674</a>
+<sup><a title="Working Draft, C++ extensions for Concepts"
+        href="#ref_n4674">
+[N4674]</a></sup>.  If
+<a title="P0696R0: Remove abbreviated functions and template-introduction syntax from the Concepts TS"
+   href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0696r0.html">
+P0696R0</a>
+<sup><a title="P0696R0: Remove abbreviated functions and template-introduction syntax from the Concepts TS"
+        href="#ref_p0696r0">
+[P0696R0]</a></sup> is adopted, then additional changes relative to the wording
+adoped in that paper will be required.
+</p>
+
+<p>Remove the added paragraph 4 inserted in 10.1.7.4 [dcl.spec.auto]:
+<blockquote>
+<del>Add the following after paragraph 3 to describe when
+<em>constrained-type-specifier</em>s in the return type refer to template
+parameters.</del>
+<blockquote>
+<del>A <em>constrained-type-specifier</em> <tt>C1</tt> within the declared
+return type of an abbreviated function template declaration does not designate
+a placeholder if its introduced <em>constraint-expression</em> (10.1.7.4.2)
+is determined to be equivalent, using the rules in 17.6.5.1 for comparing
+expressions, to the introduced <em>constraint-expression</em> for a
+<em>constrained-type-specifier</em> <tt>C2</tt> in the
+<em>parameter-declaration-clause</em> of that function declaration. Instead,
+<tt>C1</tt> is replaced by the template parameter invented for <tt>C2</tt>
+(11.3.5). [ <em>Example:</em></del>
+<blockquote class="code">
+<tt><pre><del>
+template&lt;typename T&gt; concept bool C = true;
+
+template&lt;typename... T&gt; struct Tuple;
+
+C const&amp; f1(C); <em>// has one template parameter and no deduced return type</em>
+Tuple&lt;C...&gt; f2(C); <em>// has one template parameter and a deduced return type</em>
+</del></pre></tt>
+</blockquote>
+<del>In the declaration <tt>f1</tt>, the <em>constraint-expression</em>
+introduced by the <em>constrained-type-specifier</em>s in the
+<em>parameter-declaration-clause</em> and return type are equivalent<del> </del>;
+they would both introduce the expression <tt>C&lt;T&gt;</tt>, for some invented
+template parameter <tt>T</tt>. In <tt>f2</tt>, the use of <tt>C</tt> in the
+return type would introduce the <em>constraint-expression</em>
+<tt>(C&lt;T&gt; &amp;l&amp;l ...)</tt>, which is distinct from the
+<em>constraint-expression</em> <tt>C&lt;T&gt;</tt> introduced by the invented
+<em>constrained-parameter</em> (17.1) for the
+<em>constrained-type-specifier</em> in the
+<em>parameter-declaration-clause</em> according to the rules in 11.3.5.
+&mdash; <em>end example</em></del>
+</blockquote>
+</blockquote>
+</p>
+
+<p>Renumber the subsequent paragraphs 5-16 in 10.1.7.4 [dcl.spec.auto] to
+reflect the removal of paragraph 4 and to align the paragraph numbers with
+the C++ standard.
+</p>
+
+<p>In 10.1.7.4.1 [dcl.spec.auto.deduct] paragraph 3 (corresponding to paragraph
+4 in the C++ standard), modify the last example to indicate that each
+<em>constrained-type-specifier</em> corresponds to a different invented
+template parameter:
+<blockquote>
+[&hellip;]<br/>
+[ <em>Example:</em>
+<blockquote class="code">
+<tt><pre>
+auto cf(int) -&gt; Pair&lt;C, C&gt; { return expr; }
+</pre></tt>
+</blockquote>
+The return type of <tt>cf</tt> is deduced from the parameter <tt>p2</tt> in
+the call <tt>f2(expr)</tt> of the following invented function:
+<blockquote class="code">
+<tt><pre>
+<del>template&lt;C T&gt; void f2(Pair&lt;T, T&gt;);</del>
+<ins>template&lt;C T1, C T2&gt; void f2(Pair&lt;T1, T2&gt;);</ins>
+</pre></tt>
+</blockquote>
+Both <em>constrained-type-specifier</em>s in the return type of <tt>cf</tt>
+correspond to <del>the same</del><ins>different</ins> invented template
+parameter<ins>s</ins>.
+</blockquote>
+</p>
+
+<p>Change the text added as 11.3.5 [dcl.fct] paragraph 19:
+<blockquote>
+Each template parameter is invented as follows.
+<ul>
+  <li>(19.1) &mdash; If the placeholder is designated by the <tt>auto</tt>
+      <em>type-specifier</em>, then the invented template parameter is a type
+      <em>template-parameter</em>.
+  </li>
+  <li>(19.2) &mdash; Otherwise, the placeholder is designated by a
+      <em>constrained-type-specifier</em>, and the invented parameter is a
+      <em>constrained-parameter</em> (17.1) whose <em>qualified-concept-name</em>
+      is that of the <em>constrained-type-specifier</em>.
+  </li>
+  <li>(19.3) &mdash; If the placeholder appears in the <em>decl-specifier-seq</em>
+      of a function parameter pack (??), or the <em>type-specifier-seq</em>
+      of a <em>type-id</em> that is a pack expansion, the invented template
+      parameter is a template parameter pack.
+</ul>
+All placeholders designated by <em>constrained-type-specifier</em>s <del>whose
+corresponding <em>constrained-parameter</em>s would introduce equivalent
+<em>constraint-expression</em>s (17.1), using the rules for comparing
+expressions in 17.6.5.1, </del>have <del>the same</del><ins>unique</ins>
+invented template parameter<ins>s</ins><br/>
+<ins>[ <em>Example:</em>
+<blockquote class="code">
+<tt><pre>
+template&lt;typename T&gt; concept bool C = true;
+template&lt;typename, typename&gt; class ct {};
+
+void f1(C a, C b);
+void f2(ct&lt;C,C&gt;);
+C f3(C c);
+</pre></tt>
+</blockquote>
+The types of <tt>a</tt>, <tt>b</tt>, <tt>c</tt>, and the template arguments
+to <tt>ct</tt> each correspond to unique invented template type parameters.
+The return type of <tt>f3</tt> is deduced from non-discarded return statements,
+if any, in the body of the function (9.4.1).
+<em>&mdash; end example</em> ]</ins>
+<del>[ <em>Example:</em>
+<blockquote class="code">
+<tt><pre>
+namespace N {
+  template&lt;typename T&gt; concept bool C = true;
+}
+template&lt;typename T&gt; concept bool C = true;
+template&lt;typename T, int&gt; concept bool D = true;
+template&lt;typename, int = 0&gt; concept bool E = true;
+void abbr(C, D&lt;0&gt;);
+</pre></tt>
+</blockquote>
+The <em>constrained-type-specifier</em>s <tt>C</tt> and <tt>D&lt;0&gt;</tt>
+correspond to distinct invented template parameters in the declaration of
+<tt>abbr</tt>.
+<blockquote class="code">
+<tt><pre>
+void f0(C a, C b);
+</pre></tt>
+</blockquote>
+The types of <tt>a</tt> and <tt>b</tt> are the same invented template type
+parameter.
+<blockquote class="code">
+<tt><pre>
+void f1(C&amp; a, C* b);
+</pre></tt>
+</blockquote>
+The type of <tt>a</tt> is a reference to an invented template type parameter
+<tt>T</tt>, and the type of <tt>b</tt> is a pointer to <tt>T</tt>.
+<blockquote class="code">
+<tt><pre>
+void f2(N::C a, C b);
+void f3(D&lt;0&gt; a, D&lt;1&gt; b);
+</pre></tt>
+</blockquote>
+In both functions, the parameters <tt>a</tt> and <tt>b</tt> have different
+invented template type parameters.
+<blockquote class="code">
+<tt><pre>
+void f4(E a, E&lt;&gt; b, E&lt;0&gt; c);
+</pre></tt>
+</blockquote>
+The types of <tt>a</tt>, <tt>b</tt>, and <tt>c</tt> are the same because the
+<em>constrained-type-specifier</em>s <tt>E</tt>, <tt>E&lt;&gt;</tt>, and
+<tt>E&lt;0&gt;</tt> all associate the <em>constraint-expression</em>
+<tt>E&lt;T, 0&gt;</tt>, where <tt>T</tt> is an invented template type
+parameter.
+<blockquote class="code">
+<tt><pre>
+void f5(C head, C... tail);
+</pre></tt>
+</blockquote>
+The types of <tt>head</tt> and <tt>tail</tt> are different. Their respective
+introduced <em>constraint-expression</em>s are <tt>C&lt;T&gt;</tt> and
+<tt>(C&lt;U&gt; &amp;&amp; ...)</tt>, where <tt>T</tt> is the template
+parameter invented for <tt>head</tt> and <tt>U</tt> is the template parameter
+invented for <tt>tail</tt> (17.1).
+</del>
+</blockquote>
+</p>
+
+<h1 id="acknowledgements">Acknowledgements</h1>
+
+<p>The author would like to thank Andrew Sutton for his continued dedication to
+progressing the adoption of Concepts into the C++ working paper.
+</p>
+
+<p>Thanks to Botond Ballo for initial draft review and feedback.
+</p>
+
+<h1 id="references">References</h1>
+
+<table id="references">
+  <tr>
+    <td id="ref_n3878"><sup>[N3878]</sup></td>
+    <td>
+      "Extensions to the Concept Introduction Syntax in Concepts Lite"<br/>
+      <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n3878.pdf">
+      http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n3878.pdf</a>
+    </td>
+  </tr>
+  <tr>
+    <td id="ref_n4674"><sup>[N4674]</sup></td>
+    <td>
+      "Working Draft, C++ Extensions for concepts"<br/>
+      <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/n4674.pdf">
+      http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/n4674.pdf</a>
+    </td>
+  </tr>
+  <tr>
+    <td id="ref_p0464r2"><sup>[P0464R2]</sup></td>
+    <td>
+      "Revisiting the meaning of <tt>foo(ConceptName,ConceptName)</tt>"<br/>
+      <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0464r2.html">
+      http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0464r2.html</a>
+    </td>
+  </tr>
+  <tr>
+    <td id="ref_p0691r0"><sup>[P0691R0]</sup></td>
+    <td>
+      "Integrating Concepts: “Open” items for consideration"<br/>
+      <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0691r0.pdf">
+      http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0691r0.pdf</a>
+    </td>
+  </tr>
+  <tr>
+    <td id="ref_p0694r0"><sup>[P0694R0]</sup></td>
+    <td>
+      "Function declarations using concepts"<br/>
+      <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0694r0.pdf">
+      http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0694r0.pdf</a>
+    </td>
+  </tr>
+  <tr>
+    <td id="ref_p0696r0"><sup>[P0696R0]</sup></td>
+    <td>
+      "Remove abbreviated functions and template-introduction syntax from the Concepts TS"<br/>
+      <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0696r0.html">
+      http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0696r0.html</a>
+    </td>
+  </tr>
+  <tr>
+    <td id="ref_gccbug81270"><sup>[GccBug81270]</sup></td>
+    <td>
+      "[concepts] ill-formed code with a constrained variable declaration with multiple declarators with different deduced types not rejected"<br/>
+      <a href="https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81270">
+      https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81270</a>
+    </td>
+  </tr>
+</table>
+
+</body>

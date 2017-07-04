@@ -4,6 +4,7 @@ ISO JTC1/SC22/WG21 papers:
 WG21 Number     | Title | Link
 --------------- | ----- | ----
 P0696R0         | Remove abbreviated functions and template-introduction syntax from the Concepts TS | [HTML](http://htmlpreview.github.io/?https://github.com/tahonermann/std-proposals/blob/master/p0696r0.html)
+P0725R0         | Remove the requirement for constrained-type-specifiers to be deduced to the same type from the Concepts TS | [HTML](http://htmlpreview.github.io/?https://github.com/tahonermann/std-proposals/blob/master/p0725r0.html)
 
 Drafts In Progress | Title | Link
 ------------------ | ----- | ----
