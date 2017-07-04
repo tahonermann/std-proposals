@@ -70,7 +70,7 @@ blockquote.code
   </tr>
   <tr>
     <th>Date:</th>
-    <td>2017-07-02</td>
+    <td>2017-07-03</td>
   </tr>
   <tr>
     <th>Audience:</th>
@@ -280,11 +280,12 @@ P0464R2</a>
 <sup><a title="P0464R2: Revisiting the meaning of <tt>foo(ConceptName,ConceptName)</tt>"
         href="#ref_p0464r2">
 [P0464R2]</a></sup> provides motivation for removing the same-type deduction
-requirement for abbreviated functions.  That motivation is acknowledged and
-little further motivation with respect to abbreviated functions is provided
-here.  The following discusses motivation relative to the types of variable
-declarations, return types of non-abbreviated functions, and deduction
-constraints.
+requirement (<em>consistent resolution</em>) for abbreviated functions in
+favor of allowing different-type deduction (<em>independent resolution</em>).
+That motivation is acknowledged and little further motivation with respect to
+abbreviated functions is provided here.  The following discusses additional
+motivation relative to the types of variable declarations, return types of
+non-abbreviated functions, and deduction constraints.
 </p>
 
 <p>The requirement for types specified by <em>constrained-type-specifier</em>s
@@ -393,7 +394,7 @@ ct&lt;C{T},C{T}&gt; v1 = ...; <em>// Such that both occurrences of <tt>C</tt> re
   <li>Independent resolution:
 <blockquote class="code">
 <tt><pre>
-ct&lt;C,C&gt; v1 = ...;       <em>// Such that each <tt>C</tt> is independently deduced.</em>
+ct&lt;C,C&gt; v1 = ...;       <em>// Such that each occurrence of <tt>C</tt> is independently deduced.</em>
 </pre></tt>
 </blockquote>
   </li>
@@ -459,6 +460,40 @@ auto af4(auto p1, C{T} p2) -&gt; T; <em>// The return type matches the type dedu
                                  <em>// for parameter <tt>p2</tt>.</em>
 </pre></tt>
 </blockquote>
+</p>
+
+<p>
+<a title="P0694R0: Function declarations using concepts"
+   href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0694r0.pdf">
+P0694R0</a>
+<sup><a title="P0694R0: Function declarations using concepts"
+        href="#ref_p0694r0">
+[P0694R0]</a></sup> argues that <em>consistent resolution</em> should be the
+default for variables declared with equivalent <em>constrained-type-specifier</em>s
+within the same scope and provides the following example (where <tt>Number</tt>
+names a concept):
+<blockquote class="code">
+<tt><pre>
+Number operator+(Number,Number);
+
+template&lt;typename T&gt; concept bool Number2 = requires Number&lt;T&gt;;
+
+void f()
+{
+  Number   x = 1+2;     <em>// OK</em>
+  Number   y = 1.0+2.0; <em>// error: different type bound to same concept in a single scope</em>
+  Number2  y = 1.0+2.0; <em>// OK</em>
+}
+</pre></tt>
+</blockquote>
+However, <em>consistent reslution</em> as portrayed in this example seems
+unworkable as a default for variable declarations at namespace scope since
+the first variable declaration would lock in the deduced type associated with
+the <em>concept-type-specifier</em> for the remainder of the translation
+unit.  An exception could, of course, be made for variables declared at
+namespace scope, but such a variance in the rules would be surprising and
+potentially problematic for code refactoring.  Consider replacing several
+namespace scope variables with static local variables.
 </p>
 
 <p>The examples above illustrate cases where the author feels <em>consistent
