@@ -9,3 +9,4 @@ P0725R0         | Remove the requirement for constrained-type-specifiers to be d
 Drafts In Progress | Title | Link
 ------------------ | ----- | ----
 D0696R1 (DRAFT)    | Remove abbreviated functions and template-introduction syntax from the Concepts TS (Revision 1) | [HTML](http://htmlpreview.github.io/?https://github.com/tahonermann/std-proposals/blob/master/d0696r1.html)
+D0725R1 (DRAFT)    | Remove the requirement for constrained-type-specifiers to be deduced to the same type from the Concepts TS (Revision 1) | [HTML](http://htmlpreview.github.io/?https://github.com/tahonermann/std-proposals/blob/master/d0725r1.html)
