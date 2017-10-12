@@ -1,0 +1,493 @@
+<!doctype html>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+
+<head>
+<title>Impact of the Modules TS on the C++ tools ecosystem</title>
+
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/dos.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<style type="text/css">
+pre {
+    display: inline;
+}
+</style>
+
+</head>
+
+<body>
+
+<table id="header" border="1">
+  <tr>
+    <th>Document Number:</th>
+    <td>D0804 <em>&lt;DRAFT&gt;</em></td>
+  </tr>
+  <tr>
+    <th>Authors:</th>
+    <td>
+      Tom Honermann<br/>
+    </td>
+  </tr>
+  <tr>
+    <th>Date:</th>
+    <td>2017-10-11</td>
+  </tr>
+  <tr>
+    <th>Audience:</th>
+    <td>Evolution Working Group</td>
+  </tr>
+  <tr>
+    <th>Reply-to:</th>
+    <td>Tom Honermann &lt;tom@honermann.net&gt;</td>
+  </tr>
+</table>
+
+<h1>Impact of the modules TS on the C++ tools ecosystem</h1>
+
+<ul>
+  <li><a href="#introduction">
+      Introduction</a></li>
+  <li><a href="#integration">
+      Integration strategies</a>
+    <ul>
+      <li><a href="#int_consume">
+          Consume a module artifact from another provider</a></li>
+      <li><a href="#int_translate">
+          Translate a module artifact from another provider</a></li>
+      <li><a href="#int_observe">
+          Build observation</a></li>
+      <li><a href="#int_build">
+          Build system duplication</a></li>
+      <li><a href="#int_prohibit">
+          Prohibit use of module features</a></li>
+    </ul>
+  </li>
+  <li><a href="#acknowledgements">
+      Acknowledgements</a></li>
+  <li><a href="#references">
+      References</a></li>
+</ul>
+
+<h1 id="introduction">Introduction</h1>
+
+<p>
+This paper provides a detailed description of the motivation for the concern
+expressed in comment US/001 of the PDTS 21544 collated comments document
+<sup><a title="ISO_IEC PDTS 21544 - JTC001-SC22-N5233 Collated Comments"
+        href="#ref_pdts_comments">
+[PDTS_comments]</a></sup>.
+</p>
+
+<p>
+Consider the following program that utilizes features from the
+<a title="Working Draft, Extensions to C++ for Modules"
+   href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/n4667.pdf">
+Modules TS</a>
+<sup><a title="Working Draft, Extensions to C++ for Modules"
+        href="#ref_n4667">
+[N4667]</a></sup>
+and a modularized standard library implemented as specified by
+<a title="Standard Library Modules"
+   href="http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2017/p0581r0.pdf">
+P0581R0</a>
+<sup><a title="Standard Library Modules"
+        href="#ref_p0581r0">
+[P0581R0]</a></sup>.  The code defines a module (<tt>foo</tt>) that utilizes
+entities imported from a dependent standard library module (<tt>std.core</tt>)
+and a user provided module (<tt>bar</tt>).
+</p>
+
+<fieldset>
+  <legend>foo.cpp</legend>
+<pre><code class="c++">module foo;
+
+import std.core;
+import bar;
+
+export std::vector&lt;widget&gt; get_some_widgets() {
+  /* ... */
+}
+</code></pre>
+</fieldset>
+
+<fieldset>
+  <legend>bar.cpp</legend>
+<pre><code class="c++">module bar;
+
+export class widget { /* ... */ };
+</code></pre>
+</fieldset>
+
+<p>
+The following build commands exemplify those required to build the example
+using Microsoft's implementation of the Modules TS.  Note that the order of the
+invocations is significant; the module interface unit of module <tt>bar</tt>
+(<tt>bar.cpp</tt>) must be compiled before the module interface unit of module
+<tt>foo</tt> (<tt>foo.cpp</tt>) as the latter requires the existence of the
+module artifact (<tt>bar.ifc</tt>) produced by the compilation of
+<tt>bar.cpp</tt>.
+</p>
+
+<fieldset>
+  <legend>Build commands</legend>
+<pre><code class="cmd">rem Compiling bar.cpp produces bar.ifc and bar.obj.
+cl /EHsc /MD /std:c++latest /c bar.cpp /experimental:module /module:interface
+rem Compiling foo.cpp produces foo.ifc and foo.obj.
+cl /EHsc /MD /std:c++latest /c foo.cpp /experimental:module /module:interface /module:reference bar.ifc
+</code></pre>
+</fieldset>
+
+<p>
+Now consider what is necessary for a <tt>C++</tt> tool to consume the source
+code above.  Historically, <tt>C++</tt> tools have required some amount of
+configuration to handle preprocessor state; macro definitions and header
+search paths for example.  Once configured, access to the source code (and
+potentially, support for some language extensions) is all that is needed to
+successfully parse the source code.
+</p>
+
+<p>
+The Modules TS adds additional requirements not previously needed in order to
+successfully parse source code.  With an example like the one above, access
+to the source code and preprocessor configuration alone no longer suffices.
+The tool must now be able to resolve module import declarations to either the
+source code for the corresponding module interface unit, or to some module
+artifact that provides the exported entities for the module.
+</p>
+
+<p>
+Assuming an implementation strategy similar to Microsoft's, the following
+capabilities and information must be available either directly in the tool
+or in a script or build system that invokes the tool:
+<ul>
+  <li>The ability to produce and consume module artifacts containing module
+      export information.</li>
+  <li>The transitive set of all dependent modules for each translation unit
+      to be processed, the source code for each module interface unit and
+      its included headers, the preprocessor options and language dialect
+      options necessary to compile each module interface unit, and an order
+      in which to build each module interface unit so that dependent module
+      artifacts are available as needed.</li>
+  <li>The ability to map a module import declaration to a module artifact.</li>
+</ul>
+</p>
+
+<p>
+This information may be difficult and costly to obtain and maintain,
+particularly when deep module hierarchies are present or when module
+dependencies are platform dependent (consider a standard library implementation
+that imports implementation specific modules in the source code for its
+public facing module interface units).
+</p>
+
+<p>
+Though module artifact are not intended to be a distribution format or an
+alternative to access to source code, motivation exists to use them in this
+way.  At least one large company is in the process of modularizing its source
+code (not currently using the Modules TS) in order to reduce overhead in its
+distributed build system by distributing module artifacts in lieu of source
+code.  This is clearly problematic for tool providers since, without access to
+the source code, compilation is impossible.
+</p>
+
+<p>
+Many <tt>C++</tt> tools do not supply their own standard library.  Other tools,
+such as static analyzers, realize their maximum value when they are able to make
+use of the standard library of a particular compiler provider.  Source code
+is often dependent upon a particular implementation of the standard library
+and can't be successfully parsed with other implementations.  For these reasons,
+many tools are dependent on interoperability with standard libraries provided
+by other providers; providing their own modularized standard library is not
+a feasible option.
+</p>
+
+<p>
+The remainder of this paper looks at potential options for integrating a tool
+with a modularized code base.
+</p>
+
+<h1 id="integration">Integration strategies</h1>
+
+<h2 id="int_consume">Consume a module artifact from another provider</h2>
+
+<p>
+Module artifact formats (e.g., the <tt>bar.ifc</tt> and <tt>foo.ifc</tt>
+files above) fall outside the scope of the Modules TS; they are implementation
+details if they exist at all.  Microsoft is currently using the
+<a title="Compiler-neutral Internal Program Representation for C++"
+   href="https://github.com/GabrielDosReis/ipr">
+open source IPR project</a>
+<sup><a title="Compiler-neutral Internal Program Representation for C++"
+        href="#ref_ipr">
+[IPR]</a></sup> which, in theory, could allow tools to consume Microsoft's
+module artifact files.  However, the IPR project has not been updated since
+January of 2016 which suggests that it <em>may</em> not be up to date with
+Microsoft's implementation.  (whether it is or is not up to date is not
+curently known to the authors).  Additionally, there are no backward
+compatibility promises.  To be fair, Microsoft has been clear that their
+implementation of the Modules TS is experimental, so such promises are
+not expected at this time.  The point is that there is no particular reason
+to expect that tools will be able to reliably consume module artifacts
+produced by another provider.
+</p>
+
+<p>
+Microsoft does make the source code to its standard library implementation
+available, so, in theory, a tool could construct its own module artifacts
+from it.  As of the Visual Studio 2017 release, Microsoft does not appear
+to provide source code for the module interface units distributed
+with the product, nor is a build system for compiling the standard library
+provided.
+</p>
+
+<p>
+Additionally, it isn't yet known what module artifact formats other
+implementors may choose, but it seems unlikely that all implementors will
+converge on a single portable format.  In particular, it seems likely that
+Clang would use the existing, optimized, non-portable format it currently
+uses for pre-compiled headers and Clang's own module system.  For these
+reasons, even if it turns out that consuming Microsoft's module artifact
+files is a feasible solution, that solution is unlikely to be feasible for
+all compiler providers.
+</p>
+
+<p>
+Requirements:
+<ul>
+  <li>Access to the module interface unit source code is <em>not</em>
+      required.</li>
+  <li>Module artifact formats must be public, stable, extensible, etc...</li>
+</ul
+</p>
+
+<h2 id="int_translate">Translate a module artifact from another provider</h2>
+
+<p>
+Similar to direct consumption, another approach would be to translate a module
+artifact from another provider, for example, to generate source code that
+could be compiled to produce a module artifact in another format.
+</p>
+
+<p>
+If compiler providers were to provide a tool capable of such generation, it
+would obviate the need for each tool provider to be able to directly consume
+module artifacts from every compiler provider.  Ideally, compiler providers
+would collaborate to define a common interface each could implement.
+</p>
+
+<p>
+Requirements:
+<ul>
+  <li>Access to the module interface unit source code is <em>not</em>
+      required.</li>
+  <li>Tools must be available to consume a module artifact and generate
+      (portable standards compliant with exceptions for exported entities
+      that use language extensions) source code suitable for compilation as a
+      module interface unit.</li>
+</ul
+</p>
+
+<h2 id="int_observe">Build observation</h2>
+
+<p>
+It is possible for a tool to discover modules by observing a build system in
+action.  Upon invocation of a recognized compiler, the command line for the
+invocation could be analyzed, its mode (preprocess-only, translate, produce
+a pre-compiled header, produce a module artifact, etc...) determined, and
+actions taken to replicate that action as necessary.
+</p>
+
+<p>
+For example, for the build commands provided above, a tool could observe
+the first invocation (for <tt>bar.cpp</tt>), discover that the command line
+includes <tt>/module:interface</tt>, and then use other information provided
+on the command line to determine how to compile <tt>bar.cpp</tt> so as to
+build its own module artifact for later consumption.  When the second
+invocation (for <tt>foo.cpp</tt>) is then observed, pending any errors, the
+dependent module artifacts will be available to facilitate translation (and
+production of an additional module artifact for importers of module
+<tt>foo</tt>).
+</p>
+
+<p>
+This is a technically challenging, non-portable solution that requires deep
+platform-specific integration and compiler-specific support.
+</p>
+
+<p>
+This approach fails when the compilation of needed module interface units
+is not observed.
+</p>
+
+<p>
+Requirements:
+<ul>
+  <li>Access to module interface unit source code.</li>
+  <li>The ability to recognize and understand compiler invocations.</li>
+  <li>Module artifact generation must be observed during the build<br/>
+      (This is unlikely to be the case for standard library modules)</li>
+  <li>In a distributed build environment, requires any module artifacts
+      produced by the tool to also be distributed (or rebuilt).</li>
+</ul
+</p>
+
+<h2 id="int_build">Build system duplication</h2>
+
+<p>
+Assuming a tool has support for producing and consuming module artifacts,
+it would be possible to script invoking the tool for each needed module.  This
+likely amounts to duplicating a portion of an existing build system that
+already supports one or more compilers or tools.
+</p>
+
+<p>
+Requirements:
+<ul>
+  <li>Access to module interface unit source code, including those for
+      standard library modules.</li>
+  <li>The preprocessor options, language dialect options, etc... needed to
+      translate each module interface unit.</li>
+  <li>In a distributed build environment, requires any module artifacts
+      produced by the tool to also be distributed (or rebuilt).</li>
+</ul
+</p>
+
+<h2 id="int_prohibit">Prohibit use of module features</h2>
+
+<p>
+This is the status quo.  Tool providers can elect not to support modularized
+source code.
+</p>
+
+<p>
+This may not be such a confrontational stance to take.  Some tools only require
+access to a portion of a code base.  For example common uses of
+<a title="Simplified Wrapper and Interface Generator"
+   href="http://www.swig.org">
+SWIG</a>
+<sup><a title="Simplified Wrapper and Interface Generator"
+        href="#ref_swig">
+[SWIG]</a></sup> require just a few translation units and their headers.
+Frequently, the preprocessor can be used to further restrict necessary
+dependencies.  It is conceivable that conditional compilation could
+suffice for many use cases.  However, such a stance would likely become
+increasingly difficult to maintain; especially as pressure increases to
+modularize the lowest level of dependencies, such as the standard library.
+</p>
+
+<p>
+Support for a partially modularized code base would likely require resolution
+of comment US/002 of the PDTS 21544 collated comments document
+<sup><a title="ISO_IEC PDTS 21544 - JTC001-SC22-N5233 Collated Comments"
+        href="#ref_pdts_comments">
+[PDTS_comments]</a></sup> to ensure compatibility between translation units
+that access the same entities via module exports vs declarations in the
+global module.
+</p>
+
+<p>
+Requirements:
+<ul>
+  <li>A non-modularized source code base.</li>
+</ul
+</p>
+
+<h1 id="conclusions">Conclusions</h1>
+
+<p>
+These challenges for tool providers pose a problem for the adoption of modules
+as specified by the Modules TS.  Likewise, if adoption of the Modules TS is
+high, the difficulty in providing support for modularized code bases could
+result in a chilling effect on the development of new tools unless convenient
+methods are found to address the integration concerns described here.
+</p>
+ 
+<p>
+It isn't clear how, or if, these challenges can be addressed within the
+<tt>C++</tt> standard given that build systems and implementation strategies
+can not realistically be prescribed.  As a result, this paper offers no
+particular solutions for the concerns it raises.
+</p>
+
+<p>
+These challenges suggest that a module system like
+<a title="Clang Documentation: Modules"
+   href="https://clang.llvm.org/docs/Modules.html">
+Clang's</a>
+<sup><a title="Clang Documentation: Modules"
+        href="#ref_clang_modules">
+[Clang_Modules]</a></sup> that implements module support as an optimization
+with transparent fallback to traditional headers might be a better fit for the
+<tt>C++</tt> community as a whole.  On the other hand, Clang's module system
+does not (currently) reduce dependence on the preprocessor; a desirable goal of
+the design specified in the Modules TS.  In theory, it seems possible to design
+a module import syntax that does not directly use preprocessor directives, but
+that allows import declarations to be satisfied by module artifacts (if
+available) or via transformation to preprocessor include directives otherwise
+(complete with all the macro fun that implies).  But that would be the subject
+matter of a different paper.
+</p>
+
+<h1 id="acknowledgements">Acknowledgements</h1>
+
+<p>
+Thank you to the good people at Synopsys who funded, reviewed, and helped to
+refine this paper.  In particular, Charles-Henri Gros, Thierry Lavoie,
+Michael Price, Tim Prince, and Tyler Sims.
+</p>
+
+<h1 id="references">References</h1>
+
+<table id="references" border="1">
+  <tr>
+    <td id="ref_pdts_comments"><sup>[PDTS_comments]</sup></td>
+    <td>
+      ISO_IEC PDTS 21544 - JTC001-SC22-N5233 Collated Comments<br/>
+    </td>
+  </tr>
+  <tr>
+    <td id="ref_n4667"><sup>[N4667]</sup></td>
+    <td>
+      Working Draft, Extensions to C++ for Modules<br/>
+      <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/n4667.pdf">
+      http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/n4667.pdf</a>
+    </td>
+  </tr>
+  <tr>
+    <td id="ref_p0581r0"><sup>[P0581R0]</sup></td>
+    <td>
+      Standard Library Modules<br/>
+      <a href="http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2017/p0581r0.pdf">
+      http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2017/p0581r0.pdf</a>
+    </td>
+  </tr>
+  <tr>
+    <td id="ref_clang_modules"><sup>[Clang_Modules]</sup></td>
+    <td>
+      Clang Documentation: Modules<br/>
+      <a href="https://clang.llvm.org/docs/Modules.html">
+      https://clang.llvm.org/docs/Modules.html</a>
+    </td>
+  </tr>
+  <tr>
+    <td id="ref_ipr"><sup>[IPR]</sup></td>
+    <td>
+      Compiler-neutral Internal Program Representation for C++<br/>
+      <a href="https://github.com/GabrielDosReis/ipr">
+      https://github.com/GabrielDosReis/ipr</a>
+    </td>
+  </tr>
+  <tr>
+    <td id="ref_swig"><sup>[SWIG]</sup></td>
+    <td>
+      Simplified Wrapper and Interface Generator<br/>
+      <a href="http://www.swig.org">
+      http://www.swig.org</a>
+    </td>
+  </tr>
+</table>
+
+</body>
