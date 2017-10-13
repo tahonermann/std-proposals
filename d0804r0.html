@@ -33,7 +33,7 @@ pre {
   </tr>
   <tr>
     <th>Date:</th>
-    <td>2017-10-11</td>
+    <td>2017-10-12</td>
   </tr>
   <tr>
     <th>Audience:</th>
@@ -223,15 +223,9 @@ open source IPR project</a>
 <sup><a title="Compiler-neutral Internal Program Representation for C++"
         href="#ref_ipr">
 [IPR]</a></sup> which, in theory, could allow tools to consume Microsoft's
-module artifact files.  However, the IPR project has not been updated since
-January of 2016 which suggests that it <em>may</em> not be up to date with
-Microsoft's implementation.  (whether it is or is not up to date is not
-curently known to the authors).  Additionally, there are no backward
-compatibility promises.  To be fair, Microsoft has been clear that their
-implementation of the Modules TS is experimental, so such promises are
-not expected at this time.  The point is that there is no particular reason
-to expect that tools will be able to reliably consume module artifacts
-produced by another provider.
+module artifact files, though there are no backward compatibility promises.
+To be fair, Microsoft has been clear that their implementation of the Modules
+TS is experimental, so such promises are not expected at this time.
 </p>
 
 <p>
@@ -244,14 +238,41 @@ provided.
 </p>
 
 <p>
-Additionally, it isn't yet known what module artifact formats other
-implementors may choose, but it seems unlikely that all implementors will
-converge on a single portable format.  In particular, it seems likely that
-Clang would use the existing, optimized, non-portable format it currently
-uses for pre-compiled headers and Clang's own module system.  For these
-reasons, even if it turns out that consuming Microsoft's module artifact
-files is a feasible solution, that solution is unlikely to be feasible for
-all compiler providers.
+When asked about the potential for tools to consume Microsoft generated
+module artifacts, Gabriel Dos Reis provided the following statement on
+behalf of Microsoft.
+<div style="margin-left: 2em; border-style: solid; background-color: lemonchiffon">
+We thank you for sharing an early draft of your paper.   Tooling, especially
+semantics-aware development tools, that supports sound and scalable C++
+software architecture practice is at the heart of Microsoft's efforts behind
+the C++ modules proposal.  Microsoft is a producer and a huge consumer of C++
+technologies and tools, including third party and open source components.
+Microsoft is fully committed to opening up its compiled module interface
+binary format and tooling regarding C++ modules, and encourages the larger
+C++ community to coalesce around shared formats or library APIs or conversion
+protocols.  Microsoft will address the specific points raised in this draft
+document in a separate WG21 document.  Modules represent an unprecedented
+opportunity for the C++ community to up its game regarding tooling, and we
+hope the community seizes it for the greater good of all of us.
+</div>
+</p>
+
+<p>
+It isn't yet known what module artifact formats other implementors may choose,
+but it seems unlikely that all implementors will converge on a single portable
+format.  In particular, it seems likely that Clang would use the existing,
+optimized, non-portable format it currently uses for pre-compiled headers and
+Clang's own module system.  For these reasons, even if it turns out that
+consuming Microsoft's module artifact files is a feasible solution, that
+solution is unlikely to be feasible for all compiler providers.
+</p>
+
+<p>
+The effort required to consume a module artifact and translate the information
+contained within it to a given tool's internal data representation may also be
+prohibitively expensive.  A module artifact must be able to represent nearly
+the entirety of the C++ language; translating that information to another form
+is likely to be a significant effort.
 </p>
 
 <p>
@@ -437,6 +458,11 @@ matter of a different paper.
 Thank you to the good people at Synopsys who funded, reviewed, and helped to
 refine this paper.  In particular, Charles-Henri Gros, Thierry Lavoie,
 Michael Price, Tim Prince, and Tyler Sims.
+</p>
+
+<p>
+Special thanks to Gabriel Dos Reis and Richard Smith for reviewing this paper,
+providing feedback, and continuing to engage in design discussions.
 </p>
 
 <h1 id="references">References</h1>
