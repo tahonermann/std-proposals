@@ -33,7 +33,7 @@ pre {
   </tr>
   <tr>
     <th>Date:</th>
-    <td>2017-10-12</td>
+    <td>2017-10-14</td>
   </tr>
   <tr>
     <th>Audience:</th>
@@ -223,18 +223,45 @@ open source IPR project</a>
 <sup><a title="Compiler-neutral Internal Program Representation for C++"
         href="#ref_ipr">
 [IPR]</a></sup> which, in theory, could allow tools to consume Microsoft's
-module artifact files, though there are no backward compatibility promises.
-To be fair, Microsoft has been clear that their implementation of the Modules
-TS is experimental, so such promises are not expected at this time.
+module artifact files.
+</p>
+
+<p>
+The effort required to consume a module artifact and translate the information
+contained within it to a given tool's internal data representation may be
+prohibitively expensive.  A module artifact must be able to represent nearly
+the entirety of the C++ language; translating that information to another form
+is likely to require a significant effort.  For some tools, a simpler approach
+might be to examine the module artifact to determine what source code was used
+to construct it (assuming the module artifact retains this information;
+something that seems likely as it would be useful in generating diagnostics
+for consumers), and then translate that source code directly (assuming the
+source code is present).  These tools might also benefit if the module
+artifact preserves the command line options used to compile the module
+interface unit source code.
 </p>
 
 <p>
 Microsoft does make the source code to its standard library implementation
 available, so, in theory, a tool could construct its own module artifacts
-from it.  As of the Visual Studio 2017 release, Microsoft does not appear
-to provide source code for the module interface units distributed
-with the product, nor is a build system for compiling the standard library
-provided.
+from it.  As of the Visual Studio 2017 release, Microsoft does not provide
+distinct source code for the module interface units distributed with the
+product, nor is a build system for compiling the standard library provided.
+The (experimental) <tt>.ifc</tt> files distributed with the product were
+constructed using the <tt>/module:name</tt> and <tt>/module:export</tt>
+options as described in the "Consuming Existing Legacy Header Files as Module
+Interfaces" section of
+<a title="C++ Modules in VS 2015 Update 1"
+   href="https://blogs.msdn.microsoft.com/vcblog/2015/12/03/c-modules-in-vs-2015-update-1">
+a blog post introducing the modules features implemented in Visual Studio 2015
+Update 1</a>
+<sup><a title="C++ Modules in VS 2015 Update 1"
+        href="#ref_modules_in_vs2015u1">
+[Modules_in_VS2015U1]</a></sup>.  Assuming Microsoft continues with this
+strategy for producing standard library modules, tools that require module
+interface unit source code will also have to support a translation mode
+matching the behavior of the <tt>/module:name</tt> and <tt>/module:export</tt>
+options.
 </p>
 
 <p>
@@ -260,25 +287,24 @@ hope the community seizes it for the greater good of all of us.
 <p>
 It isn't yet known what module artifact formats other implementors may choose,
 but it seems unlikely that all implementors will converge on a single portable
-format.  In particular, it seems likely that Clang would use the existing,
-optimized, non-portable format it currently uses for pre-compiled headers and
-Clang's own module system.  For these reasons, even if it turns out that
-consuming Microsoft's module artifact files is a feasible solution, that
-solution is unlikely to be feasible for all compiler providers.
-</p>
-
-<p>
-The effort required to consume a module artifact and translate the information
-contained within it to a given tool's internal data representation may also be
-prohibitively expensive.  A module artifact must be able to represent nearly
-the entirety of the C++ language; translating that information to another form
-is likely to be a significant effort.
+format.  In particular, it seems likely that Clang will use its existing,
+optimized, non-portable format currently used for pre-compiled headers and
+Clang's own module system.  GCC appears to be forging ahead with its own
+module artifact format as indicated on the
+<a title="GCC Wiki: C++ Modules"
+   href="https://gcc.gnu.org/wiki/cxx-modules">
+GCC wiki</a>
+<sup><a title="GCC Wiki: C++ Modules"
+        href="#ref_gcc_modules">
+[GCC_Modules]</a></sup>.  Thus, even if it turns out that consuming Microsoft's
+module artifact files is a feasible solution, that solution is unlikely to be
+feasible for all compiler providers.
 </p>
 
 <p>
 Requirements:
 <ul>
-  <li>Access to the module interface unit source code is <em>not</em>
+  <li>Access to the module interface unit source code <em>may</em> be
       required.</li>
   <li>Module artifact formats must be public, stable, extensible, etc...</li>
 </ul
@@ -425,7 +451,7 @@ high, the difficulty in providing support for modularized code bases could
 result in a chilling effect on the development of new tools unless convenient
 methods are found to address the integration concerns described here.
 </p>
- 
+
 <p>
 It isn't clear how, or if, these challenges can be addressed within the
 <tt>C++</tt> standard given that build systems and implementation strategies
@@ -461,8 +487,9 @@ Michael Price, Tim Prince, and Tyler Sims.
 </p>
 
 <p>
-Special thanks to Gabriel Dos Reis and Richard Smith for reviewing this paper,
-providing feedback, and continuing to engage in design discussions.
+Special thanks to Billy O'Neal, Gabriel Dos Reis, and Richard Smith for
+reviewing this paper, providing feedback and clarifications, and continuing to
+engage in design discussions.
 </p>
 
 <h1 id="references">References</h1>
@@ -496,6 +523,22 @@ providing feedback, and continuing to engage in design discussions.
       Clang Documentation: Modules<br/>
       <a href="https://clang.llvm.org/docs/Modules.html">
       https://clang.llvm.org/docs/Modules.html</a>
+    </td>
+  </tr>
+  <tr>
+    <td id="ref_gcc_modules"><sup>[GCC_Modules]</sup></td>
+    <td>
+      GCC Wiki: C++ Modules<br/>
+      <a href="https://gcc.gnu.org/wiki/cxx-modules">
+      https://gcc.gnu.org/wiki/cxx-modules</a>
+    </td>
+  </tr>
+  <tr>
+    <td id="ref_modules_in_vs2015u1"><sup>[Modules_in_VS2015U1]</sup></td>
+    <td>
+      C++ Modules in VS 2015 Update 1<br/>
+      <a href="https://blogs.msdn.microsoft.com/vcblog/2015/12/03/c-modules-in-vs-2015-update-1">
+      https://blogs.msdn.microsoft.com/vcblog/2015/12/03/c-modules-in-vs-2015-update-1</a>
     </td>
   </tr>
   <tr>
