@@ -289,7 +289,12 @@ It isn't yet known what module artifact formats other implementors may choose,
 but it seems unlikely that all implementors will converge on a single portable
 format.  In particular, it seems likely that Clang will use its existing,
 optimized, non-portable format currently used for pre-compiled headers and
-Clang's own module system.  GCC appears to be forging ahead with its own
+<a title="Clang Documentation: Modules"
+   href="https://clang.llvm.org/docs/Modules.html">
+Clang's own module system</a>
+<sup><a title="Clang Documentation: Modules"
+        href="#ref_clang_modules">
+[Clang_Modules]</a></sup>.  GCC appears to be forging ahead with its own
 module artifact format as indicated on the
 <a title="GCC Wiki: C++ Modules"
    href="https://gcc.gnu.org/wiki/cxx-modules">
@@ -454,28 +459,18 @@ methods are found to address the integration concerns described here.
 
 <p>
 It isn't clear how, or if, these challenges can be addressed within the
-<tt>C++</tt> standard given that build systems and implementation strategies
-can not realistically be prescribed.  As a result, this paper offers no
-particular solutions for the concerns it raises.
+Modules TS given that build systems and implementation strategies can not
+realistically be prescribed.  As a result, this paper offers no particular
+solutions for the concerns it raises.
 </p>
 
 <p>
-These challenges suggest that a module system like
-<a title="Clang Documentation: Modules"
-   href="https://clang.llvm.org/docs/Modules.html">
-Clang's</a>
-<sup><a title="Clang Documentation: Modules"
-        href="#ref_clang_modules">
-[Clang_Modules]</a></sup> that implements module support as an optimization
-with transparent fallback to traditional headers might be a better fit for the
-<tt>C++</tt> community as a whole.  On the other hand, Clang's module system
-does not (currently) reduce dependence on the preprocessor; a desirable goal of
-the design specified in the Modules TS.  In theory, it seems possible to design
-a module import syntax that does not directly use preprocessor directives, but
-that allows import declarations to be satisfied by module artifacts (if
-available) or via transformation to preprocessor include directives otherwise
-(complete with all the macro fun that implies).  But that would be the subject
-matter of a different paper.
+It is clear that implementation choices will impact the degree of difficulty
+tool providers and tool users will face supporting modularized code bases;
+particularly for portable code compiled by multiple compilers.  This difficulty
+will be significantly reduced if implementors work together to establish
+common utilities and/or protocols that enable a uniform abstract interface
+tools can use to resolve import declarations.
 </p>
 
 <h1 id="acknowledgements">Acknowledgements</h1>
