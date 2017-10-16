@@ -10,4 +10,3 @@ P0804R0         | Impact of the modules TS on the C++ tools ecosystem | [HTML](h
 
 Drafts In Progress | Title | Link
 ------------------ | ----- | ----
-D0804R0            | Impact of the modules TS on the C++ tools ecosystem | [HTML](http://htmlpreview.github.io/?https://github.com/tahonermann/std-proposals/blob/master/d0804r0.html)
