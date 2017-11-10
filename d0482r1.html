@@ -261,17 +261,26 @@ arguments.  For example:</p>
 // Differentiation by function name:
 void do_x(const char *);
 void do_x_utf8(const char *);
+void do_x(const wchar_t *);
+void do_x(const char16_t *);
+void do_x(const char32_t *);
 
 // Differentiation by suffix for user-defined literals:
 int operator ""_udl(const char *s, std::size_t);
 int operator ""_udl_utf8(const char *s, std::size_t);
+int operator ""_udl(const wchar_t *s, std::size_t);
+int operator ""_udl(const char16_t *s, std::size_t);
+int operator ""_udl(const char32_t *s, std::size_t);
 
 // Differentiation by function parameter:
-void do_x(const char *, bool is_utf8);
+void do_x2(const char *, bool is_utf8);
+void do_x2(const wchar_t *);
+void do_x2(const char16_t *);
+void do_x2(const char32_t *);
 
 // Differentiation by template parameter:
 template&lt;bool IsUTF8&gt;
-void do_x(const char *);
+void do_x3(const char *);
 </pre></tt>
 </blockquote>
 
@@ -299,9 +308,9 @@ make_text_view&lt;utf32_encoding&gt;(U"text")
 </blockquote>
 
 For each invocation, the encoding of the string literal is known at compile
-time, so having to explicitly specify the encoding tag feels redundant.  If
-UTF-8 strings had a distinct type, then the encoding type could be inferred,
-while still allowing an overriding tag to be supplied:
+time, so having to explicitly specify the encoding tag is redundant.  If
+UTF-8 string literals had a distinct type, then the encoding type could be
+inferred, while still allowing an overriding tag to be supplied:
 
 <blockquote class="code">
 <tt><pre>
@@ -310,7 +319,7 @@ make_text_view(L"text")  // defaults to execution_wide_character_encoding.
 make_text_view(u8"text") // defaults to utf8_encoding.
 make_text_view(u"text")  // defaults to utf16_encoding.
 make_text_view(U"text")  // defaults to utf32_encoding.
-make_text_view&lt;utf16be_encoding&gt;("\0t\0e\0x\0t\0")  // Default overridden.
+make_text_view&lt;utf16be_encoding&gt;("\0t\0e\0x\0t\0")  // Default overridden to select UTF-16BE.
 </pre></tt>
 </blockquote>
 
@@ -431,6 +440,11 @@ pessimization due to glvalue expressions of type <tt>char</tt> potentially
 aliasing objects of other types.  Use of a distinct type that does not share
 this aliasing behavior may allow for further compiler optimizations.</p>
 
+<p>UTF-8 is the most popular character encoding in use today and its popularity
+is continuing to rise <em><span style="color:red">(FIXME: citation needed)</span></em>.
+The C++ standard should be removing barriers to use of UTF-8, not adding
+additional barriers.</p>
+
 <h1 id="design">Design Considerations</h1>
 
 <h2 id="design_compat">Backward compatibility</h2>
@@ -504,10 +518,10 @@ deprecated features would enable a transition period and eventual removal.</p>
     Implicit conversion from std::u8string to std::string</h4>
 
 <p>This proposal includes a new specialization of <tt>std::basic_string</tt>
-for the new <tt>char8_t</tt> type, the associated typedef
-<tt>std::u8string</tt>, and changes to several functions to now return
-<tt>std::u8string</tt> instead of <tt>std::string</tt>.  This change renders
-ill-formed the following code that is currently well-formed.
+for the new <tt>char8_t</tt> type, a new <tt>std::u8string</tt> type alias,
+and changes to several functions to now return <tt>std::u8string</tt> instead
+of <tt>std::string</tt>.  This change renders ill-formed the following code
+that is currently well-formed.
 
 <blockquote class="code">
 <tt><pre>
