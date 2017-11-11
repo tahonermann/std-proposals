@@ -4,7 +4,17 @@
 <head>
 
 <title>char8_t: A type for UTF-8 characters and strings (Revision 1)</title>
+
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
 <style type="text/css">
+pre {
+    display: inline;
+}
+
 table#header th,
 table#header td
 {
@@ -43,12 +53,6 @@ blockquote.stddel
     background-color: #FFEBFF;
     border: 1px solid #ECD7EC;
     padding-left: 0.5empadding-right: 0.5em;
-}
-
-blockquote.code
-{
-    background-color: #F1F1F1;
-    border: 1px solid #D1D1D1;
 }
 </style>
 
@@ -233,17 +237,17 @@ expected to be addressed in a future revision of this proposal.
 <p>Consider the following string literal expressions, all of which encode
 <tt>U+0123</tt>, <tt>LATIN SMALL LETTER G WITH CEDILLA</tt>:
 
-<blockquote class="code">
-<tt><pre>
-u8"\u0123" // UTF-8:  const char[]:     0xC4 0xA3 0x00
+<fieldset>
+<pre><code class="c++">u8"\u0123" // UTF-8:  const char[]:     0xC4 0xA3 0x00
  u"\u0123" // UTF-16: const char16_t[]: 0x0123 0x0000
  U"\u0123" // UTF-32: const char32_t[]: 0x00000123 0x00000000
   "\u0123" // ???:    const char[]:     ???
  L"\u0123" // ???:    const wchar_t[]:  ???
-</pre></tt>
-</blockquote>
+</code></pre>
+</fieldset>
+</p>
 
-The UTF-8, UTF-16, and UTF-32 string literals have well-defined and portable
+<p>The UTF-8, UTF-16, and UTF-32 string literals have well-defined and portable
 sequences of code unit values.  The ordinary and wide string literal code unit
 sequences depend on the implementation defined execution and execution wide
 encodings respectively.  Code that is designed to work with text encodings must
@@ -254,11 +258,10 @@ specialization.  But for ordinary and UTF-8 string literals, differentiating
 between them requires additional information since they have the same code unit
 type.  That additional information might be provided implicitly via differently
 named functions, or explicitly via additional function or template
-arguments.  For example:</p>
+arguments.  For example:
 
-<blockquote class="code">
-<tt><pre>
-// Differentiation by function name:
+<fieldset>
+<pre><code class="c++">// Differentiation by function name:
 void do_x(const char *);
 void do_x_utf8(const char *);
 void do_x(const wchar_t *);
@@ -281,8 +284,9 @@ void do_x2(const char32_t *);
 // Differentiation by template parameter:
 template&lt;bool IsUTF8&gt;
 void do_x3(const char *);
-</pre></tt>
-</blockquote>
+</code></pre>
+</fieldset>
+</p>
 
 <p>The requirement to, in some way, specify the text encoding, other than
 through the type of the string, limits the ability to provide elegant encoding
@@ -297,31 +301,31 @@ P0244R1</a>
         href="#ref_p0244r1">
 [P0244R1]</a></sup>:
 
-<blockquote class="code">
-<tt><pre>
-make_text_view&lt;execution_character_encoding&gt;("text")
+<fieldset>
+<pre><code class="c++">make_text_view&lt;execution_character_encoding&gt;("text")
 make_text_view&lt;execution_wide_character_encoding&gt;(L"text")
 make_text_view&lt;utf8_encoding&gt;(u8"text")
 make_text_view&lt;utf16_encoding&gt;(u"text")
 make_text_view&lt;utf32_encoding&gt;(U"text")
-</pre></tt>
-</blockquote>
+</code></pre>
+</fieldset>
+</p>
 
-For each invocation, the encoding of the string literal is known at compile
+<p>For each invocation, the encoding of the string literal is known at compile
 time, so having to explicitly specify the encoding tag is redundant.  If
 UTF-8 string literals had a distinct type, then the encoding type could be
 inferred, while still allowing an overriding tag to be supplied:
 
-<blockquote class="code">
-<tt><pre>
-make_text_view("text")   // defaults to execution_character_encoding.
+<fieldset>
+<pre><code class="c++">make_text_view("text")   // defaults to execution_character_encoding.
 make_text_view(L"text")  // defaults to execution_wide_character_encoding.
 make_text_view(u8"text") // defaults to utf8_encoding.
 make_text_view(u"text")  // defaults to utf16_encoding.
 make_text_view(U"text")  // defaults to utf32_encoding.
 make_text_view&lt;utf16be_encoding&gt;("\0t\0e\0x\0t\0")  // Default overridden to select UTF-16BE.
-</pre></tt>
-</blockquote>
+</code></pre>
+</fieldset>
+</p>
 
 <p>The inability to infer an encoding for narrow strings doesn't just limit the
 interfaces of new features under consideration.  Compromised interfaces are
@@ -331,16 +335,16 @@ already present in the standard library.</p>
 specifies the following specializations of <tt>codecvt</tt> be provided to
 enable transcoding text from one encoding to another.
 
-<blockquote class="code">
-<tt><pre>
-codecvt&lt;char, char, mbstate_t&gt;     <em>// #1</em>
+<fieldset>
+<pre><code class="c++">codecvt&lt;char, char, mbstate_t&gt;     <em>// #1</em>
 codecvt&lt;wchar_t, char, mbstate_t&gt;  <em>// #2</em>
 codecvt&lt;char16_t, char, mbstate_t&gt; <em>// #3</em>
 codecvt&lt;char32_t, char, mbstate_t&gt; <em>// #4</em>
-</pre></tt>
-</blockquote>
+</code></pre>
+</fieldset>
+</p>
 
-#1 performs no conversions.  #2 converts between strings encoded in the
+<p>#1 performs no conversions.  #2 converts between strings encoded in the
 implementation defined wide and narrow encodings.  #3 and #4 convert between
 either the UTF-16 or UTF-32 encoding and the UTF-8 encoding.  Specializations
 are not currently specified for conversion between the implementation defined
@@ -362,14 +366,13 @@ overload functions for UTF-8 encoded strings.  Class
 a <tt>path</tt> object based on a range of code unit values where the encoding
 is inferred based on the value type of the range.
 
-<blockquote class="code">
-<tt><pre>
-template &lt;class Source&gt;
+<fieldset>
+<pre><code class="c++">template &lt;class Source&gt;
 path(const Source&amp; source);
 template &lt;class InputIterator&gt;
 path(InputIterator first, InputIterator last);
-</pre></tt>
-</blockquote>
+</code></pre>
+</fieldset>
 
 <p>§ 27.10.8.2.2 [path.type.cvt] describes how the source encoding is determined
 based on whether the source range value type is <tt>char</tt>, <tt>wchar_t</tt>,
@@ -382,14 +385,13 @@ constructors.
 following factory functions.  Matching factory functions are not provided for
 other encodings.
 
-<blockquote class="code">
-<tt><pre>
-template &lt;class Source&gt;
+<fieldset>
+<pre><code class="c++">template &lt;class Source&gt;
 path u8path(const Source&amp; source);
 template &lt;class InputIterator&gt;
 path u8path(InputIterator first, InputIterator last);
-</pre></tt>
-</blockquote>
+</code></pre>
+</fieldset>
 
 <p>The requirement to construct <tt>path</tt> objects using one interface for
 UTF-8 strings vs another interface for all other supported encodings creates
@@ -402,13 +404,12 @@ in otherwise platform neutral code to construct <tt>path</tt> objects.</p>
 challenge posed by use of <tt>char</tt> as the UTF-8 code unit type.  The
 following code exhibits implementation defined behavior.
 
-<blockquote class="code">
-<tt><pre>
-bool is_utf8_multibyte_code_unit(char c) {
+<fieldset>
+<pre><code class="c++">bool is_utf8_multibyte_code_unit(char c) {
   return c &gt;= 0x80;
 }
-</pre></tt>
-</blockquote>
+</code></pre>
+</fieldset>
 </p>
 
 <p>UTF-8 leading and continuation code units have values in the range 128
@@ -426,13 +427,12 @@ is always false for these implementations.</p>
 
 <p>To correct the code above, explicit conversions are required.  For example:
 
-<blockquote class="code">
-<tt><pre>
-bool is_utf8_multibyte_code_unit(char c) {
+<fieldset>
+<pre><code class="c++">bool is_utf8_multibyte_code_unit(char c) {
   return static_cast&lt;unsigned char&gt;(c) &gt;= 0x80;
 }
-</pre></tt>
-</blockquote>
+</code></pre>
+</fieldset>
 </p>
 
 <p>Finally, processing of UTF-8 strings is currently subject to an optimization
@@ -468,32 +468,30 @@ possible solution directions.</p>
 from <tt>const char8_t[]</tt> to <tt>const char[]</tt> to allow currently
 well-formed code like the following to remain well-formed:
 
-<blockquote class="code">
-<tt><pre>
-template&lt;typename T&gt; void f(const T*);
+<fieldset>
+<pre><code class="c++">template&lt;typename T&gt; void f(const T*);
 void f(const char*);
 f(u8"text");                    // Ok, calls f(const char*).
 ...
 char u8a[] = u8"text";          // Ok.
 const char (&amp;u8r)[] = u8"text"; // Ok.
 const char *u8s = u8"text";     // Ok.
-</pre></tt>
-</blockquote>
+</code></pre>
+</fieldset>
 </p>
 
 <p>It may also be necessary to permit implicit conversions for non-literal UTF-8
 strings:
 
-<blockquote class="code">
-<tt><pre>
-const auto *u8s = u8"text"; // C++14: Ok, type deduced to <tt>const char*</tt>.
+<fieldset>
+<pre><code class="c++">const auto *u8s = u8"text"; // C++14: Ok, type deduced to <tt>const char*</tt>.
                             // This proposal: Ok, type deduced to <tt>const char8_t*</tt>.
 const char *s = u8s;        // C++14: Ok, <tt>u8s</tt> has type <tt>const char*</tt>.
                             // This proposal: An implicit conversion from <tt>const char8_t*</tt>
                             // to <tt>const char*</tt> would be required for this assignment
                             // to remain well-formed.
-</pre></tt>
-</blockquote>
+</code></pre>
+</fieldset>
 </p>
 
 <p>If such implicit conversions are found to be necessary, specifying them may
@@ -523,16 +521,15 @@ and changes to several functions to now return <tt>std::u8string</tt> instead
 of <tt>std::string</tt>.  This change renders ill-formed the following code
 that is currently well-formed.
 
-<blockquote class="code">
-<tt><pre>
-void f(std::filesystem::path p) {
+<fieldset>
+<pre><code class="c++">void f(std::filesystem::path p) {
   std::string s = p.u8string(); // C++14: Ok.
                                 // This proposal: ill-formed unless conversions
                                 // from <tt>std::u8string</tt> to <tt>std::string</tt>
                                 // are provided.
 }
-</pre></tt>
-</blockquote>
+</code></pre>
+</fieldset>
 </p>
 
 <p>Implicit conversions from <tt>std::u8string</tt> to <tt>std::string</tt>
@@ -545,9 +542,8 @@ them as a deprecated feature seems warranted.</p>
 <tt>const char8_t[]</tt> and <tt>char8_t</tt> respectively.  This affects the
 types deduced for placeholder types and template parameter types.
 
-<blockquote class="code">
-<tt><pre>
-template&lt;typename T1, typename T2&gt;
+<fieldset>
+<pre><code class="c++">template&lt;typename T1, typename T2&gt;
 void ft(T1, T2);
 ...
 ft(u8"text", u8'c'); // C++14: T1 deduced to const char*, T2 deduced to char.
@@ -557,17 +553,16 @@ auto u8s = u8"text"; // C++14: Type deduced to const char*.
                      // This proposal: Type deduced to const char8_t*.
 auto u8c = u8'c';    // C++14: Type deduced to char.
                      // This proposal: Type deduced to char8_t.
-</pre></tt>
-</blockquote>
+</code></pre>
+</fieldset>
 </p>
 
 <p>This has the potential to affect backward compatibility in code that depends
 on overload resolution selecting the same overload for calls involving both
 ordinary and UTF-8 strings.  For example:
 
-<blockquote class="code">
-<tt><pre>
-template&lt;typename T&gt;
+<fieldset>
+<pre><code class="c++">template&lt;typename T&gt;
 void ft(T) {
   static int count = 0;
   return count++;
@@ -576,8 +571,8 @@ void ft(T) {
 ft("text");   // Returns 0.
 ft(u8"text"); // C++14: Returns 1.
               // This proposal: Returns 0.
-</pre></tt>
-</blockquote>
+</code></pre>
+</fieldset>
 </p>
 
 <h2 id="design_narrow_utf8">
