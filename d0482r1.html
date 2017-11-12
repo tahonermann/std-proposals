@@ -149,6 +149,8 @@ blockquote.stddel
           Core Wording</a></li>
       <li><a href="#library_wording">
           Library Wording</a></li>
+      <li><a href="#feature_testing">
+          Wording for P0096: Feature-testing recommendations for C++</a></li>
     </ul>
   </li>
   <li><a href="#acknowledgements">
@@ -158,6 +160,10 @@ blockquote.stddel
 </ul>
 
 <h1 id="changes_since_P0482R0">Changes since P0482R0</h1>
+
+<ul>
+  <li>Added wording for feature-test macros.</li>
+</ul>
 
 <h1 id="introduction">Introduction</h1>
 
@@ -1648,6 +1654,79 @@ specified in Table 135. <tt>atomic_intN_-</tt>
 </blockquote>
 </p>
 
+<h2 id="feature_testing">Wording for P0096: Feature-testing recommendations
+        for C++</h2>
+
+<p>These changes are relative to
+<a title="P0096R5: Feature-testing recommendations for C++"
+   href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0096r5.html">
+P0096R5 (Feature-testing recommendations for C++)</a>
+<sup><a title="P0096R5: Feature-testing recommendations for C++"
+        href="#ref_p0096r5">
+[P0096R5]</a></sup>
+</p>
+
+<p>Add a new subclause before 3.4, "C++17 features":
+<blockquote class=stdins>
+<strong>[3.X] C++Maybe features</strong><br/>
+<br/>
+[1] The following table itemizes changes in consideration for a future WG21
+working draft. (Changes that were made as specified in a core or library issue
+are not generally included.)<br/>
+<br/>
+[2] The table is sorted by the section of the standard primarily affected. The
+"Doc. No." column links to the paper itself on the committee web site. The
+"Macro Name" column links to the relevant portion of the "Detailed explanation
+and rationale" section of this document.  When the recommendation is to change
+the value of a macro previously recommended to be defined, the "Value" column
+links to the table entry for the previous recommendation.<br/>
+<br/>
+[3] For library features, the "Header" column identifies the header that is expected
+to define the macro, although the macro may also be predefined. For language
+features, the macro must be predefined.<br/>
+<br/>
+<table>
+  <tr>
+    <td align="center">
+      Significant changes under consideration
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <table border="1">
+        <tr>
+          <th align="center">Doc. No.</th>
+          <th align="center">Title</th>
+          <th align="center">Primary<br/>Section</th>
+          <th align="center">Macro Name</th>
+          <th align="center">Value</th>
+          <th align="center">Header</th>
+        </tr>
+        <tr>
+          <td><a href="http://wg21.link/p0482r1">P0482R1</a>
+          <td>char8_t: A type for UTF-8 characters and strings</td>
+          <td>2.13, 3.9.1</td>
+          <td>__cpp_char8_t</td>
+          <td>1</td>
+          <td><em>predefined</em></td>
+        </tr>
+        <tr>
+          <td><a href="http://wg21.link/p0482r1">P0482R1</a>
+          <td>char8_t: A type for UTF-8 characters and strings</td>
+          <td>18.3.2, 20.14.14, 21, 22, 27.10, 29</td>
+          <td>__cpp_lib_char8_t</td>
+          <td>1</td>
+          <td>&lt;atomic&gt; &lt;codecvt&gt; &lt;filesystem&gt;
+              &lt;functional&gt; &lt;limits&gt; &lt;locale&gt; &lt;string&gt;
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+</blockquote>
+</p>
+
 <h1 id="acknowledgements">Acknowledgements</h1>
 
 <p>Michael Spencer and Davide C. C. Italiano first proposed adding a new
@@ -1684,6 +1763,14 @@ P0372R0</a>
       "Working Draft, Standard for Programming Language C++", N4606, 2016.<br/>
       <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/n4606.pdf">
       http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/n4606.pdf</a></td>
+  </tr>
+  <tr>
+    <td id="ref_p0096r5"><sup>[P0096R5]</sup></td>
+    <td>
+      Clark Nelson,
+      "Feature-testing recommendations for C++", P0096R5, 2017.<br/>
+      <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0096r5.html">
+      http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0096r5.html</a></td>
   </tr>
   <tr>
     <td id="ref_p0353r0"><sup>[P0353R0]</sup></td>
