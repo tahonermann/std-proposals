@@ -162,6 +162,13 @@ blockquote.stddel
 <h1 id="changes_since_P0482R0">Changes since P0482R0</h1>
 
 <ul>
+  <li>Rebased proposed wording on
+      <a title="Working Draft, Standard for Programming Language C++"
+         href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/n4700.pdf">
+      N4700</a>
+      <sup><a title="Working Draft, Standard for Programming Language C++"
+              href="#ref_n4700">
+      [N4700]</a></sup>.</li>
   <li>Added wording for feature-test macros.</li>
 </ul>
 
@@ -380,12 +387,12 @@ path(InputIterator first, InputIterator last);
 </code></pre>
 </fieldset>
 
-<p>§ 27.10.8.2.2 [path.type.cvt] describes how the source encoding is determined
-based on whether the source range value type is <tt>char</tt>, <tt>wchar_t</tt>,
-<tt>char16_t</tt>, or <tt>char32_t</tt>.  A range with value type <tt>char</tt>
-is interpreted using the implementation defined narrow execution encoding.  It
-is not possible to construct a path object from UTF-8 encoded text using these
-constructors.
+<p>§ 30.10.7.2.2 [fs.path.type.cvt] describes how the source encoding is
+determined based on whether the source range value type is <tt>char</tt>,
+<tt>wchar_t</tt>, <tt>char16_t</tt>, or <tt>char32_t</tt>.  A range with value
+type <tt>char</tt> is interpreted using the implementation defined narrow
+execution encoding.  It is not possible to construct a path object from UTF-8
+encoded text using these constructors.
 
 <p>To accommodate UTF-8 encoded text, the file system library specifies the
 following factory functions.  Matching factory functions are not provided for
@@ -490,9 +497,9 @@ const char *u8s = u8"text";     // Ok.
 strings:
 
 <fieldset>
-<pre><code class="c++">const auto *u8s = u8"text"; // C++14: Ok, type deduced to <tt>const char*</tt>.
+<pre><code class="c++">const auto *u8s = u8"text"; // C++17: Ok, type deduced to <tt>const char*</tt>.
                             // This proposal: Ok, type deduced to <tt>const char8_t*</tt>.
-const char *s = u8s;        // C++14: Ok, <tt>u8s</tt> has type <tt>const char*</tt>.
+const char *s = u8s;        // C++17: Ok, <tt>u8s</tt> has type <tt>const char*</tt>.
                             // This proposal: An implicit conversion from <tt>const char8_t*</tt>
                             // to <tt>const char*</tt> would be required for this assignment
                             // to remain well-formed.
@@ -505,7 +512,7 @@ present a small challenge.  The standard conversion sequence might have to be
 modified to allow a data representation conversion prior to an lvalue
 transformation in order for an argument of, for example, array of
 <tt>char8_t</tt> to match a parameter of type <tt>char*</tt>.  However, the
-standard conversion sequence, as described in § 13.3.3.1.1 [over.ics.scs],
+standard conversion sequence, as described in § 16.3.3.1.1 [over.ics.scs],
 states that lvalue transformations, including the array-to-pointer conversion,
 are performed before promotions and conversions that might change the data
 representation.  It may be feasible to avoid such a change by stating that a
@@ -529,7 +536,7 @@ that is currently well-formed.
 
 <fieldset>
 <pre><code class="c++">void f(std::filesystem::path p) {
-  std::string s = p.u8string(); // C++14: Ok.
+  std::string s = p.u8string(); // C++17: Ok.
                                 // This proposal: ill-formed unless conversions
                                 // from <tt>std::u8string</tt> to <tt>std::string</tt>
                                 // are provided.
@@ -552,12 +559,12 @@ types deduced for placeholder types and template parameter types.
 <pre><code class="c++">template&lt;typename T1, typename T2&gt;
 void ft(T1, T2);
 ...
-ft(u8"text", u8'c'); // C++14: T1 deduced to const char*, T2 deduced to char.
+ft(u8"text", u8'c'); // C++17: T1 deduced to const char*, T2 deduced to char.
                      // This proposal: T1 deduced to const char8_t*, T2 deduced to char8_t.
 ...
-auto u8s = u8"text"; // C++14: Type deduced to const char*.
+auto u8s = u8"text"; // C++17: Type deduced to const char*.
                      // This proposal: Type deduced to const char8_t*.
-auto u8c = u8'c';    // C++14: Type deduced to char.
+auto u8c = u8'c';    // C++17: Type deduced to char.
                      // This proposal: Type deduced to char8_t.
 </code></pre>
 </fieldset>
@@ -575,7 +582,7 @@ void ft(T) {
 }
 ...
 ft("text");   // Returns 0.
-ft(u8"text"); // C++14: Returns 1.
+ft(u8"text"); // C++17: Returns 1.
               // This proposal: Returns 0.
 </code></pre>
 </fieldset>
@@ -595,7 +602,7 @@ Use of <tt>unsigned char</tt> closely aligns with historical use.  Use of
 types of <tt>char16_t</tt> and <tt>char32_t</tt> are specified.</p>
 
 <p>This proposal specifies <tt>unsigned char</tt> as the underlying type as
-noted in the changes to § 3.9.1 <tt>[basic.fundamental]</tt> paragraph 5.</p>
+noted in the changes to § 6.9.1 <tt>[basic.fundamental]</tt> paragraph 5.</p>
 
 <h2 id="design_deprecated">Deprecated features</h2>
 
@@ -612,9 +619,9 @@ The new specializations are functionally identical to the deprecated ones.
 
 Filesystem <tt>path</tt> objects may now be constructed with UTF-8 strings using
 the existing <tt>path</tt> constructors used for construction with other
-encodings as specified in § 27.10.8.2.2 [path.type.cvt] and § 27.10.8.4.1
-[path.construct].  This proposal deprecates the existing <tt>u8path</tt> path
-factory functions specified in § 27.10.8.6.2 [path.factory].
+encodings as specified in § 30.10.7.2.2 [fs.path.type.cvt] and § 30.10.7.4.1
+[fs.path.construct].  This proposal deprecates the existing <tt>u8path</tt> path
+factory functions specified in § 30.10.7.6.2 [fs.path.factory].
 
 <h1 id="implementation_exp">Implementation Experience</h1>
 
@@ -1593,6 +1600,79 @@ changed from "array of <em>some-integer-type</em>" to "array of
 <tt>const char32_t</tt>". The type of a wide string literal is changed from
 "array of <tt>wchar_t</tt>" to "array of <tt>const wchar_t</tt>".<br/>
 [&hellip;]</br>
+</blockquote>
+</p>
+
+<p>Change in C.5.1 [diff.cpp17.lex]:
+<blockquote>
+5.11<br/>
+<strong>Change</strong>: New keywords<br/>
+<strong>Rationale</strong>: Required for new features. The <tt>requires</tt>
+keyword is added to introduce constraints through a <em>requires-clause</em>
+or a <em>requires-expression</em>. The <tt>concept</tt> keyword is added to
+enable the definition of <em>concepts</em> (17.6.8).<br/>
+<strong>Effect on original feature</strong>: Valid ISO C++ 2017 code using
+<tt>concept</tt><ins>,</ins><del> or</del> <tt>requires</tt><ins>, or
+<tt>char8_t</tt></ins> as an identifier is not valid in this International
+Standard.<br/>
+<ins>
+<br/>
+5.13<br/>
+<strong>Change</strong>: Type of UTF-8 string and character literals.<br/>
+<strong>Rationale</strong>: Required for new features.  The changed types
+enable function overloading, template specialization, and type deduction
+to distinguish ordinary and UTF-8 string and character literals.<br/>
+<strong>Effect on original feature</strong>: Valid ISO C++ 2017 code that
+depends on UTF-8 string literals having type "array of <tt>const char</tt>"
+and UTF-8 character literals having type "<tt>char</tt>" is not valid in
+this International Standard.<br/>
+<br/>
+<div style="margin-left: 1em;">
+<tt>
+<pre>const auto *u8s = u8"text";   <em>// <tt>u8s</tt> previously deduced as <tt>const char *</tt>; now deduced as <tt>const char8_t *</tt>.</em>
+const char *ps = u8s;         <em>// ill-formed; previously well-formed.</em>
+
+auto u8c = u8'c';             <em>// <tt>u8c</tt> previously deduced as <tt>char</tt>; now deduced as <tt>char8_t</tt>.</em>
+char *pc = &amp;u8c;              <em>// ill-formed; previously well-formed.</em>
+
+std::string s = u8"text";     <em>// ill-formed; previously well-formed.</em>
+
+void f(const char *s);
+f(u8"text");                  <em>// ill-formed; previously well-formed.</em>
+
+template&lt;typename&gt; struct ct;
+template&lt;&gt; struct ct&lt;char&gt; {
+  using type = char;
+};
+ct&lt;decltype(u8'c')&gt;::type x;  <em>// ill-formed; previously well-formed.</em>
+</pre>
+</tt>
+</div>
+</ins>
+</blockquote>
+</p>
+
+<p>Add a new subcluase after C.5.1 [diff.cpp17.lex]:
+<blockquote class=stdins>
+C.5.? Clause 30: Input/Output library [diff.cpp17.input.output]<br/>
+<br/>
+30.10.7<br/>
+<strong>Change</strong>: Return type of filesystem path format
+observer member functions.<br/>
+<strong>Rationale</strong>: Required for new features.<br/>
+<strong>Effect on original feature</strong>: Valid ISO C++ 2017 code that
+depends on the <tt>u8string()</tt> and <tt>generic_u8string()</tt> member
+functions of <tt>std::filesystem::path</tt> returning <tt>std::string</tt>
+is not valid in this International Standard.<br/>
+<br/>
+<div style="margin-left: 1em;">
+<tt>
+<pre>std::filesystem::path p;
+std::string s1 = p.u8string();          <em>// ill-formed; previously well-formed.</em>
+std::string s2 = p.generic_u8string();  <em>// ill-formed; previously well-formed.</em>
+</pre>
+</tt>
+</div>
 </blockquote>
 </p>
 
