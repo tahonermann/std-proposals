@@ -68,7 +68,7 @@ blockquote.stddel
   </tr>
   <tr>
     <th>Date:</th>
-    <td>2017-11-10</td>
+    <td>2017-11-17</td>
   </tr>
   <tr>
     <th>Audience:</th>
@@ -98,7 +98,7 @@ blockquote.stddel
           </a>
         <ul>
           <li><a href="#design_compat_core">
-              Core language backward compatibility features
+              Core language backward compatibility
               </a>
             <ul>
               <li><a href="#design_compat_core_implicit_conversion">
@@ -107,7 +107,7 @@ blockquote.stddel
             </ul>
           </li>
           <li><a href="#design_compat_library">
-              Library backward compatibility features
+              Library backward compatibility
               </a>
             <ul>
               <li><a href="#design_compat_library_convert_u8string_to_string">
@@ -241,7 +241,6 @@ expected to be addressed in a future revision of this proposal.
       assessing the impact to backward compatibility.</li>
   <li>The claim that a new type may allow compilers to better optimize code that
       works with UTF-8 strings is unsubstantiated.</li>
-  <li>Wording updates for clauses C and D have not yet been provided.</li>
   <li>Impact to other proposals such as
       <a title="P0353R0: Unicode Encoding Conversions for the Standard Library"
          href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0353r0.html">
@@ -312,14 +311,14 @@ void do_x3(const char *);
 through the type of the string, limits the ability to provide elegant encoding
 sensitive interfaces.  Consider the following invocations of the
 <tt>make_text_view</tt> function proposed in
-<a title="P0244R1: Text_view: A C++ concepts and range based character encoding
+<a title="P0244R2: Text_view: A C++ concepts and range based character encoding
          and code point enumeration library"
-   href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0244r1.html">
-P0244R1</a>
-<sup><a title="P0244R1: Text_view: A C++ concepts and range based character
+   href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0244r2.html">
+P0244R2</a>
+<sup><a title="P0244R2: Text_view: A C++ concepts and range based character
                encoding and code point enumeration library"
-        href="#ref_p0244r1">
-[P0244R1]</a></sup>:
+        href="#ref_p0244r2">
+[P0244R2]</a></sup>:
 
 <fieldset>
 <pre><code class="c++">make_text_view&lt;execution_character_encoding&gt;("text")
@@ -460,10 +459,18 @@ pessimization due to glvalue expressions of type <tt>char</tt> potentially
 aliasing objects of other types.  Use of a distinct type that does not share
 this aliasing behavior may allow for further compiler optimizations.</p>
 
-<p>UTF-8 is the most popular character encoding in use today and its popularity
-is continuing to rise <em><span style="color:red">(FIXME: citation needed)</span></em>.
-The C++ standard should be removing barriers to use of UTF-8, not adding
-additional barriers.</p>
+<p>As of November 2017,
+<a title="Usage of UTF-8 for websites"
+   href="https://w3techs.com/technologies/details/en-utf8/all/all">
+UTF-8 is now used by more than 90% of all websites</a>
+<sup><a title="Usage of UTF-8 for websites"
+        href="#ref_w3techs">
+[W3Techs]</a></sup>.
+The C++ standard must improve support for UTF-8 by removing the existing
+barriers that result in redundant tagging of character encodings, non-generic
+UTF-8 specific workarounds like <tt>u8path</tt>, and the need for static
+casts to examine UTF-8 code unit values.
+</p>
 
 <h1 id="design">Design Considerations</h1>
 
@@ -479,7 +486,7 @@ address these concerns in a future revision of this document.  In the meantime,
 the following sections discuss some of the backward compatibility impact and
 possible solution directions.</p>
 
-<h3 id="design_compat_core">Core language backward compatibility features</h3>
+<h3 id="design_compat_core">Core language backward compatibility</h3>
 
 <h4 id="design_compat_core_implicit_conversion">
     Implicit conversions from UTF-8 strings to ordinary strings</h4>
@@ -530,7 +537,7 @@ author has not yet convinced himself of this possibility.</p>
 <p>If such implicit conversions are found to be necessary, providing them as
 deprecated features would enable a transition period and eventual removal.</p>
 
-<h3 id="design_compat_library">Library backward compatibility features</h3>
+<h3 id="design_compat_library">Library backward compatibility</h3>
 
 <h4 id="design_compat_library_convert_u8string_to_string">
     Implicit conversion from std::u8string to std::string</h4>
@@ -1777,6 +1784,13 @@ P0372R0</a>
 
 <table id="references">
   <tr>
+    <td id="ref_w3techs"><sup>[W3Techs]</sup></td>
+    <td>
+      "Usage of UTF-8 for websites", W3Techs, 2017.<br/>
+      <a href="https://w3techs.com/technologies/details/en-utf8/all/all">
+      https://w3techs.com/technologies/details/en-utf8/all/all</a></td>
+  </tr>
+  <tr>
     <td id="ref_n2249"><sup>[N2249]</sup></td>
     <td>
       Lawrence Crowl,
@@ -1824,13 +1838,13 @@ P0372R0</a>
       http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0372r0.html</a></td>
   </tr>
   <tr>
-    <td id="ref_p0244r1"><sup>[P0244R1]</sup></td>
+    <td id="ref_p0244r2"><sup>[P0244R2]</sup></td>
     <td>
       Tom Honermann,
       "Text_view: A C++ concepts and range based character encoding and code
-       point enumeration library", P0244R1, 2016.<br/>
-      <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0244r1.html">
-      http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0244r1.html</a></td>
+       point enumeration library", P0244R2, 2017.<br/>
+      <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0244r2.html">
+      http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0244r2.html</a></td>
   </tr>
   <tr>
     <td id="ref_p0218r1"><sup>[P0218R1]</sup></td>
