@@ -174,6 +174,9 @@ blockquote.stddel
       Implicit conversion from std::u8string to std::string</a> section to
       illustrate impact of the changes to <tt>operator""s</tt>.
   </li>
+  <li>Updated core wording for 5.13.5 to define <em>UTF-8 string literal</em>
+      before referring to it.
+  </li>
 </ul>
 
 <h1 id="introduction">Introduction</h1>
@@ -659,44 +662,48 @@ known as a <em>UTF-8 character literal</em>.[&hellip;]
 </blockquote>
 </p>
 
-<p>Remove 5.13.5 [lex.string] paragraph 7:
-<blockquote class=stddel>
+<p>Change in 5.13.5 [lex.string] paragraph 6:
+<blockquote>
+After translation phase 6, a <em>string-literal</em> that does not begin with
+an <em>encoding-prefix</em> is an <em>ordinary string literal</em><ins>.  An
+<em>ordinary string literal</em> has type "<em>array</em> of <em>n</em>
+<tt>const char</tt>" where <em>n</em> is the size of the string as defined
+below, has static storage duration (6.7)</ins>, and is initialized with the
+given characters.
+</blockquote>
+</p>
+
+<p>Change in 5.13.5 [lex.string] paragraph 7:
+<blockquote>
 A <em>string-literal</em> that begins with <tt>u8</tt>, such as
-<tt>u8"asdf"</tt>, is a UTF-8 string literal.
+<tt>u8"asdf"</tt>, is a <em>UTF-8 string literal</em><ins>, also referred to as
+a <tt>char8_t</tt> string literal.  A <tt>char8_t</tt> string literal has type
+"<em>array</em> of <em>n</em> <tt>const char8_t</tt>", where <em>n</em> is
+the size of the string as defined below; each successive element of the object
+representation (6.9) has the value of the corresponding code unit of the UTF-8
+encoding of the string.
 </blockquote>
 </p>
 
 <p>Change in 5.13.5 [lex.string] paragraph 8:
 <blockquote>
 Ordinary string literals and UTF-8 string literals are also referred to as
-narrow string literals. <del>A narrow string literal has type “array of n
-const char”, where n is the size of the string as defined below, and has
-static storage duration (6.7).</del>
+narrow string literals. <del>A narrow string literal has type "<em>array</em>
+of <em>n</em> <tt>const char</tt>", where <em>n</em> is the size of the string
+as defined below, and has static storage duration (6.7).</del>
 </blockquote>
 </p>
 
-<p>Add a new paragraph after 5.13.5 [lex.string] paragraph 8:
-<blockquote class=stdins>
-An ordinary string literal has type "array of n const char", where n is the size
-of the string as defined below, and has static storage duration (6.7).
-</blockquote>
-</p>
-
-<p>Change in 5.13.5 [lex.string] paragraph 9:
-<blockquote>
-<del>For a UTF-8 string literal, each successive element of the object
+<p>Remove 5.13.5 [lex.string] paragraph 9:
+<blockquote class=stddel>
+For a UTF-8 string literal, each successive element of the object
 representation (6.9) has the value of the corresponding code unit of the UTF-8
-encoding of the string.</del>
-<ins>A <em>string-literal</em> that begins with <tt>u8</tt>, such as
-<tt>u8"asdf"</tt>, is a UTF-8 string literal, also referred to as a
-<tt>char8_t</tt> string literal.  A <tt>char8_t</tt> string literal has type
-"array of n <tt>const char8_t</tt>", where n is the size of the string as
-defined below; each successive element of the object representation (6.9) has
-the value of the corresponding code unit of the UTF-8 encoding of the
-<em>s-char-sequence</em>.  A single <em>s-char</em> may produce more than one
-<tt>char8_t</tt> code unit.</ins>
+encoding of the string.
 </blockquote>
 </p>
+
+<p><em>Drafting note: The paragraph 9 content was incorporated in the changes
+to paragraph 7.</em></p>
 
 <p>Change in 5.13.5 [lex.string] paragraph 15:
 <blockquote>
