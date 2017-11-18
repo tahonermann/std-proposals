@@ -170,6 +170,10 @@ blockquote.stddel
               href="#ref_n4700">
       [N4700]</a></sup>.</li>
   <li>Added wording for feature-test macros.</li>
+  <li>Updated the <a href="#design_compat_library_convert_u8string_to_string">
+      Implicit conversion from std::u8string to std::string</a> section to
+      illustrate impact of the changes to <tt>operator""s</tt>.
+  </li>
 </ul>
 
 <h1 id="introduction">Introduction</h1>
@@ -536,10 +540,12 @@ that is currently well-formed.
 
 <fieldset>
 <pre><code class="c++">void f(std::filesystem::path p) {
-  std::string s = p.u8string(); // C++17: Ok.
-                                // This proposal: ill-formed unless conversions
-                                // from <tt>std::u8string</tt> to <tt>std::string</tt>
-                                // are provided.
+  std::string s;
+
+  s = p.u8string(); // C++17: Ok.
+                    // This proposal: ill-formed.
+  s = u8"text"s;    // C++17: Ok.
+                    // This proposal: ill-formed.
 }
 </code></pre>
 </fieldset>
@@ -547,7 +553,7 @@ that is currently well-formed.
 
 <p>Implicit conversions from <tt>std::u8string</tt> to <tt>std::string</tt>
 would be undesirable in general.  If they are found to be necessary, providing
-them as a deprecated feature seems warranted.</p>
+them as a deprecated feature is a possibility.</p>
 
 <h2 id="design_type_deduction">Deduced types for UTF-8 literals</h2>
 
