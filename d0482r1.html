@@ -226,31 +226,6 @@ remove barriers to working with UTF-8 encoded text and to enable generic
 interfaces that work with all five of the standard mandated text encodings in a
 consistent manner.</p>
 
-<p>This proposal is incomplete as the author ran out of time preparing it for
-the Issaquah mailing deadline.  The following are known deficiencies that are
-expected to be addressed in a future revision of this proposal.
-<ul>
-  <li>Backward compatibility is not adequately addressed.  There is some
-      discussion in the design considerations section, but no provisions
-      addressing backward compatibility are currently present in the
-      wording.  The proposed changes effectively bring the standard to the
-      state the author feels it would likely be in had <tt>char8_t</tt> been
-      added at the same time as <tt>char16_t</tt> and <tt>char32_t</tt>
-      were.</li>
-  <li>An implementation of the proposed changes is not yet available for
-      assessing the impact to backward compatibility.</li>
-  <li>The claim that a new type may allow compilers to better optimize code that
-      works with UTF-8 strings is unsubstantiated.</li>
-  <li>Impact to other proposals such as
-      <a title="P0353R0: Unicode Encoding Conversions for the Standard Library"
-         href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0353r0.html">
-      P0353R0</a>
-      <sup><a title="P0353R0: Unicode Encoding Conversions for the Standard Library"
-              href="#ref_p0353r0">
-      [P0353R0]</a></sup> is not discussed.
-  </li>
-</ul>
-
 <h1 id="motivation">Motivation</h1>
 
 <p>Consider the following string literal expressions, all of which encode
@@ -1826,14 +1801,6 @@ P0372R0</a>
       "Feature-testing recommendations for C++", P0096R5, 2017.<br/>
       <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0096r5.html">
       http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0096r5.html</a></td>
-  </tr>
-  <tr>
-    <td id="ref_p0353r0"><sup>[P0353R0]</sup></td>
-    <td>
-      Beman Dawes,
-      "Unicode Encoding Conversions for the Standard Library", P0353R0, 2016.<br/>
-      <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0353r0.html">
-      http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0353r0.html</a></td>
   </tr>
   <tr>
     <td id="ref_p0372r0"><sup>[P0372R0]</sup></td>
