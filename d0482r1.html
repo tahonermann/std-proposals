@@ -162,6 +162,8 @@ blockquote.stddel
 <h1 id="changes_since_P0482R0">Changes since P0482R0</h1>
 
 <ul>
+  <li>Updated the <a href="#implementation_exp">Implementation Experience</a>
+      section; an implementation is now available in a fork of gcc.</li>
   <li>Rebased proposed wording on
       <a title="Working Draft, Standard for Programming Language C++"
          href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/n4713.pdf">
@@ -616,8 +618,14 @@ factory functions specified in § 30.11.7.6.2 [fs.path.factory].
 
 <h1 id="implementation_exp">Implementation Experience</h1>
 
-<p>None yet, but the author intends to prototype an implementation in
-gcc/libstdc++ and/or Clang/libc++.</p>
+<p>An implementation is available in the <tt>char8_t</tt> branch of a gcc
+fork hosted on GitHub at
+<a href="https://github.com/tahonermann/gcc/tree/char8_t">
+https://github.com/tahonermann/gcc/tree/char8_t</a>.  This implementation is
+believed to be complete for both the proposed core language and library
+features.  New <tt>-fchar8_t</tt> and <tt>-fno-char8_t</tt> compiler options
+support enabling and disabling the new features.  No backward compatibility
+features are currently implemented.</p>
 
 <h1 id="wording">Formal Wording</h1>
 
