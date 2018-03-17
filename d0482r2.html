@@ -68,7 +68,7 @@ blockquote.stddel
   </tr>
   <tr>
     <th>Date:</th>
-    <td>2018-03-03</td>
+    <td>2018-03-16</td>
   </tr>
   <tr>
     <th>Audience:</th>
@@ -148,9 +148,13 @@ blockquote.stddel
       Formal Wording</a>
     <ul>
       <li><a href="#core_wording">
-          Core Wording</a></li>
+          Core wording</a></li>
       <li><a href="#library_wording">
-          Library Wording</a></li>
+          Library wording</a></li>
+      <li><a href="#annex_a_wording">
+          Annex A Grammar summary wording</a></li>
+      <li><a href="#annex_c_wording">
+          Annex C Compatibility wording</a></li>
       <li><a href="#feature_testing">
           Wording for P0096: Feature-testing recommendations for C++</a></li>
     </ul>
@@ -167,6 +171,7 @@ blockquote.stddel
   <li>Added <tt>basic_ostream&lt;char&gt;::operator&lt;&lt;()</tt> and
       <tt>basic_istream&lt;char&gt;::operator&gt;&gt;()</tt> stream
       insertion and extraction overloads for <tt>char8_t</tt>.</li>
+  <li>Updated wording to address changes requested by CWG review.</li>
   <li>Updated the feature test macro values to 201803.</li>
 </ul>
 
@@ -737,7 +742,7 @@ N4713</a>
         href="#ref_n4713">
 [N4713]</a></sup></p>
 
-<h2 id="core_wording">Core Wording</h2>
+<h2 id="core_wording">Core wording</h2>
 
 <p>Add <tt>char8_t</tt> to the list of keywords in table 5 in 5.11 [lex.key]
 paragraph 1. </p>
@@ -754,7 +759,7 @@ known as a <em>UTF-8 character literal</em>.[&hellip;]
 <blockquote>
 After translation phase 6, a <em>string-literal</em> that does not begin with
 an <em>encoding-prefix</em> is an <em>ordinary string literal</em><ins>.  An
-<em>ordinary string literal</em> has type "<em>array</em> of <em>n</em>
+ordinary string literal has type "<em>array</em> of <em>n</em>
 <tt>const char</tt>" where <em>n</em> is the size of the string as defined
 below, has static storage duration (6.6.4)</ins>, and is initialized with the
 given characters.
@@ -815,7 +820,7 @@ Characters <ins>declared with type <tt>char</tt> </ins>can be explicitly
 declared <tt>unsigned</tt> or <tt>signed</tt>.  Plain <tt>char</tt>,
 <tt>signed char</tt>, and <tt>unsigned char</tt> are three distinct types,
 collectively called <em><del>narrow</del><ins>ordinary</ins> character
-types</em>.  <ins>The <em>ordinary character types</em> and <tt>char8_t</tt> are
+types</em>.  <ins>The ordinary character types and <tt>char8_t</tt> are
 collectively called <em>narrow character types</em>.</ins>  A <tt>char</tt>, a
 <tt>signed char</tt>, <del>and </del>an <tt>unsigned char</tt><ins>, and a
 <tt>char8_t</tt></ins> occupy the same amount of storage and have the same
@@ -824,11 +829,11 @@ representation. For narrow character types, all bits of the object
 representation participate in the value representation. [ <em>Note</em>: A
 bit-field of narrow character type whose length is larger than the number of
 bits in the object representation of that type has padding bits; see 6.7.
-&mdash; <em>end note</em> ] For unsigned narrow character types<ins>, including
-<tt>char8_t</tt></ins>, each possible bit pattern of the value representation
+&mdash; <em>end note</em> ] For unsigned narrow character types,
+each possible bit pattern of the value representation
 represents a distinct number. These requirements do not hold for other types.
-In any particular implementation, a plain <tt>char</tt> object <del>can</del>
-<ins>shall</ins> take on either the same values as a <tt>signed char</tt> or an
+In any particular implementation, a plain <tt>char</tt> object can
+take on either the same values as a <tt>signed char</tt> or an
 <tt>unsigned char</tt>; which one is implementation-defined. For each value
 <em>i</em> of type <tt>unsigned char</tt><ins>, or <tt>char8_t</tt></ins> in the
 range 0 to 255 inclusive, there exists a value <em>j</em> of type <tt>char</tt>
@@ -882,9 +887,11 @@ are converted to some integral type.
 
 <p>Change in 8.5.2.3 [expr.sizeof] paragraph 1:
 <blockquote>
-[&hellip;] <tt>sizeof(char)</tt>, <tt>sizeof(signed char)</tt><ins>,</ins>
-<del>and</del> <tt>sizeof(unsigned char)</tt><ins>, and <tt>sizeof(char8_t)</tt></ins>
-are 1. [&hellip;]
+[&hellip;] <del><tt>sizeof(char)</tt>, <tt>sizeof(signed char)</tt>
+and <tt>sizeof(unsigned char)</tt> are 1</del><ins>The result of <tt>sizeof</tt>
+applied to any of the narrow character types is 1</ins>.  The result of
+<tt>sizeof</tt> applied to any other fundamental type is implementation-defined.
+[&hellip;]
 </blockquote>
 </p>
 
@@ -978,10 +985,10 @@ string literal, see 11.6.2.
 <blockquote>
 An array of <del>narrow</del><ins>ordinary</ins> character type (6.7.1),
 <ins><tt>char8_t</tt> array, </ins><tt>char16_t</tt> array, <tt>char32_t</tt>
-array, or <tt>wchar_t</tt> array can be initialized by <del>a narrow</del>
-<ins>an ordinary</ins> string literal, <ins>char8_t string literal,
-</ins>char16_t string literal, char32_t string literal, or wide string
-literal, respectively, [&hellip;]
+array, or <tt>wchar_t</tt> array can be initialized by
+<del>a narrow</del><ins>an ordinary</ins> string literal, <ins><tt>char8_t</tt>
+string literal, </ins><tt>char16_t</tt> string literal, <tt>char32_t</tt>
+string literal, or wide string literal, respectively, [&hellip;]
 </blockquote>
 </p>
 
@@ -1006,7 +1013,7 @@ The declaration of a literal operator shall have a
 </blockquote>
 </p>
 
-<h2 id="library_wording">Library Wording</h2>
+<h2 id="library_wording">Library wording</h2>
 
 <p>Change in 20.1 [library.general] paragraph 7:
 <blockquote>
@@ -1805,6 +1812,9 @@ in the header &lt;cstdint&gt;. [&hellip;]<br/>
 </blockquote>
 </p>
 
+
+<h2 id="annex_a_wording">Annex A Grammar summary wording</h2>
+
 <p>Change in A.6 [gram.dcl]:
 <blockquote>
 <div style="margin-left: 1em;">
@@ -1823,6 +1833,9 @@ in the header &lt;cstdint&gt;. [&hellip;]<br/>
 </div>
 </blockquote>
 </p>
+
+
+<h2 id="annex_c_wording">Annex C Compatibility wording</h2>
 
 <p>Change in C.1.1 [diff.lex]:
 <blockquote>
