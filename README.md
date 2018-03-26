@@ -1,5 +1,7 @@
 This repository maintains versions of the following
-ISO JTC1/SC22/WG21 papers:
+ISO JTC1/SC22 WG21 and WG14 papers:
+
+# WG21 Papers (C++)
 
 WG21 Number     | Title | Link
 --------------- | ----- | ----
@@ -13,3 +15,9 @@ P0804R0         | Impact of the modules TS on the C++ tools ecosystem | [HTML](h
 Drafts In Progress | Title | Link
 ------------------ | ----- | ----
 D0482R2         | char8_t: A type for UTF-8 characters and strings (Revision 2) | [HTML](http://htmlpreview.github.io/?https://github.com/tahonermann/std-proposals/blob/master/d0482r2.html)
+
+# WG14 Papers (C)
+
+WG14 Number     | Title | Link
+--------------- | ----- | ----
+N2231           | char8_t: A type for UTF-8 characters and strings | [HTML](http://htmlpreview.github.io/?https://github.com/tahonermann/std-proposals/blob/master/n2231.html)
