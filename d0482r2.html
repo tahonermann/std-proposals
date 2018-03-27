@@ -68,7 +68,7 @@ blockquote.stddel
   </tr>
   <tr>
     <th>Date:</th>
-    <td>2018-03-16</td>
+    <td>2018-03-26</td>
   </tr>
   <tr>
     <th>Audience:</th>
@@ -168,6 +168,15 @@ blockquote.stddel
 <h1 id="changes_since_P0482R1">Changes since P0482R1</h1>
 
 <ul>
+  <li>Updated for the corresponding
+      <a title="char8_t: A type for UTF-8 characters and strings"
+         href="http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2231.htm">
+      WG14 N2231</a>
+      <sup><a title="char8_t: A type for UTF-8 characters and strings"
+              href="#ref_wg14_n2231">
+      [WG14 N2231]</a></sup>
+      proposal for C; added wording updates for C's &lt;uchar.h&gt;, and the
+      addition of the <tt>mbrtoc8</tt> and <tt>c8rtomb</tt> functions.</li>
   <li>Added <tt>basic_ostream&lt;char&gt;::operator&lt;&lt;()</tt> and
       <tt>basic_istream&lt;char&gt;::operator&gt;&gt;()</tt> stream
       insertion and extraction overloads for <tt>char8_t</tt>.</li>
@@ -741,6 +750,16 @@ N4713</a>
 <sup><a title="Working Draft, Standard for Programming Language C++"
         href="#ref_n4713">
 [N4713]</a></sup></p>
+
+<p>These changes presume the adoption of proposal
+<a title="char8_t: A type for UTF-8 characters and strings"
+   href="http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2231.htm">
+WG14 N2231</a>
+<sup><a title="char8_t: A type for UTF-8 characters and strings"
+        href="#ref_wg14_n2231">
+[WG14 N2231]</a></sup>
+into the ISO/IEC 9899 standard for C, and that the next revision of the C++
+standard will update dependencies on ISO/IEC 9899 accordingly.</p>
 
 <h2 id="core_wording">Core wording</h2>
 
@@ -1329,6 +1348,43 @@ constexpr u8string_view operator""sv(const char8_t* str, size_t len) noexcept;
 </div>
 </blockquote>
 </p>
+
+<p>Change in 24.5.5 [cuchar.syn]:
+<blockquote>
+<tt>
+namespace std {<br/>
+&nbsp;&nbsp;using mbstate_t = <em>see below</em>;<br/>
+&nbsp;&nbsp;using size_t = <em>see 21.2.4</em>;<br/>
+<br/>
+<ins>&nbsp;&nbsp;size_t mbrtoc8(char8_t* pc8, const char* s, size_t n, mbstate_t* ps);<br/>
+&nbsp;&nbsp;size_t c8rtomb(char* s, char8_t c8, mbstate_t* ps);<br/></ins>
+&nbsp;&nbsp;size_t mbrtoc16(char16_t* pc16, const char* s, size_t n, mbstate_t* ps);<br/>
+&nbsp;&nbsp;size_t c16rtomb(char* s, char16_t c16, mbstate_t* ps);<br/>
+&nbsp;&nbsp;size_t mbrtoc32(char32_t* pc32, const char* s, size_t n, mbstate_t* ps);<br/>
+&nbsp;&nbsp;size_t c32rtomb(char* s, char32_t c32, mbstate_t* ps);<br/>
+}
+</tt>
+</blockquote>
+</p>
+
+<p>Change in 24.5.5 [cuchar.syn] paragraph 1:
+<blockquote>
+The contents and meaning of the header <tt>&lt;cuchar&gt;</tt> are the same as
+the C standard library header <tt>&lt;uchar.h&gt;</tt>, except that it does not
+declare types <ins><tt>char8_t</tt>, </ins><tt>char16_t</tt><del> nor</del><ins>, or</ins>
+<tt>char32_t</tt>.<br/>
+<br/>
+<em>See also:</em> ISO C 7.28
+</blockquote>
+</p>
+
+<p><em>Drafting note: The changes to 24.5.5 are dependent upon WG14 adopting
+<a title="char8_t: A type for UTF-8 characters and strings"
+   href="http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2231.htm">
+N2231</a>
+<sup><a title="char8_t: A type for UTF-8 characters and strings"
+        href="#ref_wg14_n2231">
+[WG14 N2231]</a></sup></em></p>
 
 <p>Change in table 69 of 25.3.1.1.1 [locale.category]:
 <blockquote>
@@ -2086,6 +2142,14 @@ P0372R0</a>
       "Adopt the File System TS for C++17", P0218R1, 2016.<br/>
       <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0372r0.html">
       http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0372r0.html</a></td>
+  </tr>
+  <tr>
+    <td id="ref_wg14_n2231"><sup>[WG14 N2231]</sup></td>
+    <td>
+      Tom Honermann,
+      "char8_t: A type for UTF-8 characters and strings", WG14 N2231, 2018.<br/>
+      <a href="http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2231.htm">
+      http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2231.htm</a></td>
   </tr>
 </table>
 
