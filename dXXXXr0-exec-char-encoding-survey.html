@@ -1,0 +1,834 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+
+<head>
+
+<title>A survey of execution character encodings</title>
+
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<style type="text/css">
+pre {
+    display: inline;
+}
+
+table#header th,
+table#header td
+{
+    text-align: left;
+}
+table#references th,
+table#references td
+{
+    vertical-align: top;
+}
+
+
+blockquote
+{
+    color: #000000;
+    background-color: #F1F1F1;
+    border: 1px solid #D1D1D1;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+}
+</style>
+
+</head>
+
+
+<body>
+
+<table id="header">
+  <tr>
+    <th>Document Number:</th>
+    <td>DXXXXR0 <em>&lt;DRAFT&gt;</em></td>
+  </tr>
+  <tr>
+    <th>Date:</th>
+    <td>2018-04-06</td>
+  </tr>
+  <tr>
+    <th>Audience:</th>
+    <td>Evolution Working Group<br/>
+        Library Evolution Working Group</td>
+  </tr>
+  <tr>
+    <th>Reply-to:</th>
+    <td>Tom Honermann &lt;tom@honermann.net&gt;</td>
+  </tr>
+</table>
+
+<h1>A survey of execution character encodings</h1>
+
+<ul>
+  <li><a href="#introduction">
+      Introduction</a></li>
+  <li><a href="#motivation">
+      Motivation</a></li>
+  <li><a href="#future">
+      Future directions</a></li>
+  <li><a href="#results">
+      survey results</a></li>
+</ul>
+
+
+<h1 id="introduction">Introduction</h1>
+
+<p>This paper contains the results of a survey of the default and supported
+execution character encodings of current C and C++ compilers.  Results are
+included only for compilers that have not been obviously discontinued.  Wide
+character encodings are not reflected in the results.  Distinctions between
+source and execution character encodings are ignored unless otherwise stated.
+</p>
+
+<p>The list of compilers to include in this survey were culled from the
+following sources:
+<ul>
+  <li>Wikipedia<br/>
+      <a href="https://en.wikipedia.org/wiki/List_of_compilers#C++_compilers">
+      https://en.wikipedia.org/wiki/List_of_compilers#C++_compilers</a>
+  </li>
+  <li>Predef<br/>
+      <a href="https://sourceforge.net/p/predef/wiki/Compilers">
+      https://sourceforge.net/p/predef/wiki/Compilers/</a>
+  </li>
+</ul>
+</p>
+
+<p>The supported character encodings for each compiler were determined by
+consulting available documentation.  No testing was performed because the
+author lacks access to most of these compiler.
+</p>
+
+
+<h1 id="motivation">Motivation</h1>
+
+<p>At the C++ standard committee meeting in Jacksonville, 2018, EWG discussed
+the long-term ramifications of the P0482 char8_t proposal.  What will happen
+as the world continues to migrate to UTF-8?  If all compilers were to transition
+to UTF-8 as their (primary) execution character encoding, what would become of
+code written to use char8_t?
+</p>
+
+<p>The data presented in this paper is intended to help set expectations
+regarding the possibility of one day mandating a specific execution character
+encoding for all compilers.  Unfortunately, the collected data is just a
+snapshot in time and therefore does not reflect current trends nor predict
+any particular future.  It nevertheless does give an indication of the amount
+of effort that would be needed to migrate all compilers to a particular
+execution character encoding.
+</p>
+
+
+<h1 id="future">Future directions</h1>
+
+<p>JF Bastien had the excellent suggestion that this data, as well as data
+for other implementation defined behavior and quantities be collected at
+<a href="http://cppreference.com">cppreference.com</a>.  The author intends to
+pursue this direction for further collection and maintenance of this data.
+</p>
+
+
+<h1 id="results">Survey results</h1>
+
+<table border="1">
+  <tr>
+    <th>Compiler</th>
+    <th>Version and release date</th>
+    <th>Default execution character encoding</th>
+    <th>Other execution character encodings supported?</th>
+    <th>References/Notes</th>
+  </tr>
+  <tr>
+    <td><a href="https://gcc.gnu.org">GCC</a></td>
+    <td>7.3.0<br/>2018-01-25</td>
+    <td>UTF-8</td>
+    <td>Yes</td>
+    <td><a href="https://gcc.gnu.org/onlinedocs/gcc-7.3.0/gcc/Preprocessor-Options.html#Preprocessor-Options">
+        https://gcc.gnu.org/onlinedocs/gcc-7.3.0/gcc/Preprocessor-Options.html#Preprocessor-Options</a><br/>
+        <br/>
+        The <tt>-fexec-charset</tt> option enables selection of an alternate
+        execution character set.
+    </td>
+  </tr>
+  <tr>
+    <td><a href="https://clang.llvm.org">Clang</a></td>
+    <td>5.0<br/>2017-09-07</td>
+    <td>UTF-8</td>
+    <td>No</td>
+    <td>According to a post to the Clang developer's mailing list, there is
+        interest in providing support for additional execution character
+        encodings:<br/>
+        <a href="http://lists.llvm.org/pipermail/cfe-dev/2018-January/056721.html">
+        http://lists.llvm.org/pipermail/cfe-dev/2018-January/056721.html</a></td>
+  </tr>
+  <tr>
+    <td><a href="https://www.visualstudio.com/vs/cplusplus/">Microsoft Visual C++</a></td>
+    <td>14.1 (Visual Studio 2017)<br/>2017-03-07</td>
+    <td>Locale dependent ASCII based code page</td>
+    <td>Yes; ASCII based code pages</td>
+    <td>
+        <a href="https://docs.microsoft.com/en-us/cpp/cpp/character-sets2">
+        https://docs.microsoft.com/en-us/cpp/cpp/character-sets2</a><br/>
+        <a href="https://docs.microsoft.com/en-us/cpp/build/reference/execution-charset-set-execution-character-set">
+        https://docs.microsoft.com/en-us/cpp/build/reference/execution-charset-set-execution-character-set</a><br/>
+        <a href="https://docs.microsoft.com/en-us/cpp/build/reference/utf-8-set-source-and-executable-character-sets-to-utf-8">
+        https://docs.microsoft.com/en-us/cpp/build/reference/utf-8-set-source-and-executable-character-sets-to-utf-8</a><br/>
+        <br/>
+        The <tt>/execution-charset</tt> and <tt>/utf-8</tt> options enable
+        selection of an alternate execution character set.<br/>
+    </td>
+  </tr>
+  <tr>
+    <td><a href="https://developer.amd.com/amd-aocc/">AMD Optimizing C/C++ Compiler (Clang based)</a></td>
+    <td>1.1<br/>2017-12-15</td>
+    <td>UTF-8 (presumed)</td>
+    <td>No (presumed)</td>
+    <td><a href="https://developer.amd.com/wordpress/media/2017/04/AOCC-1.1-User-Guide.pdf">
+        https://developer.amd.com/wordpress/media/2017/04/AOCC-1.1-User-Guide.pdf</a><br/>
+        </td>
+  </tr>
+  <tr>
+    <td><a href="https://developer.arm.com/products/software-development-tools/compilers/arm-compiler">Arm Compiler</a></td>
+    <td>5.06 update 6<br/>2017-09-28</td>
+    <td>Locale dependent</td>
+    <td>Yes; requires ISO-8859-1 compatibility</td>
+    <td><a href="https://developer.arm.com/products/software-development-tools/compilers/arm-compiler-5/docs/dui0472/latest/c-and-c-implementation-details/character-sets-and-identifiers-in-arm-c-and-c">
+        https://developer.arm.com/products/software-development-tools/compilers/arm-compiler-5/docs/dui0472/latest/c-and-c-implementation-details/character-sets-and-identifiers-in-arm-c-and-c</a><br/>
+        <br/>
+        The source character set is determined by the current locale unless a
+        Unicode BOM is present or the <tt>--locale</tt> option is specified.
+        The execution and source character set must be the same and must be a
+        subset of ISO-8859-1.<br/>
+        <br/>
+        As of version 6, a clang based compiler is now provided.</td>
+  </tr>
+  <tr>
+    <td><a href="https://developer.arm.com/products/software-development-tools/compilers/arm-compiler">Arm Compiler (Clang based)</a></td>
+    <td>6.9<br/>2017-10-25</td>
+    <td>UTF-8 (presumed)</td>
+    <td>No (presumed)</td>
+    <td>execution character encoding documentation has not been identified.
+        Supported encodings are presumed based on derivation from Clang.</td>
+  </tr>
+  <tr>
+    <td><a href="https://developer.arm.com/products/software-development-tools/hpc/arm-compiler-for-hpc">Arm Compiler for HPC (Clang based)</a></td>
+    <td>18.1<br/>2018-01-17</td>
+    <td>UTF-8 (presumed)</td>
+    <td>No (presumed)</td>
+    <td>execution character encoding documentation has not been identified.
+        Supported encodings are presumed based on derivation from Clang.</td>
+  </tr>
+  <tr>
+    <td><a href="https://www.embarcadero.com/products/cbuilder/product-editions">Embarcadero C++Builder</a></td>
+    <td>RAD Studio 10.2<br/>
+        2017-03-22</td>
+    <td>Non-Clang based: ASCII based code pages<br/><br/>
+        Clang-based: UTF-8 (presumed)</td>
+    <td>No<br/><br/>No (presumed)</td>
+    <td>Implementation defined properties are documented at
+        <a href="http://docwiki.embarcadero.com/RADStudio/Tokyo/en/ANSI_Implementation-specific_Standards">
+        http://docwiki.embarcadero.com/RADStudio/Tokyo/en/ANSI_Implementation-specific_Standards</a>.<br/>
+        <br/>
+        RAD Studio 10.2 provides both Clang and non-Clang based compilers.<br/>
+        <br/>
+        execution character encoding documentation has not been identified.
+        Supported encodings are presumed for Clang derived compilers.</td>
+  </tr>
+  <tr>
+    <td><a href="https://www.codeplay.com/products/computesuite/computecpp">Codeplay ComputeCpp</a></td>
+    <td>0.6.0<br/>2018-02-13</td>
+    <td>UTF-8 (presumed)</td>
+    <td>No (presumed)</td>
+    <td>execution character encoding documentation has not been identified.
+        Supported encodings are presumed based on derivation from Clang.</td>
+  </tr>
+  <tr>
+    <td><a href="http://www.comeaucomputing.com/">Comeau C/C++</a></td>
+    <td>4.3.10.1<br/>2008-10-06</td>
+    <td>ASCII with 8-bit extensions (presumed)</td>
+    <td>No (presumed)</td>
+    <td>execution character encoding documentation has not been identified.
+        Supported encodings are presumed based on supported platforms.</td>
+  </tr>
+  <tr>
+    <td><a href="https://www.windriver.com/products/development-tools/#diab_compiler">Wind River Diab Compiler</a></td>
+    <td>Unknown</td>
+    <td>Unknown</td>
+    <td>Unknown</td>
+    <td>Documentation is restricted to licensees.</td>
+  </tr>
+  <tr>
+    <td><a href="http://www.digitalmars.com/download/freecompiler.html">Digital Mars C/C++</a></td>
+    <td>8.5.7<br/>2013-08-01</td>
+    <td>ASCII with 8-bit extensions</td>
+    <td>Yes.</td>
+    <td><a href="http://www.digitalmars.com/ctg/CPP-Language-Implementation.html">
+        http://www.digitalmars.com/ctg/CPP-Language-Implementation.html</a><br/>
+        <br/>
+        The <tt>-j</tt> option can be used to select from a few alternative code pages.<br/>
+        <br/>
+        <code>#pragma setlocale("locale")</code> also allows changing how string
+        literals are interpreted.</td>
+  </tr>
+  <tr>
+    <td><a href="http://www.dignus.com/dcxx/">Systems/C++</a></td>
+    <td>2.10<br/>2017-07-31</td>
+    <td>EBCDIC when targeting z/OS<br/><br/>ASCII when targeting z/Linux</td>
+    <td>yes, ASCII, core language only</td>
+    <td><a href="http://www.dignus.com/dcxx/syscxx.pdf">
+        http://www.dignus.com/dcxx/syscxx.pdf</a><br/>
+        <br/>
+        The <tt>-fasciiout</tt> option switches the compile time execution
+        character encoding to ASCII, but the provided standard library does
+        not support this.
+        </td>
+  </tr>
+  <tr>
+    <td><a href="http://www.edg.com/c">EDG</a></td>
+    <td>4.14<br/>2017-09-11</td>
+    <td>Configurable</td>
+    <td>Yes, configurable</td>
+    <td><a href="https://www.edg.com/docs/edg_cpp.pdf">
+        https://www.edg.com/docs/edg_cpp.pdf</a><br/>
+        <br/>
+        The EDG frontend is eminently configurable.  Out of the box, it supports
+        ASCII, ISO-8859-1, Shift-JIS, and UTF-8.<br/>
+        </td>
+  </tr>
+  <tr>
+    <td>PathScale EKOPath</td>
+    <td>Discontinued</td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><a href="http://www.cypress.com/documentation/software-and-drivers/tool-lineup-fr-family-softune-v6">
+        Cypress FR Family SOFTUNE V6 C/C++ Compiler</a></td>
+    <td>V65L09<br/>2017-09-13</td>
+    <td>Unknown</td>
+    <td>Unknown</td>
+    <td>Unable to identify publicly accessible documentation</td>
+  </tr>
+  <tr>
+    <td><a href="https://www.ghs.com/products/compiler.html">Green Hills C/C++ Compilers</a></td>
+    <td>Unknown</td>
+    <td>Unknown</td>
+    <td>Unknown</td>
+    <td>Unable to identify publicly accessible documentation</td>
+  </tr>
+  <tr>
+    <td>HP aCC</td>
+    <td>Unknown</td>
+    <td>Unknown</td>
+    <td>Unknown</td>
+    <td>Unable to identify publicly accessible documentation</td>
+  </tr>
+  <tr>
+    <td><a href="https://www.iar.com/iar-embedded-workbench/#!?architecture=8051">IAR C/C++ Compiler for 8051</a></td>
+    <td>10.10<br/>2017-04-05</td>
+    <td>ASCII</td>
+    <td>Yes; Host ASCII compatible MBCS</td>
+    <td><a href="http://ftp.iar.se/WWWfiles/8051/webic/doc/EW8051_CompilerReference.pdf">
+        http://ftp.iar.se/WWWfiles/8051/webic/doc/EW8051_CompilerReference.pdf</a><br/>
+        <br/>
+        The <tt>--enable_multibytes</tt> option enables setting the execution
+        character encoding to the host encoding.
+        </td>
+  </tr>
+  <tr>
+    <td><a href="https://www.iar.com/iar-embedded-workbench/#!?architecture=Arm">IAR C/C++ Compiler for Arm</a></td>
+    <td>8.22<br/>2018-02-23</td>
+    <td>ASCII</td>
+    <td>Yes; MBCS, UTF-8, UTF-16</td>
+    <td><a href="http://ftp.iar.se/WWWfiles/arm/webic/doc/EWARM_DevelopmentGuide.ENU.pdf">
+        http://ftp.iar.se/WWWfiles/arm/webic/doc/EWARM_DevelopmentGuide.ENU.pdf</a><br/>
+        <br/>
+        The <tt>--source_encoding</tt> option affects both the source and
+        execution character encodings.</td>
+  </tr>
+  <tr>
+    <td><a href="https://www.iar.com/iar-embedded-workbench/#!?architecture=AVR32">IAR C/C++ Compiler for AVR32</a></td>
+    <td>4.30<br/>2015</td>
+    <td>ASCII</td>
+    <td>Yes; Host ASCII compatible MBCS</td>
+    <td><a href="http://ftp.iar.se/WWWfiles/AVR32/webic/doc/EWAVR32_CompilerReference.pdf">
+        http://ftp.iar.se/WWWfiles/AVR32/webic/doc/EWAVR32_CompilerReference.pdf</a><br/>
+        <br/>
+        The <tt>--enable_multibytes</tt> option enables setting the execution
+        character encoding to the host encoding.
+        </td>
+  </tr>
+  <tr>
+    <td><a href="https://www.iar.com/iar-embedded-workbench/#!?architecture=AVR">IAR C/C++ Compiler for AVR</a></td>
+    <td>7.10<br/>2017-05-30</td>
+    <td>ASCII</td>
+    <td>Yes; Host ASCII compatible MBCS</td>
+    <td><a href="http://ftp.iar.se/WWWfiles/AVR/webic/doc/EWAVR_CompilerReference.pdf">
+        http://ftp.iar.se/WWWfiles/AVR/webic/doc/EWAVR_CompilerReference.pdf</a><br/>
+        <br/>
+        The <tt>--enable_multibytes</tt> option enables setting the execution
+        character encoding to the host encoding.
+        </td>
+  </tr>
+  <tr>
+    <td><a href="https://www.iar.com/iar-embedded-workbench/#!?architecture=MAXQ">IAR C/C++ Compiler for Maxim MAXQ</a></td>
+    <td>2.43<br/>2017-10-31</td>
+    <td>ASCII</td>
+    <td>Yes; Host ASCII compatible MBCS</td>
+    <td><a href="http://ftp.iar.se/WWWfiles/maxq/guides/EWMAXQ_CompilerReference.pdf">
+        http://ftp.iar.se/WWWfiles/maxq/guides/EWMAXQ_CompilerReference.pdf</a><br/>
+        <br/>
+        The <tt>--enable_multibytes</tt> option enables setting the execution
+        character encoding to the host encoding.
+        </td>
+  </tr>
+  <tr>
+    <td><a href="https://www.iar.com/iar-embedded-workbench/#!?architecture=CR16C">IAR C/C++ Compiler for National CR16C</a></td>
+    <td>3.30<br/></td>
+    <td>ASCII</td>
+    <td>Yes; Host ASCII compatible MBCS</td>
+    <td><a href="http://ftp.iar.se/WWWfiles/cr16c/webic/doc/EWCR16C_CompilerReference.pdf">
+        http://ftp.iar.se/WWWfiles/cr16c/webic/doc/EWCR16C_CompilerReference.pdf</a><br/>
+        <br/>
+        The <tt>--enable_multibytes</tt> option enables setting the execution
+        character encoding to the host encoding.
+        </td>
+  </tr>
+  <tr>
+    <td><a href="https://www.iar.com/iar-embedded-workbench/#!?architecture=ColdFire">IAR C/C++ Compiler for NXP Coldfire</a></td>
+    <td>1.23<br/>2010</td>
+    <td>ASCII</td>
+    <td>Yes; Host ASCII compatible MBCS</td>
+    <td><a href="http://ftp.iar.se/WWWfiles/cf/EWCF_CompilerReference.pdf">
+        http://ftp.iar.se/WWWfiles/cf/EWCF_CompilerReference.pdf</a><br/>
+        <br/>
+        The <tt>--enable_multibytes</tt> option enables setting the execution
+        character encoding to the host encoding.
+        </td>
+  </tr>
+  <tr>
+    <td><a href="https://www.iar.com/iar-embedded-workbench/#!?architecture=HCS12">IAR C/C++ Compiler for NXP HCS12</a></td>
+    <td>4.10<br/>2014</td>
+    <td>ASCII</td>
+    <td>Yes; Host ASCII compatible MBCS</td>
+    <td><a href="http://ftp.iar.se/WWWfiles/hcs12/guides/EWHCS12_CompilerReference.pdf">
+        http://ftp.iar.se/WWWfiles/hcs12/guides/EWHCS12_CompilerReference.pdf</a><br/>
+        <br/>
+        The <tt>--enable_multibytes</tt> option enables setting the execution
+        character encoding to the host encoding.
+        </td>
+  </tr>
+  <tr>
+    <td><a href="https://www.iar.com/iar-embedded-workbench/#!?architecture=S08">IAR C/C++ Compiler for NXP S08</a></td>
+    <td>1.20<br/>2011</td>
+    <td>ASCII</td>
+    <td>Yes; Host ASCII compatible MBCS</td>
+    <td><a href="http://ftp.iar.se/WWWfiles/s08/EWS08_CompilerReference.pdf">
+        http://ftp.iar.se/WWWfiles/s08/EWS08_CompilerReference.pdf</a><br/>
+        <br/>
+        The <tt>--enable_multibytes</tt> option enables setting the execution
+        character encoding to the host encoding.
+        </td>
+  </tr>
+  <tr>
+    <td><a href="https://www.iar.com/iar-embedded-workbench/#!?architecture=78K">IAR C/C++ Compiler for Renesas 78K</a></td>
+    <td>4.7<br/>2010</td>
+    <td>ASCII</td>
+    <td>Yes; Host ASCII compatible MBCS</td>
+    <td><a href="http://ftp.iar.se/WWWfiles/78K/webic/doc/EW78K_CompilerGuide.ENU.pdf">
+        http://ftp.iar.se/WWWfiles/78K/webic/doc/EW78K_CompilerGuide.ENU.pdf</a><br/>
+        <br/>
+        The <tt>--enable_multibytes</tt> option enables setting the execution
+        character encoding to the host encoding.
+        </td>
+  </tr>
+  <tr>
+    <td><a href="https://www.iar.com/iar-embedded-workbench/#!?architecture=H8">IAR C/C++ Compiler for Renesas H8</a></td>
+    <td>2.30<br/>2011</td>
+    <td>ASCII</td>
+    <td>Yes; Host ASCII compatible MBCS</td>
+    <td><a href="http://ftp.iar.se/WWWfiles/H8/webic/doc/EWH8_CompilerReference.pdf">
+        http://ftp.iar.se/WWWfiles/H8/webic/doc/EWH8_CompilerReference.pdf</a><br/>
+        <br/>
+        The <tt>--enable_multibytes</tt> option enables setting the execution
+        character encoding to the host encoding.
+        </td>
+  </tr>
+  <tr>
+    <td><a href="https://www.iar.com/iar-embedded-workbench/#!?architecture=M16C">IAR C/C++ Compiler for Renesas M16C and R8C</a></td>
+    <td>3.70<br/>2014</td>
+    <td>ASCII</td>
+    <td>Yes; Host ASCII compatible MBCS</td>
+    <td><a href="http://ftp.iar.se/WWWfiles/ewm16c/EWM16C_CompilerGuide.pdf">
+        http://ftp.iar.se/WWWfiles/ewm16c/EWM16C_CompilerGuide.pdf</a><br/>
+        <br/>
+        The <tt>--enable_multibytes</tt> option enables setting the execution
+        character encoding to the host encoding.
+        </td>
+  </tr>
+  <tr>
+    <td><a href="https://www.iar.com/iar-embedded-workbench/#!?architecture=M32C">IAR C/C++ Compiler for Renesas M32C</a></td>
+    <td>3.30<br/>2004</td>
+    <td>ASCII</td>
+    <td>No</td>
+    <td><a href="http://ftp.iar.se/WWWfiles/m32c/guides/EWM32C_CompilerReference.pdf">
+        http://ftp.iar.se/WWWfiles/m32c/guides/EWM32C_CompilerReference.pdf</a></td>
+  </tr>
+  <tr>
+    <td><a href="https://www.iar.com/iar-embedded-workbench/#!?architecture=R32C">IAR C/C++ Compiler for Renesas R32C</a></td>
+    <td>1.40<br/>2012</td>
+    <td>ASCII</td>
+    <td>Yes; Host ASCII compatible MBCS</td>
+    <td><a href="http://ftp.iar.se/WWWfiles/r32c/EWR32C_CompilerReference.pdf">
+        http://ftp.iar.se/WWWfiles/r32c/EWR32C_CompilerReference.pdf</a><br/>
+        <br/>
+        The <tt>--enable_multibytes</tt> option enables setting the execution
+        character encoding to the host encoding.
+        </td>
+  </tr>
+  <tr>
+    <td><a href="https://www.iar.com/iar-embedded-workbench/#!?architecture=RH850">IAR C/C++ Compiler for Renesas RH850</a></td>
+    <td>1.40<br/>2016</td>
+    <td>ASCII</td>
+    <td>Yes; Host ASCII compatible MBCS</td>
+    <td><a href="http://ftp.iar.se/WWWfiles/rh850/EWRH850_DevelopmentGuide.ENU.pdf">
+        http://ftp.iar.se/WWWfiles/rh850/EWRH850_DevelopmentGuide.ENU.pdf</a><br/>
+        <br/>
+        The <tt>--enable_multibytes</tt> option enables setting the execution
+        character encoding to the host encoding.
+        </td>
+  </tr>
+  <tr>
+    <td><a href="https://www.iar.com/iar-embedded-workbench/#!?architecture=RL78">IAR C/C++ Compiler for Renesas RL78</a></td>
+    <td>3.10<br/>2017-09-20</td>
+    <td>ASCII</td>
+    <td>Yes; Host ASCII compatible MBCS</td>
+    <td><a href="http://ftp.iar.se/WWWfiles/rl78/EWRL78_DevelopmentGuide.ENU.pdf">
+        http://ftp.iar.se/WWWfiles/rl78/EWRL78_DevelopmentGuide.ENU.pdf</a><br/>
+        <br/>
+        The <tt>--enable_multibytes</tt> option enables setting the execution
+        character encoding to the host encoding.
+        </td>
+  </tr>
+  <tr>
+    <td><a href="https://www.iar.com/iar-embedded-workbench/#!?architecture=RX">IAR C/C++ Compiler for Renesas RX</a></td>
+    <td>3.10<br/>2017-04-21</td>
+    <td>ASCII</td>
+    <td>Yes; Host ASCII compatible MBCS</td>
+    <td><a href="http://ftp.iar.se/WWWfiles/RX/webic/doc/EWRX_DevelopmentGuide.ENU.pdf">
+        http://ftp.iar.se/WWWfiles/RX/webic/doc/EWRX_DevelopmentGuide.ENU.pdf</a><br/>
+        <br/>
+        The <tt>--enable_multibytes</tt> option enables setting the execution
+        character encoding to the host encoding.
+        </td>
+  </tr>
+  <tr>
+    <td><a href="https://www.iar.com/iar-embedded-workbench/#!?architecture=SuperH">IAR C/C++ Compiler for Renesas SuperH</a></td>
+    <td>2.30<br/>2014</td>
+    <td>ASCII</td>
+    <td>Yes; Host ASCII compatible MBCS</td>
+    <td><a href="http://ftp.iar.se/WWWfiles/superh/guides/EWSH_DevelopmentGuide.pdf">
+        http://ftp.iar.se/WWWfiles/superh/guides/EWSH_DevelopmentGuide.pdf</a><br/>
+        <br/>
+        The <tt>--enable_multibytes</tt> option enables setting the execution
+        character encoding to the host encoding.
+        </td>
+  </tr>
+  <tr>
+    <td><a href="">IAR C/C++ Compiler for Renesas V850</a></td>
+    <td>4.20<br/>2015</td>
+    <td>ASCII</td>
+    <td>Yes; Host ASCII compatible MBCS</td>
+    <td><a href="http://ftp.iar.se/WWWfiles/v850/webic/ew/doc/EWV850_CompilerReference.pdf">
+        http://ftp.iar.se/WWWfiles/v850/webic/ew/doc/EWV850_CompilerReference.pdf</a><br/>
+        <br/>
+        The <tt>--enable_multibytes</tt> option enables setting the execution
+        character encoding to the host encoding.
+        </td>
+  </tr>
+  <tr>
+    <td><a href="https://www.iar.com/iar-embedded-workbench/#!?architecture=SAM8">IAR C/C++ Compiler for SAM8</a></td>
+    <td>3.20<br/>2003</td>
+    <td>ASCII</td>
+    <td>No</td>
+    <td><a href="http://ftp.iar.se/WWWfiles/sam8/EWSAM8_CompilerReference.pdf">
+        http://ftp.iar.se/WWWfiles/sam8/EWSAM8_CompilerReference.pdf</a></td>
+  </tr>
+  <tr>
+    <td><a href="https://www.iar.com/iar-embedded-workbench/#!?architecture=STM8">IAR C/C++ Compiler for STM8</a></td>
+    <td>3.10<br/>2017-06-30</td>
+    <td>ASCII</td>
+    <td>Yes; Host ASCII compatible MBCS</td>
+    <td><a href="http://ftp.iar.se/WWWfiles/stm8/guides/EWSTM8_DevelopmentGuide.pdf">
+        http://ftp.iar.se/WWWfiles/stm8/guides/EWSTM8_DevelopmentGuide.pdf</a><br/>
+        <br/>
+        The <tt>--enable_multibytes</tt> option enables setting the execution
+        character encoding to the host encoding.
+        </td>
+  </tr>
+  <tr>
+    <td><a href="https://www.iar.com/iar-embedded-workbench/#!?architecture=MSP430">IAR C/C++ Compiler for TI MSP430</a></td>
+    <td>7.11<br/>2017-11-20</td>
+    <td>ASCII</td>
+    <td>Yes; Host ASCII compatible MBCS</td>
+    <td><a href="http://ftp.iar.se/WWWfiles/msp430/webic/doc/EW430_CompilerReference.pdf">
+        http://ftp.iar.se/WWWfiles/msp430/webic/doc/EW430_CompilerReference.pdf</a><br/>
+        <br/>
+        The <tt>--enable_multibytes</tt> option enables setting the execution
+        character encoding to the host encoding.
+        </td>
+  </tr>
+  <tr>
+    <td><a href="https://www.ibm.com/developerworks/downloads/r/xlcplusaix/">IBM XL C/C++ for AIX</a></td>
+    <td>13.1.3<br/>2015-12-08</td>
+    <td>ASCII</td>
+    <td>Yes; MBCS</td>
+    <td><a href="https://www.ibm.com/support/knowledgecenter/SSGH3R_13.1.3/com.ibm.compilers.aix.doc/welcome.html">
+        https://www.ibm.com/support/knowledgecenter/SSGH3R_13.1.3/com.ibm.compilers.aix.doc/welcome.html</a><br/>
+        <br/>
+        The <tt>-qmbcs</tt> option can be used to enable MBCS support.
+        </td>
+  </tr>
+  <tr>
+    <td><a href="https://www.ibm.com/developerworks/downloads/r/xlcpluslinux/">IBM XL C/C++ for Linux on Power (Clang based)</a></td>
+    <td>13.1.6<br/>2017-12-05</td>
+    <td>UTF-8 (presumed)</td>
+    <td>No (presumed)</td>
+    <td><a href="https://www.ibm.com/support/knowledgecenter/SSXVZZ_13.1.6/com.ibm.compilers.linux.doc/welcome.html">
+        https://www.ibm.com/support/knowledgecenter/SSXVZZ_13.1.6/com.ibm.compilers.linux.doc/welcome.html</a><br/>
+        </td>
+  </tr>
+  <tr>
+    <td><a href="https://www.ibm.com/developerworks/downloads/r/xlcpluslinuxonz/">IBM XL C/C++ for Linux on z Systems (Clang based)</a></td>
+    <td>1.5<br/>2015-11-24</td>
+    <td>UTF-8 (presumed)</td>
+    <td>No (presumed)</td>
+    <td><a href="https://www.ibm.com/support/knowledgecenter/SSVUN6_1.2.0/com.ibm.compilers.loz.doc/welcome.html">
+        https://www.ibm.com/support/knowledgecenter/SSVUN6_1.2.0/com.ibm.compilers.loz.doc/welcome.html</a><br/>
+        </td>
+  </tr>
+  <tr>
+    <td><a href="https://www.ibm.com/us-en/marketplace/xl-cpp-compiler-zvm">IBM XL C/C++ for z/VM</a></td>
+    <td>1.3<br/>2011-10-12</td>
+    <td>Locale dependent EBCDIC based code page</td>
+    <td>Yes; EBCDIC based code pages</td>
+    <td>The XL C/C++ for z/VM compiler is derived from the XL C/C++ for z/OS
+        compiler with some additional limitations:<br/>
+        <a href="https://www.ibm.com/support/knowledgecenter/SSB27U_6.4.0/com.ibm.zvm.v640.vmcug/vmcug20.htm">
+        https://www.ibm.com/support/knowledgecenter/SSB27U_6.4.0/com.ibm.zvm.v640.vmcug/vmcug20.htm</a><br/>
+        </td>
+  </tr>
+  <tr>
+    <td><a href="">IBM XL C/C++ for Blue Gene/Q</a></td>
+    <td>12.1<br/>2012-06-15</td>
+    <td>ASCII</td>
+    <td>Yes; MBCS</td>
+    <td><a href="https://www.ibm.com/support/knowledgecenter/SS2LWA_12.1.0/welcome.html">
+        https://www.ibm.com/support/knowledgecenter/SS2LWA_12.1.0/welcome.html</a><br/>
+        <br/>
+        The <tt>-qmbcs</tt> option can be used to enable MBCS support.
+        </td>
+  </tr>
+  <tr>
+    <td><a href="https://www.ibm.com/us-en/marketplace/xl-cpp-compiler-zos">IBM z/OS C/C++</a></td>
+    <td>2.3<br/>2017-07</td>
+    <td>Locale dependent EBCDIC based code page with ISO-2022 shift sequences</td>
+    <td>Yes; EBCDIC based code pages, ASCII based code pages</td>
+    <td><a href="https://www-01.ibm.com/support/docview.wss?uid=swg27036892">
+        https://www-01.ibm.com/support/docview.wss?uid=swg27036892</a><br/>
+        <br/>
+        The <tt>CONVLIT</tt> and <TT>LOCALE</tt> options enable overriding the
+        execution character encoding.<br/>
+        <a href="https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.cbcux01/convlit.htm">
+        https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.cbcux01/convlit.htm</a></br>
+        </td>
+  </tr>
+  <tr>
+    <td><a href="https://www.imagecraft.com/products/jumpstart-c-tools-menu/jumpstart-cpp">ImageCraft JumpStart C and C++ for Cortex (GCC based)</a></td>
+    <td>9.01<br/>2018-03-30</td>
+    <td>UTF-8 (presumed)</td>
+    <td>Yes (presumed)</td>
+    <td><a href="https://www.imagecraft.com/help/ICCV9CORTEX/JumpStart%20C++%20for%20Cortex%20User%20Guide-V0.9.pdf">
+        https://www.imagecraft.com/help/ICCV9CORTEX/JumpStart%20C++%20for%20Cortex%20User%20Guide-V0.9.pdf</a><br/>
+        </td>
+  </tr>
+  <tr>
+    <td><a href="https://www.imagecraft.com/products/jumpstart-c-tools-menu/jumpstart-c-v8">ImageCraft JumpStart C for AVR</a></td>
+    <td>8.28<br/>2018-03-26</td>
+    <td>ASCII (presumed)</td>
+    <td>No (presumed)</td>
+    <td><a href="http://imagecraft.com/help/ICCV8AVR/index.htm">
+        http://imagecraft.com/help/ICCV8AVR/index.htm</a><br/>
+        </td>
+  </tr>
+  <tr>
+    <td><a href="https://software.intel.com/en-us/parallel-studio-xe">Intel C/C++</a></td>
+    <td>17.0<br/>2016-09-15</td>
+    <td>ASCII (presumed)</td>
+    <td>Yes; MBCS</td>
+    <td><a href="https://software.intel.com/en-us/intel-cplusplus-compiler-17.0-user-and-reference-guide">
+        https://software.intel.com/en-us/intel-cplusplus-compiler-17.0-user-and-reference-guide</a><br/>
+        <br/>
+        The <tt>-multibyte-chars</tt> option can be used to enable MBCS support.
+        </td>
+  </tr>
+  <tr>
+    <td>KAI C++</td>
+    <td>Discontinued</td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><a href="https://www.synopsys.com/dw/ipdir.php?ds=sw_metaware">Synopsys DesignWare ARC MetaWare C/C++</a></td>
+    <td>Unknown</td>
+    <td>Unknown</td>
+    <td>Unknown</td>
+    <td>Unable to identify publicly accessible documentation</td>
+  </tr>
+  <tr>
+    <td>NXP CodeWarrior</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Mentor Performance Optimized GNU Compiler (GCC based)</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Mentor Graphics EDGE C/C++ Compiler</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><a href="https://developer.amd.com/x86-open64-compiler-suite/">Open64</a></td>
+    <td>4.5.2.1<br/>2013-03-28</td>
+    <td></td>
+    <td></td>
+    <td><a href="https://developer.amd.com/wordpress/media/2012/10/open64.pdf">
+        https://developer.amd.com/wordpress/media/2012/10/open64.pdf</a>
+        </td>
+  </tr>
+  <tr>
+    <td>Oracle Developer Studio</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>nVidea PGI</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Renesas C/C++ Compiler Package for RX Family</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Renesas C/C++ Compiler Package for SuperH Family</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Renesas C/C++ Compiler Package for M32R Family [M3T-CC32R]</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Renesas C/C++ Compiler Package for R8C and M16C Families</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Renesas C/C++ Compiler Package for M16C Series and R8C Family [M3T-NC30WA]</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Renesas C/C++ Compiler Package for H8SX, H8S, H8 Family</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Sony SN</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Stratus VOS C++ compiler (GCC based)</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Symantec C++</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>TenDRA C/C++</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Texas Instruments C/C++ Compiler</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Ultimate C/C++</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Open Watcom C/C++</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+</table>
+
+
+</body>
+

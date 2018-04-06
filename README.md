@@ -15,6 +15,7 @@ P0804R0         | Impact of the modules TS on the C++ tools ecosystem | [HTML](h
 
 Drafts In Progress | Title | Link
 ------------------ | ----- | ----
+DXXXXR0            | A survey of execution character encodings | [HTML](http://htmlpreview.github.io/?https://github.com/tahonermann/std-proposals/blob/master/dXXXXr0-exec-char-encoding-survey.html)
 
 # WG14 Papers (C)
 
