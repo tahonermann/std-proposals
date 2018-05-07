@@ -169,6 +169,9 @@ blockquote.stddel
 <h1 id="changes_since_P0482R2">Changes since P0482R2</h1>
 
 <ul>
+  <li>Updated the implementation experience section to note Richard Smith's
+      contribution of an implementation of the proposed core language changes
+      to Clang.</li>
 </ul>
 
 <h1 id="introduction">Introduction</h1>
@@ -725,6 +728,16 @@ believed to be complete for both the proposed core language and library
 features.  New <tt>-fchar8_t</tt> and <tt>-fno-char8_t</tt> compiler options
 support enabling and disabling the new features.  No backward compatibility
 features are currently implemented.</p>
+
+<p>Richard Smith implemented support for the proposed core wording changes
+for the next release of Clang.  The changes are guarded by new
+<tt>-fchar8_t</tt> and <tt>-fno-char8_t</tt> matching the gcc implementation.
+No backward compatibility features are currently implemented.  Support for
+the proposed library features has not yet been implemented in libc++.
+Richard's changes can be found at
+<a href="http://llvm.org/viewvc/llvm-project?view=revision&revision=331244">
+http://llvm.org/viewvc/llvm-project?view=revision&revision=331244</a>
+</p>
 
 <h1 id="wording">Formal Wording</h1>
 
