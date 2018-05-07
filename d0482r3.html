@@ -156,6 +156,8 @@ blockquote.stddel
           Annex A Grammar summary wording</a></li>
       <li><a href="#annex_c_wording">
           Annex C Compatibility wording</a></li>
+      <li><a href="#annex_d_wording">
+          Annex D Compatibility features wording</a></li>
       <li><a href="#feature_testing">
           Wording for P0096: Feature-testing recommendations for C++</a></li>
     </ul>
@@ -169,6 +171,7 @@ blockquote.stddel
 <h1 id="changes_since_P0482R2">Changes since P0482R2</h1>
 
 <ul>
+  <li>Added a wording section for annex D for deprecated features.</li>
   <li>Updated the implementation experience section to note Richard Smith's
       contribution of an implementation of the proposed core language changes
       to Clang.</li>
@@ -751,7 +754,7 @@ N4713</a>
         href="#ref_n4713">
 [N4713]</a></sup></p>
 
-<p>These changes presume the adoption of proposal
+<p>Where noted, these changes presume the adoption of proposal
 <a title="char8_t: A type for UTF-8 characters and strings"
    href="http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2231.htm">
 WG14 N2231</a>
@@ -805,6 +808,9 @@ of <em>n</em> <tt>const char</tt>", where <em>n</em> is the size of the string
 as defined below, and has static storage duration (6.6.4).</del>
 </blockquote>
 </p>
+
+<p><em>Drafting note: The deleted paragraph 8 content was incorporated in the
+changes to paragraphs 6 and 7.</em></p>
 
 <p>Remove 5.13.5 [lex.string] paragraph 9:
 <blockquote class=stddel>
@@ -1407,8 +1413,8 @@ N2231</a>
           <td><tt>
             ctype&lt;char&gt;, ctype&lt;wchar_t&gt;<br/>
             codecvt&lt;char,char,mbstate_t&gt;<br/>
-            codecvt&lt;char16_t,char,mbstate_t&gt;<ins> (deprecated)</ins><br/>
-            codecvt&lt;char32_t,char,mbstate_t&gt;<ins> (deprecated)</ins><br/>
+            <del>codecvt&lt;char16_t,char,mbstate_t&gt;</del><br/>
+            <del>codecvt&lt;char32_t,char,mbstate_t&gt;</del><br/>
             <ins>codecvt&lt;char16_t,char8_t,mbstate_t&gt;</ins><br/>
             <ins>codecvt&lt;char32_t,char8_t,mbstate_t&gt;</ins><br/>
             codecvt&lt;wchar_t,char,mbstate_t&gt;<br/>
@@ -1426,13 +1432,17 @@ N2231</a>
 </blockquote>
 </p>
 
+<p><em>Drafting note: The deleted <tt>char</tt> based <tt>codecvt</tt>
+specializations have been deprecated and moved to annex D,
+[depr.locale.category].</em></p>
+
 <p>Change in table 70 of 25.3.1.1.1 [locale.category]:
 <blockquote>
 <div style="margin-left: 1em;">
 <table>
   <tr>
     <td align="center">
-      Table 70 &mdash; Required specializatoins
+      Table 70 &mdash; Required specializations
     </td>
   </tr>
   <tr>
@@ -1451,8 +1461,8 @@ N2231</a>
           <td><tt>
             ctype_byname&lt;char&gt;, ctype_byname&lt;wchar_t&gt;<br/>
             codecvt_byname&lt;char,char,mbstate_t&gt;<br/>
-            codecvt_byname&lt;char16_t,char,mbstate_t&gt;<ins> (deprecated)</ins><br/>
-            codecvt_byname&lt;char32_t,char,mbstate_t&gt;<ins> (deprecated)</ins><br/>
+            <del>codecvt_byname&lt;char16_t,char,mbstate_t&gt;</del><br/>
+            <del>codecvt_byname&lt;char32_t,char,mbstate_t&gt;</del><br/>
             <ins>codecvt_byname&lt;char16_t,char8_t,mbstate_t&gt;</ins><br/>
             <ins>codecvt_byname&lt;char32_t,char8_t,mbstate_t&gt;</ins><br/>
             codecvt_byname&lt;wchar_t,char,mbstate_t&gt;<br/>
@@ -1470,19 +1480,21 @@ N2231</a>
 </blockquote>
 </p>
 
+<p><em>Drafting note: The deleted <tt>char</tt> based <tt>codecvt_byname</tt>
+specializations have been deprecated and moved to annex D,
+[depr.locale.category].</em></p>
+
 <p>Change in 25.4.1.4 [locale.codecvt] paragraph 3:
 <blockquote>
 The specializations required in Table 69 (25.3.1.1.1) convert the
 implementation-defined native character set.
 <tt>codecvt&lt;char, char, mbstate_t&gt;</tt> implements a degenerate
-conversion; it does not convert at all. The specialization<ins>s</ins>
-<tt>codecvt&lt;char16_t, char, mbstate_t&gt;</tt> <ins>(deprecated) and
-<tt>codecvt&lt;char16_t, char8_t, mbstate_t&gt;</tt></ins>
-convert<del>s</del> between the UTF-16 and UTF-8 encoding
-forms, and the specialization<ins>s</ins>
-<tt>codecvt&lt;char32_t, char, mbstate_t&gt;</tt> <ins>(deprecated) and
-<tt>codecvt&lt;char32_t, char8_t, mbstate_t&gt;</tt></ins>
-convert<del>s</del> between the UTF-32 and UTF-8 encoding forms.
+conversion; it does not convert at all. The specialization
+<tt>codecvt&lt;char16_t, <del>char</del><ins>char8_t</ins>, mbstate_t&gt;</tt>
+converts between the UTF-16 and UTF-8 encoding
+forms, and the specialization
+<tt>codecvt&lt;char32_t, <del>char</del><ins>char8_t</ins>, mbstate_t&gt;</tt>
+converts between the UTF-32 and UTF-8 encoding forms.
 <tt>codecvt&lt;wchar_t,char,mbstate_t&gt;</tt> converts between the native
 character sets for <del>narrow</del><ins>ordinary</ins> and wide characters.
 Specializations on <tt>mbstate_t</tt> perform conversion between encodings
@@ -1660,10 +1672,10 @@ called <em>encoded character types</em>.
 </p>
 
 <p>Change in 30.11.5 [fs.filesystem.syn]:
-<blockquote>
+<blockquote class=stddel>
 <div style="margin-left: 1em;">
 <tt>
-&nbsp;&nbsp;<em>// <del>30.11.7.6.2</del><ins>D.??</ins>, path factory functions <ins>(deprecated)</ins>:</em><br/>
+&nbsp;&nbsp;<em>// 30.11.7.6.2, <tt>path</tt> factory functions</em><br/>
 &nbsp;&nbsp;template &lt;class Source&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;path u8path(const Source&amp; source);<br/>
 &nbsp;&nbsp;template &lt;class InputIterator&gt;<br/>
@@ -1672,6 +1684,9 @@ called <em>encoded character types</em>.
 </div>
 </blockquote>
 </p>
+
+<p><em>Drafting note: The deleted <tt>u8path</tt> factory functions
+have been deprecated and moved to annex D, [depr.fs.path.factory].</em></p>
 
 <p>Change in 30.11.7 [fs.class.path] paragraph 6:
 <blockquote>
@@ -1806,11 +1821,129 @@ encoding of the string returned by <tt>generic_u8string()</tt> is always UTF-8.
 </blockquote>
 </p>
 
-<p>Move subclause 30.11.7.6.2 [fs.path.factory] to appendix D
-and rename it to [depr.fs.path.factory]</p>
+<p>Remove subclause 30.11.7.6.2 [fs.path.factory].</p>
 
-<p><em>Drafting note: The <tt>u8path</tt> factory function templates are
-deprecated.</em></p>
+<blockquote class="stddel">
+<p>
+<tt>
+<pre>template&lt;class Source&gt;
+  path u8path(const Source&amp; source);
+template&lt;class InputIterator&gt;
+  path u8path(InputIterator first, InputIterator last);
+</pre>
+</tt>
+</p>
+
+<p>
+<table>
+  <tr>
+    <td>1</td>
+    <td>
+<em>Requires:</em> The source and <tt>[first, last)</tt> sequences are UTF-8
+encoded.  The value type of <tt>Source</tt> and <tt>InputIterator</tt> is
+<tt>char</tt>.
+    </td>
+  </tr>
+</table>
+</p>
+
+<p>
+<table>
+  <tr>
+    <td>2</td>
+    <td>
+<em>Returns:</em>
+    </td>
+  </tr>
+</table>
+</p>
+
+<p>
+<table>
+  <tr>
+    <td>(2.1)</td>
+    <td>&mdash;</td>
+    <td>
+If <tt>value_type</tt> is <tt>char</tt> and the current native narrow encoding
+(30.11.7.2.2) is UTF-8, return <tt>path(source)</tt> or
+<tt>path(first, last)</tt>; otherwise,
+    </td>
+  </tr>
+</table>
+</p>
+
+<p>
+<table>
+  <tr>
+    <td>(2.2)</td>
+    <td>&mdash;</td>
+    <td>
+if <tt>value_type</tt> is <tt>wchar_t</tt> and the native wide encoding is
+UTF-16, or if <tt>value_type</tt> is <tt>char16_t</tt> or <tt>char32_t</tt>,
+convert <tt>source</tt> or <tt>[first, last)</tt> to a temporary, <tt>tmp</tt>,
+of type <tt>string_type</tt> and return <tt>path(tmp)</tt>; otherwise,
+    </td>
+  </tr>
+</table>
+</p>
+
+<p>
+<table>
+  <tr>
+    <td>(2.3)</td>
+    <td>&mdash;</td>
+    <td>
+convert <tt>source</tt> or <tt>[first, last)</tt> to a temporary, <tt>tmp</tt>,
+of type <tt>u32string</tt> and return <tt>path(tmp)</tt>.
+    </td>
+  </tr>
+</table>
+</p>
+
+<p>
+<table>
+  <tr>
+    <td>3</td>
+    <td>
+<em>Remarks:</em> Argument format conversion (30.11.7.2.1) applies to the
+arguments for these functions. How Unicode encoding conversions are performed
+is unspecified.
+    </td>
+  </tr>
+</table>
+</p>
+
+<p>
+<table>
+  <tr>
+    <td>4</td>
+    <td>
+[ <em>Example:</em> A string is to be read from a database that is encoded in
+UTF-8, and used to create a directory using the native encoding for filenames:
+<div style="margin-left: 1em;">
+<tt>
+<pre>namespace fs = std::filesystem;
+std::string utf8_string = read_utf8_data();
+fs::create_directory(fs::u8path(utf8_string));
+</pre>
+</tt>
+</div>
+For POSIX-based operating systems with the native narrow encoding set to UTF-8,
+no encoding or type conversion occurs.<br/>
+For POSIX-based operating systems with the native narrow encoding not set to
+UTF-8, a conversion to UTF-32 occurs, followed by a conversion to the current
+native narrow encoding.  Some Unicode characters may have no native character
+set representation.<br/>
+For Windows-based operating systems a conversion from UTF-8 to UTF-16 occurs.
+&mdash; <em>end example</em> ]
+    </td>
+  </tr>
+</table>
+</p>
+</blockquote>
+
+<p><em>Drafting note: The <tt>u8path</tt> factory function templates have been
+deprecated and moved to annex D, [depr.fs.path.factory].</em></p>
 
 <p>Change in 32.2 [atomics.syn]:
 <blockquote>
@@ -1959,7 +2092,7 @@ ct&lt;decltype(u8'c')&gt;::type x;  <em>// ill-formed; previously well-formed.</
 </blockquote>
 </p>
 
-<p>Add a new subcluase after C.5.4 [diff.cpp17.library]:
+<p>Add a new subclause after C.5.4 [diff.cpp17.library]:
 <blockquote class=stdins>
 C.5.? Clause 30: Input/Output library [diff.cpp17.input.output]<br/>
 <br/>
@@ -1982,6 +2115,213 @@ std::string s2 = p.generic_u8string();  <em>// ill-formed; previously well-forme
 </div>
 </blockquote>
 </p>
+
+
+<h2 id="annex_d_wording">Annex D Compatibility features wording</h2>
+
+<p>Add a new subclause after D.18 [depr.conversions]:</p>
+<blockquote class="stdins">
+<p>
+D.19 Deprecated locale category facets [depr.locale.category]<br/>
+</p>
+
+<p>
+<table>
+  <tr>
+    <td>1</td>
+    <td>
+The <tt>ctype</tt> locale category includes the following facets in addition to
+those specified in table 69 of 25.3.1.1.1 [locale.category].
+<div style="margin-left: 1em;">
+<tt>
+<pre>codecvt&lt;char16_t, char, mbstate_t&gt;
+codecvt&lt;char32_t, char, mbstate_t&gt;
+</pre>
+</tt>
+</div>
+    </td>
+  </tr>
+</table>
+</p>
+
+<p>
+<table>
+  <tr>
+    <td>2</td>
+    <td>
+The <tt>ctype</tt> locale category includes the following facets in addition to
+those specified in table 70 of 25.3.1.1.1 [locale.category].
+<div style="margin-left: 1em;">
+<tt>
+<pre>codecvt_byname&lt;char16_t, char, mbstate_t&gt;
+codecvt_byname&lt;char32_t, char, mbstate_t&gt;
+</pre>
+</tt>
+</div>
+    </td>
+  </tr>
+</table>
+</p>
+
+<p>
+<table>
+  <tr>
+    <td>3</td>
+    <td>
+The following class template specializations are required in addition to those
+specified in 25.4.1.4 [locale.codecvt].  The specialization
+<tt>codecvt&lt;char16_t, char, mbstate_t&gt;</tt> converts between the UTF-16
+and UTF-8 encoding forms, and the specialization
+<tt>codecvt&lt;char32_t, char, mbstate_t&gt;</tt> converts between the UTF-32
+and UTF-8 encoding forms.
+    </td>
+  </tr>
+</table>
+</p>
+
+</blockquote>
+
+<p>Add another new subclause after D.18 [depr.conversions]:</p>
+<blockquote class="stdins">
+<p>
+D.20 Deprecated filesystem path factory functions [depr.fs.path.factory]<br/>
+</p>
+
+<p>
+<table>
+  <tr>
+    <td>1</td>
+    <td>
+The header <tt>&lt;filesystem&gt;</tt> has the following additions:
+<div style="margin-left: 1em;">
+<tt>
+<pre>namespace std::filesystem {
+  template &lt;class Source&gt;
+    path u8path(const Source&amp; source);
+  template &lt;class InputIterator&gt;
+    path u8path(InputIterator first, InputIterator last);
+}
+</pre>
+</tt>
+</div>
+    </td>
+  </tr>
+</table>
+</p>
+
+<p>
+<table>
+  <tr>
+    <td>2</td>
+    <td>
+<em>Requires:</em> The source and <tt>[first, last)</tt> sequences are UTF-8
+encoded.  The value type of <tt>Source</tt> and <tt>InputIterator</tt> is
+<tt>char</tt>.
+    </td>
+  </tr>
+</table>
+</p>
+
+<p>
+<table>
+  <tr>
+    <td>3</td>
+    <td>
+<em>Returns:</em>
+    </td>
+  </tr>
+</table>
+</p>
+
+<p>
+<table>
+  <tr>
+    <td>(3.1)</td>
+    <td>&mdash;</td>
+    <td>
+If <tt>value_type</tt> is <tt>char</tt> and the current native narrow encoding
+(30.11.7.2.2) is UTF-8, return <tt>path(source)</tt> or
+<tt>path(first, last)</tt>; otherwise,
+    </td>
+  </tr>
+</table>
+</p>
+
+<p>
+<table>
+  <tr>
+    <td>(3.2)</td>
+    <td>&mdash;</td>
+    <td>
+if <tt>value_type</tt> is <tt>wchar_t</tt> and the native wide encoding is
+UTF-16, or if <tt>value_type</tt> is <tt>char16_t</tt> or <tt>char32_t</tt>,
+convert <tt>source</tt> or <tt>[first, last)</tt> to a temporary, <tt>tmp</tt>,
+of type <tt>string_type</tt> and return <tt>path(tmp)</tt>; otherwise,
+    </td>
+  </tr>
+</table>
+</p>
+
+<p>
+<table>
+  <tr>
+    <td>(3.3)</td>
+    <td>&mdash;</td>
+    <td>
+convert <tt>source</tt> or <tt>[first, last)</tt> to a temporary, <tt>tmp</tt>,
+of type <tt>u32string</tt> and return <tt>path(tmp)</tt>.
+    </td>
+  </tr>
+</table>
+</p>
+
+<p>
+<table>
+  <tr>
+    <td>4</td>
+    <td>
+<em>Remarks:</em> Argument format conversion (30.11.7.2.1) applies to the
+arguments for these functions. How Unicode encoding conversions are performed
+is unspecified.
+    </td>
+  </tr>
+</table>
+</p>
+
+<p>
+<table>
+  <tr>
+    <td>5</td>
+    <td>
+[ <em>Example:</em> A string is to be read from a database that is encoded in
+UTF-8, and used to create a directory using the native encoding for filenames:
+<div style="margin-left: 1em;">
+<tt>
+<pre>namespace fs = std::filesystem;
+std::string utf8_string = read_utf8_data();
+fs::create_directory(fs::u8path(utf8_string));
+</pre>
+</tt>
+</div>
+For POSIX-based operating systems with the native narrow encoding set to UTF-8,
+no encoding or type conversion occurs.<br/>
+For POSIX-based operating systems with the native narrow encoding not set to
+UTF-8, a conversion to UTF-32 occurs, followed by a conversion to the current
+native narrow encoding.  Some Unicode characters may have no native character
+set representation.<br/>
+For Windows-based operating systems a conversion from UTF-8 to UTF-16 occurs.
+&mdash; <em>end example</em> ]
+    </td>
+  </tr>
+</table>
+</p>
+
+</blockquote>
+
+<p><em>Drafting note: The contents of paragraph 1 correspond to the text removed
+from 30.11.5 [fs.filesystem.syn].  The contents of paragraphs 2-5 correspond to
+the text removed from 30.11.7.6.2 [fs.path.factory]</em></p>
+
 
 <h2 id="feature_testing">Wording for P0096: Feature-testing recommendations
         for C++</h2>
@@ -2072,6 +2412,11 @@ P0372R0</a>
 <sup><a title="P0372R0: A type for utf-8 data"
         href="#ref_p0372r0">
 [P0372R0]</a></sup>.
+</p>
+
+<p>Thanks to Alisdair Meredith for reviewing wording and providing feedback in
+advance of the Rapperswil meeting.
+</p>
 
 <h1 id="references">References</h1>
 
