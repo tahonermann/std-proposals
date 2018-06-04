@@ -171,6 +171,16 @@ blockquote.stddel
 <h1 id="changes_since_P0482R3">Changes since P0482R3</h1>
 
 <ul>
+  <li>Minor wording changes following review by CWG in Rapperswil.
+    <ul>
+      <li>6.6.5 [basic.align] paragraph 6; change "narrow" to "ordinary"
+          in the note.</li>
+      <li>6.7.1 [basic.fundamental] paragraph 1; strike "of type unsigned
+          char" and remove the addition of ", or char8_t".</li>
+      <li>11.6 [dcl.init] paragraphs 12.1-12.4; change "narrow" to
+          "ordinary".</li>
+    </ul>
+  </li>
 </ul>
 
 <h1 id="introduction">Introduction</h1>
@@ -827,6 +837,17 @@ due to <em>multibyte encoding</em>. [&hellip;]
 </blockquote>
 </p>
 
+<p>Change in 6.6.5 [[basic.align] paragraph 6:
+<blockquote>
+The alignment requirement of a complete type can be queried using an
+<tt>alignof</tt> expression.  Furthermore, the narrow character types shall
+have the weakest alignment requirement.  [ <em>Note</em>: This enables the
+<del>narrow</del><ins>ordinary</ins> character types to be used as the
+underlying type for an aligned memory area ([dcl.align]).  &mdash;
+<em>end note</em> ]
+</blockquote>
+</p>
+
 <p>Change in 6.7.1 [basic.fundamental] paragraph 1:
 <blockquote>
 Objects declared <del>as characters</del><ins>with type </ins>
@@ -854,9 +875,9 @@ represents a distinct number. These requirements do not hold for other types.
 In any particular implementation, a plain <tt>char</tt> object can
 take on either the same values as a <tt>signed char</tt> or an
 <tt>unsigned char</tt>; which one is implementation-defined. For each value
-<em>i</em> of type <tt>unsigned char</tt><ins>, or <tt>char8_t</tt></ins> in the
+<em>i</em> <del>of type <tt>unsigned char</tt> </del>in the
 range 0 to 255 inclusive, there exists a value <em>j</em> of type <tt>char</tt>
-such that the result of an integral conversion (7.8) from <em>i</em> to
+such that the result of an integral conversion from <em>i</em> to
 <tt>char</tt> is <em>j</em>, and the result of an integral conversion from
 <em>j</em> to <tt>unsigned char</tt><ins> or <tt>char8_t</tt></ins> is
 <em>i</em>.
@@ -983,6 +1004,53 @@ The simple type specifiers are<br/>
   </tr>
 </table>
 </div>
+<br/>[&hellip;]
+</blockquote>
+</p>
+
+<p>Change in 11.6 [dcl.init] paragraph (12.1):
+<blockquote>
+(12.1) &mdash; If an indeterminate value of unsigned
+<del>narrow</del><ins>ordinary</ins> character type or <tt>std::byte</tt> type
+([cstddef.syn]) is produced by the evaluation of:
+<br/>[&hellip;]<br/>
+<div style="margin-left: 1em;">
+(12.1.3) &mdash; the operand of a cast or conversion ([conv.integral],
+[expr.type.conv], [expr.static.cast], [expr.cast]) to an unsigned
+<del>narrow</del><ins>ordinary</ins> character type or <tt>std::byte</tt> type
+([cstddef.syn]), or
+</div>
+[&hellip;]<br/>
+then the result of the operation is an indeterminate value.
+</blockquote>
+</p>
+
+<p>Change in 11.6 [dcl.init] paragraph (12.2):
+<blockquote>
+(12.2) If an indeterminate value of unsigned <del>narrow</del><ins>ordinary</ins>
+character type or <tt>std::byte</tt> type is produced by the evaluation of the
+right operand of a simple assignment operator whose first operand is an lvalue
+of unsigned <del>narrow</del><ins>ordinary</ins> character type or
+<tt>std::byte</tt> type, an indeterminate value replaces the value of the object
+referred to by the left operand.
+</blockquote>
+</p>
+
+<p>Change in 11.6 [dcl.init] paragraph (12.3):
+<blockquote>
+(12.3) If an indeterminate value of unsigned <del>narrow</del><ins>ordinary</ins>
+character type is produced by the evaluation of the initialization expression
+when initializing an object of unsigned <del>narrow</del><ins>ordinary</ins>
+character type, that object is initialized to an indeterminate value.
+</blockquote>
+</p>
+
+<p>Change in 11.6 [dcl.init] paragraph (12.4):
+<blockquote>
+(12.4) If an indeterminate value of unsigned <del>narrow</del><ins>ordinary</ins>
+character type or <tt>std::byte</tt> type is produced by the evaluation of the
+initialization expression when initializing an object of <tt>std::byte</tt> type,
+that object is initialized to an indeterminate value.
 <br/>[&hellip;]
 </blockquote>
 </p>
@@ -2401,7 +2469,7 @@ features, the macro must be predefined.<br/>
 <h1 id="acknowledgements">Acknowledgements</h1>
 
 <p>Michael Spencer and Davide C. C. Italiano first proposed adding a new
-<tt>char8_t</tt> fundamental type in 
+<tt>char8_t</tt> fundamental type in
 <a title="P0372R0: A type for utf-8 data"
    href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0372r0.html">
 P0372R0</a>
