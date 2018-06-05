@@ -874,8 +874,9 @@ represents a distinct number. These requirements do not hold for other types.
 In any particular implementation, a plain <tt>char</tt> object can
 take on either the same values as a <tt>signed char</tt> or an
 <tt>unsigned char</tt>; which one is implementation-defined. For each value
-<em>i</em> of type <tt>unsigned char</tt> <ins>or <tt>char8_t</tt> </ins>in the
-range 0 to 255 inclusive, there exists a value <em>j</em> of type <tt>char</tt>
+<em>i</em> <del>of type <tt>unsigned char</tt> </del>in the range 0 to 255
+inclusive<ins> of type <tt>unsigned char</tt> or <tt>char8_t</tt></ins>, there
+exists a value <em>j</em> of type <tt>char</tt>
 such that the result of an integral conversion from <em>i</em> to
 <tt>char</tt> is <em>j</em>, and the result of an integral conversion from
 <em>j</em> to <tt>unsigned char</tt><ins> or <tt>char8_t</tt></ins> is
