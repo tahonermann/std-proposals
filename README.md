@@ -26,10 +26,10 @@ WG14 Number     | Title
 [P0482R2]: http://htmlpreview.github.io/?https://github.com/tahonermann/std-proposals/blob/master/p0482r2.html
 [P0482R3]: http://htmlpreview.github.io/?https://github.com/tahonermann/std-proposals/blob/master/p0482r3.html
 [P0482R4]: http://htmlpreview.github.io/?https://github.com/tahonermann/std-proposals/blob/master/p0482r4.html
+[D0482R5]: http://htmlpreview.github.io/?https://github.com/tahonermann/std-proposals/blob/master/d0482r5.html
 [P0696R0]: http://htmlpreview.github.io/?https://github.com/tahonermann/std-proposals/blob/master/p0696r0.html
 [P0696R1]: http://htmlpreview.github.io/?https://github.com/tahonermann/std-proposals/blob/master/p0696r1.html
 [P0725R0]: http://htmlpreview.github.io/?https://github.com/tahonermann/std-proposals/blob/master/p0725r0.html
 [P0804R0]: http://htmlpreview.github.io/?https://github.com/tahonermann/std-proposals/blob/master/p0804r0.html
-[D0482R5]: http://htmlpreview.github.io/?https://github.com/tahonermann/std-proposals/blob/master/d0482r5.html
 [DXXXXR0]: http://htmlpreview.github.io/?https://github.com/tahonermann/std-proposals/blob/master/dXXXXr0-exec-char-encoding-survey.html
 [N2231]: http://htmlpreview.github.io/?https://github.com/tahonermann/std-proposals/blob/master/n2231.html
