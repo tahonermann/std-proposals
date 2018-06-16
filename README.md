@@ -17,7 +17,6 @@ P0804R0         | Impact of the modules TS on the C++ tools ecosystem | [HTML](h
 
 Drafts In Progress | Title | Link
 ------------------ | ----- | ----
-D0482R4            | char8_t: A type for UTF-8 characters and strings (Revision 4) | [HTML](http://htmlpreview.github.io/?https://github.com/tahonermann/std-proposals/blob/master/d0482r4.html)
 DXXXXR0            | A survey of execution character encodings | [HTML](http://htmlpreview.github.io/?https://github.com/tahonermann/std-proposals/blob/master/dXXXXr0-exec-char-encoding-survey.html)
 
 # WG14 Papers (C)
