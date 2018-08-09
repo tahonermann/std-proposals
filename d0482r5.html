@@ -169,6 +169,14 @@ blockquote.stddel
 <h1 id="changes_since_P0482R4">Changes since P0482R4</h1>
 
 <ul>
+  <li>Rebased to
+<a title="Working Draft, Standard for Programming Language C++"
+   href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/n4762.pdf">
+N4762</a>
+<sup><a title="Working Draft, Standard for Programming Language C++"
+        href="#ref_n4762">
+[N4762]</a></sup>.</li>
+  <li>Updated [stable.name] reference to link to the current working draft.</li>
 </ul>
 
 <h1 id="introduction">Introduction</h1>
@@ -742,11 +750,11 @@ http://llvm.org/viewvc/llvm-project?view=revision&revision=331244</a>
 
 <p>These changes are relative to
 <a title="Working Draft, Standard for Programming Language C++"
-   href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/n4713.pdf">
-N4713</a>
+   href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/n4762.pdf">
+N4762</a>
 <sup><a title="Working Draft, Standard for Programming Language C++"
-        href="#ref_n4713">
-[N4713]</a></sup></p>
+        href="#ref_n4762">
+[N4762]</a></sup></p>
 
 <p>Where noted, these changes presume the adoption of proposal
 <a title="char8_t: A type for UTF-8 characters and strings"
@@ -763,7 +771,9 @@ standard will update dependencies on ISO/IEC 9899 accordingly.</p>
 <p>Add <tt>char8_t</tt> to the list of keywords in table 5 in 5.11 [lex.key]
 paragraph 1. </p>
 
-<p>Change in 5.13.3 [lex.ccon] paragraph 3:
+<p>Change in
+<a href="http://eel.is/c++draft/lex.literal#lex.ccon-3">
+5.13.3 [lex.ccon] paragraph 3</a>:
 <blockquote>
 A character literal that begins with <tt>u8</tt>, such as <tt>u8'w'</tt>, is a
 character literal of type <del><tt>char</tt></del><ins><tt>char8_t</tt></ins>,
@@ -771,45 +781,58 @@ known as a <em>UTF-8 character literal</em>.[&hellip;]
 </blockquote>
 </p>
 
-<p>Change in 5.13.5 [lex.string] paragraph 6:
+<p>Change in
+<a href="http://eel.is/c++draft/lex.literal#lex.string-6">
+5.13.5 [lex.string] paragraph 6</a>:
 <blockquote>
 After translation phase 6, a <em>string-literal</em> that does not begin with
 an <em>encoding-prefix</em> is an <em>ordinary string literal</em><ins>.  An
 ordinary string literal has type "<em>array</em> of <em>n</em>
 <tt>const char</tt>" where <em>n</em> is the size of the string as defined
-below, has static storage duration (6.6.4)</ins>, and is initialized with the
-given characters.
+below, has static storage duration
+<a href="http://eel.is/c++draft/basic.stc">(6.6.4)</a></ins>, and is initialized
+with the given characters.
 </blockquote>
 </p>
 
-<p>Change in 5.13.5 [lex.string] paragraph 7:
+<p>Change in
+<a href="http://eel.is/c++draft/lex.literal#lex.string-7">
+5.13.5 [lex.string] paragraph 7</a>:
 <blockquote>
 A <em>string-literal</em> that begins with <tt>u8</tt>, such as
 <tt>u8"asdf"</tt>, is a <em>UTF-8 string literal</em><ins>, also referred to as
 a <tt>char8_t</tt> string literal.  A <tt>char8_t</tt> string literal has type
 "<em>array</em> of <em>n</em> <tt>const char8_t</tt>", where <em>n</em> is
 the size of the string as defined below; each successive element of the object
-representation (6.7) has the value of the corresponding code unit of the UTF-8
-encoding of the string.
+representation
+<a href="http://eel.is/c++draft/basic.types">(6.7)</a> has the value of the
+corresponding code unit of the UTF-8 encoding of the string.
 </blockquote>
 </p>
 
-<p>Change in 5.13.5 [lex.string] paragraph 8:
+<p>Change in
+<a href="http://eel.is/c++draft/lex.literal#lex.string-8">
+5.13.5 [lex.string] paragraph 8</a>:
 <blockquote>
 Ordinary string literals and UTF-8 string literals are also referred to as
 narrow string literals. <del>A narrow string literal has type "<em>array</em>
 of <em>n</em> <tt>const char</tt>", where <em>n</em> is the size of the string
-as defined below, and has static storage duration (6.6.4).</del>
+as defined below, and has static storage duration
+<a href="http://eel.is/c++draft/basic.stc">(6.6.4)</a>.</del>
 </blockquote>
 </p>
 
 <p><em>Drafting note: The deleted paragraph 8 content was incorporated in the
 changes to paragraphs 6 and 7.</em></p>
 
-<p>Remove 5.13.5 [lex.string] paragraph 9:
+<p>Remove
+<a href="http://eel.is/c++draft/lex.literal#lex.string-9">
+5.13.5 [lex.string] paragraph 9</a>:
 <blockquote class=stddel>
 For a UTF-8 string literal, each successive element of the object
-representation (6.7) has the value of the corresponding code unit of the UTF-8
+representation
+<a href="http://eel.is/c++draft/basic.types">(6.7)</a>
+has the value of the corresponding code unit of the UTF-8
 encoding of the string.
 </blockquote>
 </p>
@@ -817,7 +840,9 @@ encoding of the string.
 <p><em>Drafting note: The paragraph 9 content was incorporated in the changes
 to paragraph 7.</em></p>
 
-<p>Change in 5.13.5 [lex.string] paragraph 15:
+<p>Change in
+<a href="http://eel.is/c++draft/lex.literal#lex.string-15">
+5.13.5 [lex.string] paragraph 15</a>:
 <blockquote>
 [&hellip;] In a narrow string literal, a <em>universal-character-name</em>
 may map to more than one <tt>char</tt> <ins>or <tt>char8_t</tt></ins> element
@@ -825,18 +850,27 @@ due to <em>multibyte encoding</em>. [&hellip;]
 </blockquote>
 </p>
 
-<p>Change in 6.6.5 [[basic.align] paragraph 6:
+<p>Change in
+<a href="http://eel.is/c++draft/basic.align#6">
+6.6.5 [basic.align] paragraph 6</a>:
 <blockquote>
 The alignment requirement of a complete type can be queried using an
-<tt>alignof</tt> expression.  Furthermore, the narrow character types shall
+<tt>alignof</tt> expression
+<a href="http://eel.is/c++draft/expr.alignof">(7.6.2.6)</a>.
+Furthermore, the narrow character types
+<a href="http://eel.is/c++draft/basic.fundamental">(6.7.1)</a>
+shall
 have the weakest alignment requirement.  [ <em>Note</em>: This enables the
 <del>narrow</del><ins>ordinary</ins> character types to be used as the
-underlying type for an aligned memory area ([dcl.align]).  &mdash;
+underlying type for an aligned memory area
+<a href="http://eel.is/c++draft/dcl.align">(9.11.2)</a>.  &mdash;
 <em>end note</em> ]
 </blockquote>
 </p>
 
-<p>Change in 6.7.1 [basic.fundamental] paragraph 1:
+<p>Change in
+<a href="http://eel.is/c++draft/basic.fundamental#1">
+6.7.1 [basic.fundamental] paragraph 1</a>:
 <blockquote>
 Objects declared <del>as characters</del><ins>with type </ins>
 <del>(</del><tt>char</tt><del>)</del> shall be large enough to store any member
@@ -852,11 +886,13 @@ types</em>.  <ins>The ordinary character types and <tt>char8_t</tt> are
 collectively called <em>narrow character types</em>.</ins>  A <tt>char</tt>, a
 <tt>signed char</tt>, <del>and </del>an <tt>unsigned char</tt><ins>, and a
 <tt>char8_t</tt></ins> occupy the same amount of storage and have the same
-alignment requirements (6.6.5); that is, they have the same object
-representation. For narrow character types, all bits of the object
-representation participate in the value representation. [ <em>Note</em>: A
-bit-field of narrow character type whose length is larger than the number of
-bits in the object representation of that type has padding bits; see 6.7.
+alignment requirements
+<a href="http://eel.is/c++draft/basic.align">(6.6.5)</a>; that is, they have
+the same object representation. For narrow character types, all bits of the
+object representation participate in the value representation. [ <em>Note</em>:
+A bit-field of narrow character type whose length is larger than the number of
+bits in the object representation of that type has padding bits; see
+<a href="http://eel.is/c++draft/basic.types">6.7</a>.
 &mdash; <em>end note</em> ] For unsigned narrow character types,
 each possible bit pattern of the value representation
 represents a distinct number. These requirements do not hold for other types.
@@ -866,27 +902,35 @@ take on either the same values as a <tt>signed char</tt> or an
 <em>i</em> <del>of type <tt>unsigned char</tt> </del>in the range 0 to 255
 inclusive<ins> of type <tt>unsigned char</tt> or <tt>char8_t</tt></ins>, there
 exists a value <em>j</em> of type <tt>char</tt>
-such that the result of an integral conversion from <em>i</em> to
+such that the result of an integral conversion
+<a href="http://eel.is/c++draft/conv.integral">(7.3.8)</a>
+from <em>i</em> to
 <tt>char</tt> is <em>j</em>, and the result of an integral conversion from
 <em>j</em> to <tt>unsigned char</tt><ins> or <tt>char8_t</tt></ins> is
 <em>i</em>.
 </blockquote>
 </p>
 
-<p>Change in 6.7.1 [basic.fundamental] paragraph 5:
+<p>Change in
+<a href="http://eel.is/c++draft/basic.fundamental#5">
+6.7.1 [basic.fundamental] paragraph 5</a>:
 <blockquote>
 [&hellip;] Type <tt>wchar_t</tt> shall have the same size, signedness, and
-alignment requirements (6.6.5) as one of the other integral types, called its
+alignment requirements
+<a href="http://eel.is/c++draft/basic.align">(6.6.5)</a>
+as one of the other integral types, called its
 underlying type.  <ins>Type <tt>char8_t</tt> denotes a distinct type with the
 same size, signedness, and alignment as <tt>unsigned char</tt>, called its
 underlying type.</ins>  Types <tt>char16_t</tt> and <tt>char32_t</tt> denote
 distinct types with the same size, signedness, and alignment as
 <tt>uint_least16_t</tt> and <tt>uint_least32_t</tt>, respectively, in
-<tt>&lt;cstdint&gt;</tt>, called the underlying types. [&hellip;]
+<tt>&lt;cstdint&gt;</tt>, called the underlying types.
 </blockquote>
 </p>
 
-<p>Change in 6.7.1 [basic.fundamental] paragraph 7:
+<p>Change in
+<a href="http://eel.is/c++draft/basic.fundamental#7">
+6.7.1 [basic.fundamental] paragraph 7</a>:
 <blockquote>
 Types <tt>bool</tt>, <tt>char</tt>, <ins><tt>char8_t</tt>, </ins>
 <tt>char16_t</tt>, <tt>char32_t</tt>, <tt>wchar_t</tt>, and the signed and
@@ -894,17 +938,21 @@ unsigned integer types are collectively called integral types. [&hellip;]
 </blockquote>
 </p>
 
-<p>Change in 6.7.4 [conv.rank] paragraph 1:
+<p>Change in
+<a href="http://eel.is/c++draft/conv.rank#1.8">
+6.7.4 [conv.rank] subparagraph (1.8)</a>:
 <blockquote>
 [&hellip;]<br/>
 (1.8) &mdash; The ranks of <ins><tt>char8_t</tt>, </ins><tt>char16_t</tt>,
 <tt>char32_t</tt>, and <tt>wchar_t</tt> shall equal the ranks of their
-underlying types (6.7.1).
+underlying types <a href="http://eel.is/c++draft/basic.fundamental">(6.7.1)</a>.
 <br/>[&hellip;]
 </blockquote>
 </p>
 
-<p>Change to footnote 64 associated with 8.3 [expr.arith.conv] paragraph 1 (1.5):
+<p>Change to
+<a href="http://eel.is/c++draft/expr.arith.conv#footnote-65">
+footnote 65 associated with 7.4 [expr.arith.conv] subparagraph (1.5)</a>:
 <blockquote>
 As a consequence, operands of type <tt>bool</tt>, <ins><tt>char8_t</tt>, </ins>
 <tt>char16_t</tt>, <tt>char32_t</tt>, <tt>wchar_t</tt>, or an enumerated type
@@ -912,17 +960,23 @@ are converted to some integral type.
 </blockquote>
 </p>
 
-<p>Change in 8.5.2.3 [expr.sizeof] paragraph 1:
+<p>Change in
+<a href="http://eel.is/c++draft/expr.sizeof#1">
+7.6.2.3 [expr.sizeof] paragraph 1</a>:
 <blockquote>
 [&hellip;] <del><tt>sizeof(char)</tt>, <tt>sizeof(signed char)</tt>
 and <tt>sizeof(unsigned char)</tt> are 1</del><ins>The result of <tt>sizeof</tt>
 applied to any of the narrow character types is 1</ins>.  The result of
-<tt>sizeof</tt> applied to any other fundamental type is implementation-defined.
+<tt>sizeof</tt> applied to any other fundamental type
+<a href="http://eel.is/c++draft/basic.fundamental">(6.7.1)</a> is
+implementation-defined.
 [&hellip;]
 </blockquote>
 </p>
 
-<p>Change in 10.1.7.2 [dcl.type.simple] paragraph 1:
+<p>Change in
+<a href="http://eel.is/c++draft/dcl.type.simple#1">
+9.1.7.2 [dcl.type.simple] paragraph 1</a>:
 <blockquote>
 The simple type specifiers are<br/>
 <div style="margin-left: 1em;">
@@ -939,7 +993,9 @@ The simple type specifiers are<br/>
 </blockquote>
 </p>
 
-<p>Change in table 11 of 10.1.7.2 [dcl.type.simple] paragraph 2:
+<p>Change in
+<a href="http://eel.is/c++draft/dcl.type.simple#2">
+table 11 of 9.1.7.2 [dcl.type.simple] paragraph 2</a>:
 <blockquote>
 [&hellip;]<br/>
 <div style="margin-left: 1em;">
@@ -997,35 +1053,50 @@ The simple type specifiers are<br/>
 </blockquote>
 </p>
 
-<p>Change in 11.6 [dcl.init] paragraph (12.1):
+<p>Change in
+<a href="http://eel.is/c++draft/dcl.init#12.1">
+9.3 [dcl.init] subparagraph (12.1)</a>:
 <blockquote>
 (12.1) &mdash; If an indeterminate value of unsigned
-<del>narrow</del><ins>ordinary</ins> character type or <tt>std::byte</tt> type
-([cstddef.syn]) is produced by the evaluation of:
+<del>narrow</del><ins>ordinary</ins> character type
+<a href="http://eel.is/c++draft/basic.fundamental">(6.7.1)</a>
+or <tt>std::byte</tt> type
+<a href="http://eel.is/c++draft/support.types#cstddef.syn">(16.2.1)</a>
+is produced by the evaluation of:
 <br/>[&hellip;]<br/>
 <div style="margin-left: 1em;">
-(12.1.3) &mdash; the operand of a cast or conversion ([conv.integral],
-[expr.type.conv], [expr.static.cast], [expr.cast]) to an unsigned
+(12.1.3) &mdash; the operand of a cast or conversion
+(<a href="http://eel.is/c++draft/conv.integral">7.3.8</a>,
+<a href="http://eel.is/c++draft/expr.type.conv">7.6.1.3</a>,
+<a href="http://eel.is/c++draft/expr.static.cast">7.6.1.9</a>,
+<a href="http://eel.is/c++draft/expr.cast">7.6.3</a>)
+to an unsigned
 <del>narrow</del><ins>ordinary</ins> character type or <tt>std::byte</tt> type
-([cstddef.syn]), or
+<a href="http://eel.is/c++draft/support.types#cstddef.syn">(16.2.1)</a>, or
 </div>
 [&hellip;]<br/>
 then the result of the operation is an indeterminate value.
 </blockquote>
 </p>
 
-<p>Change in 11.6 [dcl.init] paragraph (12.2):
+<p>Change in
+<a href="http://eel.is/c++draft/dcl.init#12.2">
+9.3 [dcl.init] subparagraph (12.2)</a>:
 <blockquote>
 (12.2) If an indeterminate value of unsigned <del>narrow</del><ins>ordinary</ins>
 character type or <tt>std::byte</tt> type is produced by the evaluation of the
-right operand of a simple assignment operator whose first operand is an lvalue
+right operand of a simple assignment operator
+<a href="http://eel.is/c++draft/expr.ass">(7.6.18)</a>
+whose first operand is an lvalue
 of unsigned <del>narrow</del><ins>ordinary</ins> character type or
 <tt>std::byte</tt> type, an indeterminate value replaces the value of the object
 referred to by the left operand.
 </blockquote>
 </p>
 
-<p>Change in 11.6 [dcl.init] paragraph (12.3):
+<p>Change in
+<a href="http://eel.is/c++draft/dcl.init#12.3">
+9.3 [dcl.init] subparagraph (12.3)</a>:
 <blockquote>
 (12.3) If an indeterminate value of unsigned <del>narrow</del><ins>ordinary</ins>
 character type is produced by the evaluation of the initialization expression
@@ -1034,7 +1105,9 @@ character type, that object is initialized to an indeterminate value.
 </blockquote>
 </p>
 
-<p>Change in 11.6 [dcl.init] paragraph (12.4):
+<p>Change in
+<a href="http://eel.is/c++draft/dcl.init#12.4">
+9.3 [dcl.init] subparagraph (12.4)</a>:
 <blockquote>
 (12.4) If an indeterminate value of unsigned <del>narrow</del><ins>ordinary</ins>
 character type or <tt>std::byte</tt> type is produced by the evaluation of the
@@ -1044,20 +1117,26 @@ that object is initialized to an indeterminate value.
 </blockquote>
 </p>
 
-<p>Change in 11.6 [dcl.init] paragraph 17:
+<p>Change in
+<a href="http://eel.is/c++draft/dcl.init#17.3">
+9.3 [dcl.init] subparagraph (17.3)</a>:
 <blockquote>
 [&hellip;]<br/>
 (17.3) &mdash; If the destination type is an array of characters, <ins>an
 array of <tt>char8_t</tt>, </ins>an array of <tt>char16_t</tt>, an array of
 <tt>char32_t</tt>, or an array of <tt>wchar_t</tt>, and the initializer is a
-string literal, see 11.6.2.
+string literal, see
+<a href="http://eel.is/c++draft/dcl.init.string">9.3.2</a>.
 <br/>[&hellip;]
 </blockquote>
 </p>
 
-<p>Change in 11.6.2 [dcl.init.string] paragraph 1:
+<p>Change in
+<a href="http://eel.is/c++draft/dcl.init.string#1">
+9.3.2 [dcl.init.string] paragraph 1</a>:
 <blockquote>
-An array of <del>narrow</del><ins>ordinary</ins> character type (6.7.1),
+An array of <del>narrow</del><ins>ordinary</ins> character type
+<a href="http://eel.is/c++draft/basic.fundamental">(6.7.1)</a>,
 <ins><tt>char8_t</tt> array, </ins><tt>char16_t</tt> array, <tt>char32_t</tt>
 array, or <tt>wchar_t</tt> array can be initialized by
 <del>a narrow</del><ins>an ordinary</ins> string literal, <ins><tt>char8_t</tt>
@@ -1066,7 +1145,9 @@ string literal, or wide string literal, respectively, [&hellip;]
 </blockquote>
 </p>
 
-<p>Change in 16.5.8 [over.literal] paragraph 3:
+<p>Change in
+<a href="http://eel.is/c++draft/over.literal#3">
+11.5.8 [over.literal] paragraph 3</a>:
 <blockquote>
 The declaration of a literal operator shall have a
 <em>parameter-declaration-clause</em> equivalent to one of the following:
@@ -1089,9 +1170,13 @@ The declaration of a literal operator shall have a
 
 <h2 id="library_wording">Library wording</h2>
 
-<p>Change in 20.1 [library.general] paragraph 7:
+<p>Change in
+<a href="http://eel.is/c++draft/library.general#8">
+15.1 [library.general] paragraph 8</a>:
 <blockquote>
-The strings library (Clause 24) provides support for manipulating text
+The strings library
+<a href="http://eel.is/c++draft/#strings">(Clause 20)</a>
+provides support for manipulating text
 represented as sequences of type <tt>char</tt>,
 <ins>sequences of type <tt>char8_t</tt>, </ins>
 sequences of type <tt>char16_t</tt>,
@@ -1101,10 +1186,12 @@ and sequences of any other character-like type.
 </blockquote>
 </p>
 
-<p>Change in 20.3.2 [defns.character]:
+<p>Change in
+<a href="http://eel.is/c++draft/definitions#defns.character">
+15.3.2 [defns.character]</a>:
 <blockquote>
 [&hellip;]<br/>
-[ <em>Note 1 to entry:</em> The term does not mean only <tt>char</tt>,
+[ <em>Note:</em> The term does not mean only <tt>char</tt>,
 <ins><tt>char8_t</tt>, </ins><tt>char16_t</tt>, <tt>char32_t</tt>, and
 <tt>wchar_t</tt> objects, but any value that can be represented by a type
 that provides the definitions specified in these Clauses.  &mdash;
@@ -1112,7 +1199,9 @@ that provides the definitions specified in these Clauses.  &mdash;
 </blockquote>
 </p>
 
-<p>Change in 21.3.2 [limits.syn]:
+<p>Change in
+<a href="http://eel.is/c++draft/limits.syn">
+16.3.2 [limits.syn]</a>:
 <blockquote>
 <div style="margin-left: 1em;">
 <tt>
@@ -1130,7 +1219,9 @@ that provides the definitions specified in these Clauses.  &mdash;
 </blockquote>
 </p>
 
-<p>Change in 24.2 [char.traits] paragraph 1:
+<p>Change in
+<a href="http://eel.is/c++draft/char.traits#1">
+20.2 [char.traits] paragraph 1</a>:
 <blockquote>
 This subclause defines requirements on classes representing <em>character
 traits</em>, and defines a class template <tt>char_traits&lt;charT&gt;</tt>,
@@ -1144,7 +1235,9 @@ that satisfy those requirements.
 </blockquote>
 </p>
 
-<p>Change in 24.2 [char.traits] paragraph 4:
+<p>Change in
+<a href="http://eel.is/c++draft/char.traits#4">
+20.2 [char.traits] paragraph 4</a>:
 <blockquote>
 This subclause specifies a class template, <tt>char_traits&lt;charT&gt;</tt>,
 and <del>four</del><ins>five</ins> explicit specializations of it,
@@ -1157,10 +1250,13 @@ and <del>four</del><ins>five</ins> explicit specializations of it,
 </blockquote>
 </p>
 
-<p><em>Drafting note: 24.2p4 appears to unnecessarily duplicate information
-previously presented in 24.2p1.</em></p>
+<p><em>Drafting note: <a href="http://eel.is/c++draft/char.traits#4">20.2p4</a>
+appears to unnecessarily duplicate information previously presented in
+<a href="http://eel.is/c++draft/char.traits#1">20.2p1</a>.</em></p>
 
-<p>Change in 24.2.3 [char.traits.specializations]:
+<p>Change in
+<a href="http://eel.is/c++draft/char.traits.specializations">
+20.2.3 [char.traits.specializations]</a>:
 <blockquote>
 <div style="margin-left: 1em;">
 <tt>namespace std {</tt><br/>
@@ -1175,7 +1271,9 @@ previously presented in 24.2p1.</em></p>
 </blockquote>
 </p>
 
-<p>Change in 24.2.3 [char.traits.specializations] paragraph 1:
+<p>Change in
+<a href="http://eel.is/c++draft/char.traits.specializations#1">
+20.2.3 [char.traits.specializations] paragraph 1</a>:
 <blockquote>
 The header <tt>&lt;string&gt;</tt> shall define <del>four</del><ins>five</ins>
 specializations of the class template <tt>char_traits</tt>:
@@ -1187,11 +1285,13 @@ specializations of the class template <tt>char_traits</tt>:
 </blockquote>
 </p>
 
-<p>Add a new subclause after 24.2.3.1 [char.traits.specializations.char]:
+<p>Add a new subclause after
+<a href="http://eel.is/c++draft/char.traits.specializations#char">
+20.2.3.1 [char.traits.specializations.char]</a>:
 <blockquote class=stdins>
 <table>
   <tr>
-    <td>24.2.3.?</td>
+    <td>20.2.3.?</td>
     <td><tt>struct char_traits&lt;char8_t&gt;</tt></td>
     <td>[char.traits.specializations.char8_t]</td>
   </tr>
@@ -1227,10 +1327,19 @@ namespace std {<br/>
 </blockquote>
 </p>
 
+<p><em>Drafting note: The <tt>char_traits&lt;char8_t&gt;</tt>
+specification above was copied from the <tt>char_traits&lt;char16_t&gt;</tt>
+specification in
+<a href="http://eel.is/c++draft/char.traits.specializations.char16_t">
+[char.traits.specializations.char16_t]</a> and then modified to update the
+targets of the type aliases.</em></p>
+
 <p>Add paragraph 1:
 <blockquote class=stdins>
 The type <tt>u8streampos</tt> shall be an implementation-defined type that
-satisfies the requirements for <tt>pos_type</tt> in 30.2.2 and 30.3.
+satisfies the requirements for <tt>pos_type</tt> in
+<a href="http://eel.is/c++draft/iostreams.limits.pos">27.2.2</a> and
+<a href="http://eel.is/c++draft/iostream.forward">27.3</a>.
 </blockquote>
 </p>
 
@@ -1249,7 +1358,15 @@ cannot appear as a valid UTF-8 code unit.
 </blockquote>
 </p>
 
-<p>Change in 24.3 [string.classes] paragraph 1:
+<p><em>Drafting note: Paragraphs 1-3 above were copied from the
+<tt>char_traits&lt;char16_t&gt;</tt> specification in
+<a href="http://eel.is/c++draft/char.traits.specializations.char16_t">
+[char.traits.specializations.char16_t]</a> and then modified to reflect use of
+the <tt>u8streampos</tt> type and UTF-8.</em></p>
+
+<p>Change in
+<a href="http://eel.is/c++draft/string.classes#1">
+20.3 [string.classes] paragraph 1</a>:
 <blockquote>
 The header <tt>&lt;string&gt;</tt> defines the <tt>basic_string</tt> class
 template for manipulating varying-length sequences of char-like objects and
@@ -1264,7 +1381,9 @@ template for manipulating varying-length sequences of char-like objects and
 </blockquote>
 </p>
 
-<p>Change in 24.3.1 [string.syn]:
+<p>Change in
+<a href="http://eel.is/c++draft/string.classes#string.syn">
+20.3.1 [string.syn]</a>:
 <blockquote>
 <h4>Header <tt>&lt;string&gt;</tt> synopsis</h4>
 <div style="margin-left: 1em;">
@@ -1272,7 +1391,7 @@ template for manipulating varying-length sequences of char-like objects and
 #include &lt;initializer_list&gt;<br/>
 <br/>
 namespace std {<br/>
-&nbsp;&nbsp;// 24.2, <em>character traits</em>:<br/>
+&nbsp;&nbsp;// [char.traits], <em>character traits</em>:<br/>
 &nbsp;&nbsp;template&lt;class charT&gt; struct char_traits;<br/>
 &nbsp;&nbsp;template&lt;&gt; struct char_traits&lt;char&gt;;<br/>
 &nbsp;&nbsp;<ins>template&lt;&gt; struct char_traits&lt;char8_t&gt;;</ins><br/>
@@ -1287,7 +1406,7 @@ namespace std {<br/>
 &nbsp;&nbsp;using u32string = basic_string&lt;char32_t&gt;;<br/>
 &nbsp;&nbsp;using wstring   = basic_string&lt;wchar_t&gt;;<br/>
 [&hellip;]<br/>
-&nbsp;&nbsp;// 24.3.5, <em>hash support</em>:<br/>
+&nbsp;&nbsp;// [basic.string.hash], <em>hash support</em>:<br/>
 &nbsp;&nbsp;template&lt;class T&gt; struct hash;<br/>
 &nbsp;&nbsp;template&lt;&gt; struct hash&lt;string&gt;;<br/>
 &nbsp;&nbsp;<ins>template&lt;&gt; struct hash&lt;u8string&gt;;</ins><br/>
@@ -1308,7 +1427,7 @@ namespace std {<br/>
 <br/>
 &nbsp;&nbsp;inline namespace literals {<br/>
 &nbsp;&nbsp;inline namespace string_literals {<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;// 24.3.6, suffix for basic_string literals:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;// [basic.string.literals], suffix for basic_string literals:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;string    operator "" s(const char* str, size_t len);<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<ins>u8string operator "" s(const char8_t* str, size_t len);</ins><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;u16string operator "" s(const char16_t* str, size_t len);<br/>
@@ -1322,7 +1441,9 @@ namespace std {<br/>
 </blockquote>
 </p>
 
-<p>Change in 24.3.5 [basic.string.hash]:
+<p>Change in
+<a href="http://eel.is/c++draft/basic.string.hash">
+20.3.5 [basic.string.hash]</a>:
 <blockquote>
 <tt>
 template&lt;&gt; struct hash&lt;string&gt;;<br/>
@@ -1334,10 +1455,12 @@ template&lt;&gt; struct hash&lt;wstring&gt;;<br/>
 </blockquote>
 </p>
 
-<p>Add a new paragraph after 24.3.6 [basic.string.literals] paragraph 1:
+<p>Add a new paragraph after
+<a href="http://eel.is/c++draft/basic.string.literals#1">
+20.3.6 [basic.string.literals] paragraph 1</a>:
 <blockquote class="stdins">
 <tt>
-u8string operator "" s(const char8_t* str, size_t len);
+u8string operator""s(const char8_t* str, size_t len);
 </tt>
 <div style="margin-left: 1em;">
  <em>Returns</em>: <tt>u8string{str, len}</tt>.
@@ -1345,7 +1468,9 @@ u8string operator "" s(const char8_t* str, size_t len);
 </blockquote>
 </p>
 
-<p>Change in 24.4.1 [string.view.synop]:
+<p>Change in
+<a href="http://eel.is/c++draft/string.view.synop">
+20.4.1 [string.view.synop]</a>:
 <blockquote>
 <div style="margin-left: 1em;">
 <tt>
@@ -1357,7 +1482,7 @@ u8string operator "" s(const char8_t* str, size_t len);
 &nbsp;&nbsp;using u32string_view = basic_string_view&lt;char32_t&gt;;<br/>
 &nbsp;&nbsp;using wstring_view = basic_string_view&lt;wchar_t&gt;;<br/>
 <br/>
-&nbsp;&nbsp;// 24.4.5, hash support<br/>
+&nbsp;&nbsp;// [string.view.hash], hash support<br/>
 &nbsp;&nbsp;template&lt;class T&gt; struct hash;<br/>
 &nbsp;&nbsp;template&lt;&gt; struct hash&lt;string_view&gt;;<br/>
 &nbsp;&nbsp;<ins>template&lt;&gt; struct hash&lt;u8string_view&gt;;</ins><br/>
@@ -1367,7 +1492,7 @@ u8string operator "" s(const char8_t* str, size_t len);
 <br/>
 &nbsp;&nbsp;inline namespace literals {<br/>
 &nbsp;&nbsp;inline namespace string_view_literals {<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;// 24.4.6, suffix for basic_string_view literals<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;// [string.view.literals], suffix for basic_string_view literals<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;constexpr string_view    operator""sv(const char* str, size_t len) noexcept;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<ins>constexpr u8string_view operator""sv(const char8_t* str, size_t len) noexcept;</ins><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;constexpr u16string_view operator""sv(const char16_t* str, size_t len) noexcept;<br/>
@@ -1381,7 +1506,9 @@ u8string operator "" s(const char8_t* str, size_t len);
 </blockquote>
 </p>
 
-<p>Change in 24.4.5 [string.view.hash]:
+<p>Change in
+<a href="http://eel.is/c++draft/string.view.hash">
+20.4.5 [string.view.hash]</a>:
 <blockquote>
 <tt>
 template&lt;&gt; struct hash&lt;string_view&gt;;<br/>
@@ -1393,7 +1520,9 @@ template&lt;&gt; struct hash&lt;wstring_view&gt;;<br/>
 </blockquote>
 </p>
 
-<p>Add a new paragraph after 24.4.6 [string.view.literals] paragraph 1:
+<p>Add a new paragraph after
+<a href="http://eel.is/c++draft/string.view.literals#1">
+20.4.6 [string.view.literals] paragraph 1</a>:
 <blockquote class="stdins">
 <tt>
 constexpr u8string_view operator""sv(const char8_t* str, size_t len) noexcept;
@@ -1404,12 +1533,14 @@ constexpr u8string_view operator""sv(const char8_t* str, size_t len) noexcept;
 </blockquote>
 </p>
 
-<p>Change in 24.5.5 [cuchar.syn]:
+<p>Change in
+<a href="http://eel.is/c++draft/cuchar.syn">
+20.5.5 [cuchar.syn]</a>:
 <blockquote>
 <tt>
 namespace std {<br/>
 &nbsp;&nbsp;using mbstate_t = <em>see below</em>;<br/>
-&nbsp;&nbsp;using size_t = <em>see 21.2.4</em>;<br/>
+&nbsp;&nbsp;using size_t = <em>see <a href="http://eel.is/c++draft/support.types.layout">16.2.4</a></em>;<br/>
 <br/>
 <ins>&nbsp;&nbsp;size_t mbrtoc8(char8_t* pc8, const char* s, size_t n, mbstate_t* ps);<br/>
 &nbsp;&nbsp;size_t c8rtomb(char* s, char8_t c8, mbstate_t* ps);<br/></ins>
@@ -1422,7 +1553,9 @@ namespace std {<br/>
 </blockquote>
 </p>
 
-<p>Change in 24.5.5 [cuchar.syn] paragraph 1:
+<p>Change in
+<a href="http://eel.is/c++draft/cuchar.syn#1">
+20.5.5 [cuchar.syn] paragraph 1</a>:
 <blockquote>
 The contents and meaning of the header <tt>&lt;cuchar&gt;</tt> are the same as
 the C standard library header <tt>&lt;uchar.h&gt;</tt>, except that it does not
@@ -1433,7 +1566,8 @@ declare types <ins><tt>char8_t</tt>, </ins><tt>char16_t</tt><del> nor</del><ins>
 </blockquote>
 </p>
 
-<p><em>Drafting note: The changes to 24.5.5 are dependent upon WG14 adopting
+<p><em>Drafting note: The changes to
+<a href="http://eel.is/c++draft/cuchar.syn">20.5.5</a> are dependent upon WG14 adopting
 <a title="char8_t: A type for UTF-8 characters and strings"
    href="http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2231.htm">
 N2231</a>
@@ -1441,13 +1575,15 @@ N2231</a>
         href="#ref_wg14_n2231">
 [WG14 N2231]</a></sup></em></p>
 
-<p>Change in table 69 of 25.3.1.1.1 [locale.category]:
+<p>Change in table 91 of
+<a href="http://eel.is/c++draft/locale.category#2">
+26.3.1.1.1 [locale.category] paragraph 2</a>:
 <blockquote>
 <div style="margin-left: 1em;">
 <table>
   <tr>
     <td align="center">
-      Table 69 &mdash; Locale category facets
+      Table 91 &mdash; Locale category facets
     </td>
   </tr>
   <tr>
@@ -1489,13 +1625,15 @@ N2231</a>
 specializations have been deprecated and moved to annex D,
 [depr.locale.category].</em></p>
 
-<p>Change in table 70 of 25.3.1.1.1 [locale.category]:
+<p>Change in table 92 of
+<a href="http://eel.is/c++draft/locale.category#4">
+26.3.1.1.1 [locale.category] paragraph 4</a>:
 <blockquote>
 <div style="margin-left: 1em;">
 <table>
   <tr>
     <td align="center">
-      Table 70 &mdash; Required specializations
+      Table 92 &mdash; Required specializations
     </td>
   </tr>
   <tr>
@@ -1537,9 +1675,12 @@ specializations have been deprecated and moved to annex D,
 specializations have been deprecated and moved to annex D,
 [depr.locale.category].</em></p>
 
-<p>Change in 25.4.1.4 [locale.codecvt] paragraph 3:
+<p>Change in
+<a href="http://eel.is/c++draft/locale.codecvt#3">
+26.4.1.4 [locale.codecvt] paragraph 3</a>:
 <blockquote>
-The specializations required in Table 69 (25.3.1.1.1) convert the
+The specializations required in Table 91
+<a href="http://eel.is/c++draft/locale.category">(26.3.1.1.1)</a> convert the
 implementation-defined native character set.
 <tt>codecvt&lt;char, char, mbstate_t&gt;</tt> implements a degenerate
 conversion; it does not convert at all. The specialization
@@ -1559,7 +1700,9 @@ from the specialized <tt>do_in</tt> or <tt>do_out</tt> members.
 </p>
 
 
-<p>Change in 30.3.1 [iosfwd.syn]:
+<p>Change in
+<a href="http://eel.is/c++draft/iosfwd.syn">
+27.3.1 [iosfwd.syn]</a>:
 <blockquote>
 <div style="margin-left: 1em;">
 <tt>
@@ -1576,7 +1719,9 @@ from the specialized <tt>do_in</tt> or <tt>do_out</tt> members.
 </blockquote>
 </p>
 
-<p>Change in 30.7.4.1 [istream]:
+<p>Change in
+<a href="http://eel.is/c++draft/istream">
+27.7.4.1 [istream]</a>:
 <blockquote>
 <div style="margin-left: 1em;">
 <tt>
@@ -1605,7 +1750,9 @@ namespace std {<br/>
 </blockquote>
 </p>
 
-<p>Change in 30.7.4.2.3 [istream.extractors] paragraph 7:
+<p>Change in
+<a href="http://eel.is/c++draft/istream.extractors#7">
+27.7.4.2.3 [istream.extractors] paragraph 7</a>:
 <blockquote>
 <div style="margin-left: 1em;">
 <tt>
@@ -1624,7 +1771,9 @@ template&lt;class traits&gt;<br/>
 </blockquote>
 </p>
 
-<p>Change in 30.7.4.2.3 [istream.extractors] paragraph 12:
+<p>Change in
+<a href="http://eel.is/c++draft/istream.extractors#12">
+27.7.4.2.3 [istream.extractors] paragraph 12</a>:
 <blockquote>
 <div style="margin-left: 1em;">
 <tt>
@@ -1643,7 +1792,9 @@ template&lt;class traits&gt;<br/>
 </blockquote>
 </p>
 
-<p>Change in 30.7.5.1 [ostream]:
+<p>Change in
+<a href="http://eel.is/c++draft/ostream">
+27.7.5.1 [ostream]</a>:
 <blockquote>
 <div style="margin-left: 1em;">
 <tt>
@@ -1668,7 +1819,9 @@ namespace std {<br/>
 </blockquote>
 </p>
 
-<p>Change in 30.7.5.2.4 [ostream.inserters.character] paragraph 1:
+<p>Change in
+<a href="http://eel.is/c++draft/ostream.inserters.character#1">
+27.7.5.2.4 [ostream.inserters.character] paragraph 1</a>:
 <blockquote>
 <div style="margin-left: 1em;">
 <tt>
@@ -1693,7 +1846,9 @@ template&lt;class traits&gt;<br/>
 </blockquote>
 </p>
 
-<p>Change in 30.7.5.2.4 [ostream.inserters.character] paragraph 3:
+<p>Change in
+<a href="http://eel.is/c++draft/ostream.inserters.character#3">
+27.7.5.2.4 [ostream.inserters.character] paragraph 3</a>:
 <blockquote>
 <div style="margin-left: 1em;">
 <tt>
@@ -1716,7 +1871,9 @@ template&lt;class traits&gt;<br/>
 </blockquote>
 </p>
 
-<p>Change in 30.11.4 [fs.req] paragraph 1:
+<p>Change in
+<a href="http://eel.is/c++draft/fs.req#1">
+27.11.4 [fs.req] paragraph 1</a>:
 <blockquote>
 Throughout this subclause, <tt>char</tt>, <tt>wchar_t</tt>,
 <ins><tt>char8_t</tt>, </ins><tt>char16_t</tt>, and <tt>char32_t</tt> are collectively
@@ -1724,11 +1881,13 @@ called <em>encoded character types</em>.
 </blockquote>
 </p>
 
-<p>Change in 30.11.5 [fs.filesystem.syn]:
+<p>Change in
+<a href="http://eel.is/c++draft/fs.filesystem.syn">
+27.11.5 [fs.filesystem.syn]</a>:
 <blockquote class=stddel>
 <div style="margin-left: 1em;">
 <tt>
-&nbsp;&nbsp;<em>// 30.11.7.6.2, <tt>path</tt> factory functions</em><br/>
+&nbsp;&nbsp;<em>// 27.11.7.7.1, <tt>path</tt> factory functions</em><br/>
 &nbsp;&nbsp;template &lt;class Source&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;path u8path(const Source&amp; source);<br/>
 &nbsp;&nbsp;template &lt;class InputIterator&gt;<br/>
@@ -1741,7 +1900,9 @@ called <em>encoded character types</em>.
 <p><em>Drafting note: The deleted <tt>u8path</tt> factory functions
 have been deprecated and moved to annex D, [depr.fs.path.factory].</em></p>
 
-<p>Change in 30.11.7 [fs.class.path] paragraph 6:
+<p>Change in
+<a href="http://eel.is/c++draft/fs.class.path#6">
+27.11.7 [fs.class.path] paragraph 6</a>:
 <blockquote>
 <div style="margin-left: 1em;">
 <tt>
@@ -1763,16 +1924,23 @@ have been deprecated and moved to annex D, [depr.fs.path.factory].</em></p>
 </blockquote>
 </p>
 
-<p>Change in 30.11.7.2.2 [fs.path.type.cvt] paragraph 1:
+<p>Change in
+<a href="http://eel.is/c++draft/fs.path.type.cvt#1">
+27.11.7.2.2 [fs.path.type.cvt] paragraph 1</a>:
 <blockquote>
 The <em>native encoding</em> of <del>a narrow</del><ins>an ordinary</ins>
 character string is the operating system dependent current encoding for
-pathnames (30.11.7). The <em>native encoding</em> for wide character strings
-is the implementation-defined execution wide-character set encoding (5.3).
+pathnames
+<a href="http://eel.is/c++draft/fs.class.path">(27.11.7)</a>.
+The <em>native encoding</em> for wide character strings
+is the implementation-defined execution wide-character set encoding
+<a href="http://eel.is/c++draft/lex.charset">(5.3)</a>.
 </blockquote>
 </p>
 
-<p>Change in 30.11.7.2.2 [fs.path.type.cvt] subparagraph (2.1):
+<p>Change in
+<a href="http://eel.is/c++draft/fs.path.type.cvt#2.1">
+27.11.7.2.2 [fs.path.type.cvt] subparagraph (2.1)</a>:
 <blockquote>
 (2.1) &mdash; <tt>char</tt>: The encoding is the native
 <del>narrow</del><ins>ordinary</ins> encoding. The method of conversion, if
@@ -1789,14 +1957,18 @@ prone. &mdash; <em>end note</em> ]
 </blockquote>
 </p>
 
-<p>Add a new subparagraph after 30.11.7.2.2 [fs.path.type.cvt] subparagraph (2.2):
+<p>Add a new subparagraph after
+<a href="http://eel.is/c++draft/fs.path.type.cvt#2.2">
+27.11.7.2.2 [fs.path.type.cvt] subparagraph (2.2)</a>:
 <blockquote class="stdins">
 (2.?) &mdash; <tt>char8_t</tt>: The encoding is UTF-8. The method of conversion is
 unspecified.
 </blockquote>
 </p>
 
-<p>Change in 30.11.7.4.1 [fs.path.construct] subparagraph (7.2):
+<p>Change in
+<a href="http://eel.is/c++draft/fs.path.construct#7.2">
+27.11.7.4.1 [fs.path.construct] subparagraph (7.2)</a>:
 <blockquote>
 &mdash; Otherwise a conversion is performed using the
 <tt>codecvt&lt;wchar_t, char, mbstate_t&gt;</tt> facet of <tt>loc</tt>, and
@@ -1809,12 +1981,15 @@ encoding.
 correct?  <tt>codecvt&lt;wchar_t, char, mbstate_t&gt;</tt> already converts to
 the ordinary character encoding.</em></p>
 
-<p>Change in 30.11.7.4.1 [fs.path.construct] paragraph 8:
+<p>Change in
+<a href="http://eel.is/c++draft/fs.path.construct#8">
+27.11.7.4.1 [fs.path.construct] paragraph 8</a>:
 <blockquote>
 [&hellip;]<br/>
 For POSIX-based operating systems, the path is constructed by first using
 <tt>latin1_facet</tt> to convert ISO/IEC 8859-1 encoded <tt>latin1_string</tt>
-to a wide character string in the native wide encoding (30.11.7.2.2). The
+to a wide character string in the native wide encoding
+<a href="http://eel.is/c++draft/fs.path.type.cvt">(27.11.7.2.2)</a>. The
 resulting wide string is then converted to
 <del>a narrow</del><ins>an ordinary</ins> character pathname string in the
 current native <del>narrow</del><ins>ordinary</ins> encoding. If the native
@@ -1827,7 +2002,9 @@ encodings some characters may have no representation.
 </blockquote>
 </p>
 
-<p>Change in 30.11.7.4.6 [fs.path.native.obs] paragraph 8:
+<p>Change in
+<a href="http://eel.is/c++draft/fs.path.native.obs#8">
+27.11.7.4.6 [fs.path.native.obs] paragraph 8</a>:
 <blockquote>
 <div style="margin-left: 1em;">
 <tt>
@@ -1843,15 +2020,20 @@ std::u32string u32string() const;<br/>
 </blockquote>
 </p>
 
-<p>Change in 30.11.7.4.6 [fs.path.native.obs] paragraph 9:
+<p>Change in
+<a href="http://eel.is/c++draft/fs.path.native.obs#9">
+27.11.7.4.6 [fs.path.native.obs] paragraph 9</a>:
 <blockquote>
-<em>Remarks</em>: Conversion, if any, is performed as specified by 30.11.7.2.
+<em>Remarks</em>: Conversion, if any, is performed as specified by
+<a href="http://eel.is/c++draft/fs.path.cvt">27.11.7.2</a>.
 <del>The encoding of the string returned by <tt>u8string()</tt> is always
 UTF-8.</del>
 </blockquote>
 </p>
 
-<p>Change in 30.11.7.4.7 [fs.path.generic.obs] paragraph 5:
+<p>Change in
+<a href="http://eel.is/c++draft/fs.path.generic.obs#5">
+27.11.7.4.7 [fs.path.generic.obs] paragraph 5</a>:
 <blockquote>
 <div style="margin-left: 1em;">
 <tt>
@@ -1867,14 +2049,19 @@ std::u32string generic_u32string() const;<br/>
 </blockquote>
 </p>
 
-<p>Change in 30.11.7.4.7 [fs.path.generic.obs] paragraph 6:
+<p>Change in
+<a href="http://eel.is/c++draft/fs.path.generic.obs#6">
+27.11.7.4.7 [fs.path.generic.obs] paragraph 6</a>:
 <blockquote>
-<em>Remarks</em>: Conversion, if any, is specified by 30.11.7.2. <del>The
-encoding of the string returned by <tt>generic_u8string()</tt> is always UTF-8.
+<em>Remarks</em>: Conversion, if any, is specified by
+<a href="http://eel.is/c++draft/fs.path.cvt">27.11.7.2</a>.
+<del>The encoding of the string returned by <tt>generic_u8string()</tt> is always UTF-8.
 </blockquote>
 </p>
 
-<p>Remove subclause 30.11.7.6.2 [fs.path.factory].</p>
+<p>Remove subclause
+<a href="http://eel.is/c++draft/fs.path.factory">
+27.11.7.7.1 [fs.path.factory]</a>.</p>
 
 <blockquote class="stddel">
 <p>
@@ -1918,7 +2105,8 @@ encoded.  The value type of <tt>Source</tt> and <tt>InputIterator</tt> is
     <td>&mdash;</td>
     <td>
 If <tt>value_type</tt> is <tt>char</tt> and the current native narrow encoding
-(30.11.7.2.2) is UTF-8, return <tt>path(source)</tt> or
+<a href="http://eel.is/c++draft/fs.path.type.cvt">(27.11.7.2.2)</a>
+is UTF-8, return <tt>path(source)</tt> or
 <tt>path(first, last)</tt>; otherwise,
     </td>
   </tr>
@@ -1958,7 +2146,8 @@ of type <tt>u32string</tt> and return <tt>path(tmp)</tt>.
   <tr>
     <td>3</td>
     <td>
-<em>Remarks:</em> Argument format conversion (30.11.7.2.1) applies to the
+<em>Remarks:</em> Argument format conversion
+<a href="http://eel.is/c++draft/fs.path.fmt.cvt">(27.11.7.2.1)</a> applies to the
 arguments for these functions. How Unicode encoding conversions are performed
 is unspecified.
     </td>
@@ -1998,12 +2187,14 @@ For Windows-based operating systems a conversion from UTF-8 to UTF-16 occurs.
 <p><em>Drafting note: The <tt>u8path</tt> factory function templates have been
 deprecated and moved to annex D, [depr.fs.path.factory].</em></p>
 
-<p>Change in 32.2 [atomics.syn]:
+<p>Change in
+<a href="http://eel.is/c++draft/atomics.syn">
+29.2 [atomics.syn]</a>:
 <blockquote>
 <div style="margin-left: 1em;">
 <tt>
 [&hellip;]<br/>
-&nbsp;&nbsp;<em>// 32.5, lock-free property</em><br/>
+&nbsp;&nbsp;<em>// [atomics.lockfree], lock-free property</em><br/>
 &nbsp;&nbsp;#define ATOMIC_BOOL_LOCK_FREE <em>unspecified</em><br/>
 &nbsp;&nbsp;#define ATOMIC_CHAR_LOCK_FREE <em>unspecified</em><br/>
 &nbsp;&nbsp;<ins>#define ATOMIC_CHAR8_T_LOCK_FREE <em>unspecified</em></ins><br/>
@@ -2021,7 +2212,9 @@ deprecated and moved to annex D, [depr.fs.path.factory].</em></p>
 </blockquote>
 </p>
 
-<p>Change in 32.5 [atomics.lockfree]:
+<p>Change in
+<a href="http://eel.is/c++draft/atomics.lockfree">
+29.5 [atomics.lockfree]</a>:
 <blockquote>
 <div style="margin-left: 1em;">
 <tt>
@@ -2037,7 +2230,9 @@ deprecated and moved to annex D, [depr.fs.path.factory].</em></p>
 </blockquote>
 </p>
 
-<p>Change in 32.6.2 [atomics.types.int] paragraph 1:
+<p>Change in
+<a href="http://eel.is/c++draft/atomics.types.int#1">
+29.7.2 [atomics.types.int] paragraph 1</a>:
 <blockquote>
 There are specializations of the <tt>atomic</tt> template for the
 integral types <tt>char</tt>, <tt>signed char</tt>, <tt>unsigned char</tt>,
@@ -2053,7 +2248,9 @@ in the header &lt;cstdint&gt;. [&hellip;]<br/>
 
 <h2 id="annex_a_wording">Annex A Grammar summary wording</h2>
 
-<p>Change in A.6 [gram.dcl]:
+<p>Change in
+<a href="http://eel.is/c++draft/gram.dcl">
+A.6 [gram.dcl]</a>:
 <blockquote>
 <div style="margin-left: 1em;">
 <tt>
@@ -2075,13 +2272,16 @@ in the header &lt;cstdint&gt;. [&hellip;]<br/>
 
 <h2 id="annex_c_wording">Annex C Compatibility wording</h2>
 
-<p>Change in C.1.1 [diff.lex]:
+<p>Change in
+<a href="http://eel.is/c++draft/diff.lex#3">
+C.1.1 [diff.lex] paragraph 3</a>:
 <blockquote>
 [&hellip;]</br>
+<strong>Affected subclause:</strong> <a href="http://eel.is/c++draft/lex.string">5.13.5</a><br/>
 <strong>Change</strong>: String literals made const.<br/>
 The type of a string literal is changed from "array of <tt>char</tt>" to
 "array of <tt>const char</tt>". <ins>The type of a <tt>char8_t</tt> string
-literal is changed from "array of <em>some-integer-type</em>" to "array of
+literal is changed from "array of <tt>char</tt>" to "array of
 <tt>const char8_t</tt>". </ins>The type of a <tt>char16_t</tt> string literal
 is changed from "array of <em>some-integer-type</em>" to "array of
 <tt>const char16_t</tt>". The type of a <tt>char32_t</tt> string literal is
@@ -2092,16 +2292,21 @@ changed from "array of <em>some-integer-type</em>" to "array of
 </blockquote>
 </p>
 
-<p>Change in C.5.1 [diff.cpp17.lex] paragraph 1:
+<p>Change in
+<a href="http://eel.is/c++draft/diff.cpp17.lex#1">
+C.5.1 [diff.cpp17.lex] paragraph 1</a>:
 <blockquote>
-<strong>Affected subclause:</strong> 5.11<br/>
+<strong>Affected subclause:</strong> <a href="http://eel.is/c++draft/lex.key">5.11</a><br/>
 <strong>Change</strong>: New keywords<br/>
 <strong>Rationale</strong>: Required for new features. The <tt>requires</tt>
 keyword is added to introduce constraints through a <em>requires-clause</em>
 or a <em>requires-expression</em>. The <tt>concept</tt> keyword is added to
-enable the definition of <em>concepts</em> (17.6.8).  <ins>The <tt>char8_t</tt>
+enable the definition of <em>concepts</em>
+<a href="http://eel.is/c++draft/temp.concept">(12.6.8)</a>.
+<ins>The <tt>char8_t</tt>
 keyword is added to differentiate the types of ordinary and UTF-8
-literals (5.13.5).</ins><br/>
+literals
+<a href="http://eel.is/c++draft/lex.string">(5.13.5)</a>.</ins><br/>
 <strong>Effect on original feature</strong>: Valid ISO C++ 2017 code using
 <tt>concept</tt><ins>,</ins><del> or</del> <tt>requires</tt><ins>, or
 <tt>char8_t</tt></ins> as an identifier is not valid in this International
@@ -2109,9 +2314,11 @@ Standard.<br/>
 </blockquote>
 </p>
 
-<p>Add a new paragraph to C.5.1 [diff.cpp17.lex]:
+<p>Add a new paragraph to
+<a href="http://eel.is/c++draft/diff.cpp17.lex#1">
+C.5.1 [diff.cpp17.lex]</a>:
 <blockquote class=stdins>
-<strong>Affected subclause:</strong> 5.13<br/>
+<strong>Affected subclause:</strong> <a href="http://eel.is/c++draft/lex.literal">5.13</a><br/>
 <strong>Change</strong>: Type of UTF-8 string and character literals.<br/>
 <strong>Rationale</strong>: Required for new features.  The changed types
 enable function overloading, template specialization, and type deduction
@@ -2145,11 +2352,13 @@ ct&lt;decltype(u8'c')&gt;::type x;  <em>// ill-formed; previously well-formed.</
 </blockquote>
 </p>
 
-<p>Add a new subclause after C.5.4 [diff.cpp17.library]:
+<p>Add a new subclause after
+<a href="http://eel.is/c++draft/diff.cpp17#containers">
+C.5.8 [diff.cpp17.containers]</a>:
 <blockquote class=stdins>
-C.5.? Clause 30: Input/Output library [diff.cpp17.input.output]<br/>
+C.5.? [input.output]: Input/output library [diff.cpp17.input.output]<br/>
 <br/>
-<strong>Affected subclause:</strong> 30.11.7<br/>
+<strong>Affected subclause:</strong> <a href="http://eel.is/c++draft/fs.class.path">27.11.7</a><br/>
 <strong>Change</strong>: Return type of filesystem path format
 observer member functions.<br/>
 <strong>Rationale</strong>: Required for new features.<br/>
@@ -2172,10 +2381,12 @@ std::string s2 = p.generic_u8string();  <em>// ill-formed; previously well-forme
 
 <h2 id="annex_d_wording">Annex D Compatibility features wording</h2>
 
-<p>Add a new subclause after D.18 [depr.conversions]:</p>
+<p>Add a new subclause after
+<a href="http://eel.is/c++draft/depr.conversions">
+D.14 [depr.conversions]</a>:</p>
 <blockquote class="stdins">
 <p>
-D.19 Deprecated locale category facets [depr.locale.category]<br/>
+D.?? Deprecated locale category facets [depr.locale.category]<br/>
 </p>
 
 <p>
@@ -2184,7 +2395,7 @@ D.19 Deprecated locale category facets [depr.locale.category]<br/>
     <td>1</td>
     <td>
 The <tt>ctype</tt> locale category includes the following facets in addition to
-those specified in table 69 of 25.3.1.1.1 [locale.category].
+those specified in table 91 of <a href="http://eel.is/c++draft/locale.category">26.3.1.1.1</a>.
 <div style="margin-left: 1em;">
 <tt>
 <pre>codecvt&lt;char16_t, char, mbstate_t&gt;
@@ -2203,7 +2414,7 @@ codecvt&lt;char32_t, char, mbstate_t&gt;
     <td>2</td>
     <td>
 The <tt>ctype</tt> locale category includes the following facets in addition to
-those specified in table 70 of 25.3.1.1.1 [locale.category].
+those specified in table 92 of <a href="http://eel.is/c++draft/locale.category">26.3.1.1.1</a>.
 <div style="margin-left: 1em;">
 <tt>
 <pre>codecvt_byname&lt;char16_t, char, mbstate_t&gt;
@@ -2222,7 +2433,7 @@ codecvt_byname&lt;char32_t, char, mbstate_t&gt;
     <td>3</td>
     <td>
 The following class template specializations are required in addition to those
-specified in 25.4.1.4 [locale.codecvt].  The specialization
+specified in [locale.codecvt].  The specialization
 <tt>codecvt&lt;char16_t, char, mbstate_t&gt;</tt> converts between the UTF-16
 and UTF-8 encoding forms, and the specialization
 <tt>codecvt&lt;char32_t, char, mbstate_t&gt;</tt> converts between the UTF-32
@@ -2234,10 +2445,12 @@ and UTF-8 encoding forms.
 
 </blockquote>
 
-<p>Add another new subclause after D.18 [depr.conversions]:</p>
+<p>Add another new subclause after
+<a href="http://eel.is/c++draft/depr.conversions">
+D.14 [depr.conversions]</a>:</p>
 <blockquote class="stdins">
 <p>
-D.20 Deprecated filesystem path factory functions [depr.fs.path.factory]<br/>
+D.?? Deprecated filesystem path factory functions [depr.fs.path.factory]<br/>
 </p>
 
 <p>
@@ -2293,7 +2506,8 @@ encoded.  The value type of <tt>Source</tt> and <tt>InputIterator</tt> is
     <td>&mdash;</td>
     <td>
 If <tt>value_type</tt> is <tt>char</tt> and the current native narrow encoding
-(30.11.7.2.2) is UTF-8, return <tt>path(source)</tt> or
+<a href="http://eel.is/c++draft/fs.path.type.cvt">(27.11.7.2.2)</a>
+is UTF-8, return <tt>path(source)</tt> or
 <tt>path(first, last)</tt>; otherwise,
     </td>
   </tr>
@@ -2333,7 +2547,7 @@ of type <tt>u32string</tt> and return <tt>path(tmp)</tt>.
   <tr>
     <td>4</td>
     <td>
-<em>Remarks:</em> Argument format conversion (30.11.7.2.1) applies to the
+<em>Remarks:</em> Argument format conversion applies to the
 arguments for these functions. How Unicode encoding conversions are performed
 is unspecified.
     </td>
@@ -2372,8 +2586,8 @@ For Windows-based operating systems a conversion from UTF-8 to UTF-16 occurs.
 </blockquote>
 
 <p><em>Drafting note: The contents of paragraph 1 correspond to the text removed
-from 30.11.5 [fs.filesystem.syn].  The contents of paragraphs 2-5 correspond to
-the text removed from 30.11.7.6.2 [fs.path.factory]</em></p>
+from [fs.filesystem.syn].  The contents of paragraphs 2-5 correspond to
+the text removed from [fs.path.factory]</em></p>
 
 
 <h2 id="feature_testing">Wording for P0096: Feature-testing recommendations
@@ -2498,11 +2712,11 @@ advance of the Rapperswil meeting.
       http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4197.html</a></td>
   </tr>
   <tr>
-    <td id="ref_n4713"><sup>[N4713]</sup></td>
+    <td id="ref_n4762"><sup>[N4762]</sup></td>
     <td>
-      "Working Draft, Standard for Programming Language C++", N4713, 2017.<br/>
-      <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/n4713.pdf">
-      http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/n4713.pdf</a></td>
+      "Working Draft, Standard for Programming Language C++", N4762, 2018.<br/>
+      <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/n4762.pdf">
+      http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/n4762.pdf</a></td>
   </tr>
   <tr>
     <td id="ref_p0096r5"><sup>[P0096R5]</sup></td>
