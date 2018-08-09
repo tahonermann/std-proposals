@@ -156,8 +156,6 @@ blockquote.stddel
           Annex C Compatibility wording</a></li>
       <li><a href="#annex_d_wording">
           Annex D Compatibility features wording</a></li>
-      <li><a href="#feature_testing">
-          Wording for P0096: Feature-testing recommendations for C++</a></li>
     </ul>
   </li>
   <li><a href="#acknowledgements">
@@ -177,6 +175,7 @@ N4762</a>
         href="#ref_n4762">
 [N4762]</a></sup>.</li>
   <li>Updated [stable.name] reference to link to the current working draft.</li>
+  <li>Moved feature test macros into core/library wording.</li>
 </ul>
 
 <h1 id="introduction">Introduction</h1>
@@ -1168,6 +1167,52 @@ The declaration of a literal operator shall have a
 </blockquote>
 </p>
 
+<p>Change in table 16 of
+<a href="http://eel.is/c++draft/cpp.predefined#1.8">
+14.8 [cpp.predefined] paragraph 1</a>:
+<blockquote>
+<div style="margin-left: 1em;">
+<table>
+  <tr>
+    <td align="center">
+      Table 16 &mdash; Feature-test macros
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <table border="1">
+        <tr>
+          <th align="center">Macro name</th>
+          <th align="center">Value</th>
+        </tr>
+        <tr>
+          <td>[&hellip;]</td>
+          <td>[&hellip;]</td>
+        </tr>
+        <tr>
+          <td>__cpp_capture_star_this</td>
+          <td>201603L</td>
+        </tr>
+        <tr>
+          <td><ins>__cpp_char8_t</ins></td>
+          <td><ins>201803L</ins></td>
+        </tr>
+        <tr>
+          <td>__cpp_constexpr</td>
+          <td>201603L</td>
+        </tr>
+        <tr>
+          <td>[&hellip;]</td>
+          <td>[&hellip;]</td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+</div>
+</blockquote>
+</p>
+
 <h2 id="library_wording">Library wording</h2>
 
 <p>Change in
@@ -1196,6 +1241,65 @@ and sequences of any other character-like type.
 <tt>wchar_t</tt> objects, but any value that can be represented by a type
 that provides the definitions specified in these Clauses.  &mdash;
 <em>end note</em> ]
+</blockquote>
+</p>
+
+<p>Change in table 35 of
+<a href="http://eel.is/c++draft/support.limits.general#3">
+16.3.1 [support.limits.general] paragraph 3</a>:
+<blockquote>
+<div style="margin-left: 1em;">
+<table>
+  <tr>
+    <td align="center">
+      Table 35 &mdash; Standard library feature-test macros
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <table border="1">
+        <tr>
+          <th align="center">Macro name</th>
+          <th align="center">Value</th>
+          <th align="center">Header(s)</th>
+        </tr>
+        <tr>
+          <td>[&hellip;]</td>
+          <td>[&hellip;]</td>
+          <td>[&hellip;]</td>
+        </tr>
+        <tr>
+          <td>__cpp_lib_byte</td>
+          <td>201603L</td>
+          <td>&lt;cstddef&gt;</td>
+        </tr>
+        <tr>
+          <td><ins>__cpp_lib_char8_t</ins></td>
+          <td><ins>201803L</ins></td>
+          <td><ins>&lt;atomic&gt;
+                   &lt;filesystem&gt;
+                   &lt;istream&gt;
+                   &lt;limits&gt;
+                   &lt;locale&gt;
+                   &lt;ostream&gt;
+                   &lt;string&gt;
+                   &lt;string_view&gt;</ins></td>
+        </tr>
+        <tr>
+          <td>__cpp_lib_chrono</td>
+          <td>201611L</td>
+          <td>&lt;chrono&gt;</td>
+        </tr>
+        <tr>
+          <td>[&hellip;]</td>
+          <td>[&hellip;]</td>
+          <td>[&hellip;]</td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+</div>
 </blockquote>
 </p>
 
@@ -2590,85 +2694,6 @@ from [fs.filesystem.syn].  The contents of paragraphs 2-5 correspond to
 the text removed from [fs.path.factory]</em></p>
 
 
-<h2 id="feature_testing">Wording for P0096: Feature-testing recommendations
-        for C++</h2>
-
-<p>These changes are relative to
-<a title="P0096R5: Feature-testing recommendations for C++"
-   href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0096r5.html">
-P0096R5 (Feature-testing recommendations for C++)</a>
-<sup><a title="P0096R5: Feature-testing recommendations for C++"
-        href="#ref_p0096r5">
-[P0096R5]</a></sup>
-</p>
-
-<p>Add a new subclause before 3.4, "C++17 features":
-<blockquote class=stdins>
-<strong>[3.X] C++Maybe features</strong><br/>
-<br/>
-[1] The following table itemizes changes in consideration for a future WG21
-working draft. (Changes that were made as specified in a core or library issue
-are not generally included.)<br/>
-<br/>
-[2] The table is sorted by the section of the standard primarily affected. The
-"Doc. No." column links to the paper itself on the committee web site. The
-"Macro Name" column links to the relevant portion of the "Detailed explanation
-and rationale" section of this document.  When the recommendation is to change
-the value of a macro previously recommended to be defined, the "Value" column
-links to the table entry for the previous recommendation.<br/>
-<br/>
-[3] For library features, the "Header" column identifies the header that is expected
-to define the macro, although the macro may also be predefined. For language
-features, the macro must be predefined.<br/>
-<br/>
-<table>
-  <tr>
-    <td align="center">
-      Significant changes under consideration
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <table border="1">
-        <tr>
-          <th align="center">Doc. No.</th>
-          <th align="center">Title</th>
-          <th align="center">Primary<br/>Section</th>
-          <th align="center">Macro Name</th>
-          <th align="center">Value</th>
-          <th align="center">Header</th>
-        </tr>
-        <tr>
-          <td><a href="http://wg21.link/p0482r5">P0482R5</a>
-          <td>char8_t: A type for UTF-8 characters and strings</td>
-          <td>5.13, 6.7.1</td>
-          <td>__cpp_char8_t</td>
-          <td>201803</td>
-          <td><em>predefined</em></td>
-        </tr>
-        <tr>
-          <td><a href="http://wg21.link/p0482r5">P0482R5</a>
-          <td>char8_t: A type for UTF-8 characters and strings</td>
-          <td>21.3.2, 24.3.1, 24.4.1, 25.2, 30.10.5, 32.2</td>
-          <td>__cpp_lib_char8_t</td>
-          <td>201803</td>
-          <td>&lt;atomic&gt;
-              &lt;filesystem&gt;
-              &lt;istream&gt;
-              &lt;limits&gt;
-              &lt;locale&gt;
-              &lt;ostream&gt;
-              &lt;string&gt;
-              &lt;string_view&gt;
-          </td>
-        </tr>
-      </table>
-    </td>
-  </tr>
-</table>
-</blockquote>
-</p>
-
 <h1 id="acknowledgements">Acknowledgements</h1>
 
 <p>Michael Spencer and Davide C. C. Italiano first proposed adding a new
@@ -2717,14 +2742,6 @@ advance of the Rapperswil meeting.
       "Working Draft, Standard for Programming Language C++", N4762, 2018.<br/>
       <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/n4762.pdf">
       http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/n4762.pdf</a></td>
-  </tr>
-  <tr>
-    <td id="ref_p0096r5"><sup>[P0096R5]</sup></td>
-    <td>
-      Clark Nelson,
-      "Feature-testing recommendations for C++", P0096R5, 2017.<br/>
-      <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0096r5.html">
-      http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0096r5.html</a></td>
   </tr>
   <tr>
     <td id="ref_p0372r0"><sup>[P0372R0]</sup></td>
