@@ -174,8 +174,17 @@ N4762</a>
 <sup><a title="Working Draft, Standard for Programming Language C++"
         href="#ref_n4762">
 [N4762]</a></sup>.</li>
-  <li>Updated [stable.name] reference to link to the current working draft.</li>
-  <li>Moved feature test macros into core/library wording.</li>
+  <li>Updated [stable.name] references to link to the current working draft.</li>
+  <li>Incorporated the changes to feature test macros into core (14.8) and
+      library (16.3.1) wording.</li>
+  <li>Modified library wording for the <tt>cuchar</tt> (20.5.5) header changes
+      to avoid dependencies on ISO C adoption of
+<a title="char8_t: A type for UTF-8 characters and strings"
+   href="http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2231.htm">
+N2231</a>
+<sup><a title="char8_t: A type for UTF-8 characters and strings"
+        href="#ref_wg14_n2231">
+[WG14 N2231]</a></sup>.</li>
 </ul>
 
 <h1 id="introduction">Introduction</h1>
@@ -755,15 +764,6 @@ N4762</a>
         href="#ref_n4762">
 [N4762]</a></sup></p>
 
-<p>Where noted, these changes presume the adoption of proposal
-<a title="char8_t: A type for UTF-8 characters and strings"
-   href="http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2231.htm">
-WG14 N2231</a>
-<sup><a title="char8_t: A type for UTF-8 characters and strings"
-        href="#ref_wg14_n2231">
-[WG14 N2231]</a></sup>
-into the ISO/IEC 9899 standard for C, and that the next revision of the C++
-standard will update dependencies on ISO/IEC 9899 accordingly.</p>
 
 <h2 id="core_wording">Core wording</h2>
 
@@ -1662,22 +1662,27 @@ namespace std {<br/>
 20.5.5 [cuchar.syn] paragraph 1</a>:
 <blockquote>
 The contents and meaning of the header <tt>&lt;cuchar&gt;</tt> are the same as
-the C standard library header <tt>&lt;uchar.h&gt;</tt>, except that it does not
-declare types <ins><tt>char8_t</tt>, </ins><tt>char16_t</tt><del> nor</del><ins>, or</ins>
-<tt>char32_t</tt>.<br/>
+the C standard library header <tt>&lt;uchar.h&gt;</tt>, except that it
+<ins>declares the additional <tt>mbrtoc8</tt> and <tt>c8rtomb</tt> functions,
+and </ins>does not declare types <tt>char16_t</tt> nor <tt>char32_t</tt>.<br/>
 <br/>
 <em>See also:</em> ISO C 7.28
 </blockquote>
 </p>
 
-<p><em>Drafting note: The changes to
-<a href="http://eel.is/c++draft/cuchar.syn">20.5.5</a> are dependent upon WG14 adopting
+<p><em>Drafting note: If WG14 were to adopt
 <a title="char8_t: A type for UTF-8 characters and strings"
    href="http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2231.htm">
 N2231</a>
 <sup><a title="char8_t: A type for UTF-8 characters and strings"
         href="#ref_wg14_n2231">
-[WG14 N2231]</a></sup></em></p>
+[WG14 N2231]</a></sup> in a future revision of ISO C, and if WG21 were
+to update its normative reference to ISO C to a later revision containing
+those changes, then the updates to
+<a href="http://eel.is/c++draft/cuchar.syn#1">20.5.5 paragraph 1</a> above will
+require modification to exclude a declaration of the <tt>char8_t</tt> typedef
+and to remove mention of the additional <tt>mbrtoc8</tt> and <tt>c8rtomb</tt>
+functions.</em></p>
 
 <p>Change in table 91 of
 <a href="http://eel.is/c++draft/locale.category#2">
