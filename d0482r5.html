@@ -164,7 +164,7 @@ blockquote.stddel
       References</a></li>
 </ul>
 
-<h1 id="changes_since_P0482R4">Changes since P0482R4</h1>
+<h1 id="changes_since_P0482R4">Changes since <a href="http://wg21.link/p0482r4">P0482R4</a></h1>
 
 <ul>
   <li>Rebased to
@@ -767,8 +767,35 @@ N4762</a>
 
 <h2 id="core_wording">Core wording</h2>
 
-<p>Add <tt>char8_t</tt> to the list of keywords in table 5 in 5.11 [lex.key]
-paragraph 1. </p>
+<p>Change in
+<a href="http://eel.is/c++draft/lex.key#1">
+table 5 of 5.11 [lex.key] paragraph 1</a>:
+<blockquote>
+[&hellip;]<br/>
+<div style="margin-left: 1em;">
+<table>
+  <tr>
+    <td align="center">
+      Table 5 &mdash; Keywords
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <table border="1">
+        <tr><td>[&hellip;]</td></tr>
+        <tr><td>char</td></tr>
+        <tr><td><ins>char8_t</ins></td></tr>
+        <tr><td>char16_t</td></tr>
+        <tr><td>char32_t</td></tr>
+        <tr><td>[&hellip;]</td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+</div>
+[&hellip;]<br/>
+</blockquote>
+</p>
 
 <p>Change in
 <a href="http://eel.is/c++draft/lex.literal#lex.ccon-3">
