@@ -68,7 +68,7 @@ blockquote.stddel
   </tr>
   <tr>
     <th>Date:</th>
-    <td>2018-08-12</td>
+    <td>2018-08-24</td>
   </tr>
   <tr>
     <th>Audience:</th>
@@ -186,10 +186,15 @@ N2231</a>
 <sup><a title="char8_t: A type for UTF-8 characters and strings"
         href="#ref_wg14_n2231">
 [WG14 N2231]</a></sup>.</li>
-  <li>Added wording for an additional <tt>hash&lt;pmr::u8string&gt;</tt> specialization
-      in [string.syn] (20.3.1) and [basic.string.hash] (20.3.5).</li>
+  <li>Added wording for an additional <tt>hash&lt;pmr::u8string&gt;</tt>
+      specialization in [string.syn] (20.3.1) and [basic.string.hash]
+      (20.3.5).</li>
   <li>Added wording for an additional <tt>char8_t</tt> specialization of
       <tt>atomic_ref</tt> in [atomics.ref.int] (29.6.2).</li>
+  <li>Adjusted wording for [char.traits.specializations.char8_t] to align with
+      Tim Song's proposed &lt;string&gt; wording cleanup.</li>
+  <li>Added a missing definition for <tt>u8streampos</tt> to the
+      <tt>&lt;iosfwd&gt;</tt> synopsis.</li>
 </ul>
 
 <h1 id="introduction">Introduction</h1>
@@ -1472,33 +1477,25 @@ targets of the type aliases.</em></p>
 
 <p>Add paragraph 1:
 <blockquote class=stdins>
-The type <tt>u8streampos</tt> shall be an implementation-defined type that
-satisfies the requirements for <tt>pos_type</tt> in
-<a href="http://eel.is/c++draft/iostreams.limits.pos">27.2.2</a> and
-<a href="http://eel.is/c++draft/iostream.forward">27.3</a>.
-</blockquote>
-</p>
-
-<p>Add paragraph 2:
-<blockquote class=stdins>
-The two-argument members <tt>assign</tt>, <tt>eq</tt>, and <tt>lt</tt> shall be
+The two-argument members <tt>assign</tt>, <tt>eq</tt>, and <tt>lt</tt> are
 defined identically to the built-in operators <tt>=</tt>, <tt>==</tt>, and
 <tt>&lt;</tt> respectively.
 </blockquote>
 </p>
 
-<p>Add paragraph 3:
+<p>Add paragraph 2:
 <blockquote class=stdins>
-The member <tt>eof()</tt> shall return an implementation-defined constant that
+The member <tt>eof()</tt> returns an implementation-defined constant that
 cannot appear as a valid UTF-8 code unit.
 </blockquote>
 </p>
 
-<p><em>Drafting note: Paragraphs 1-3 above were copied from the
+<p><em>Drafting note: Paragraphs 1-2 above are lightly edited copies from the
 <tt>char_traits&lt;char16_t&gt;</tt> specification in
 <a href="http://eel.is/c++draft/char.traits.specializations.char16_t">
-[char.traits.specializations.char16_t]</a> and then modified to reflect use of
-the <tt>u8streampos</tt> type and UTF-8.</em></p>
+[char.traits.specializations.char16_t]</a> that were then modified to match
+wording changes in Tim Song's proposed cleanup of the &lt;string&gt; library.
+</em></p>
 
 <p>Change in
 <a href="http://eel.is/c++draft/string.classes#1">
@@ -1865,6 +1862,11 @@ from the specialized <tt>do_in</tt> or <tt>do_out</tt> members.
 &nbsp;&nbsp;template&lt;&gt; class char_traits&lt;char16_t&gt;;<br/>
 &nbsp;&nbsp;template&lt;&gt; class char_traits&lt;char32_t&gt;;<br/>
 &nbsp;&nbsp;template&lt;&gt; class char_traits&lt;wchar_t&gt;;<br/>
+[&hellip;]<br/>
+&nbsp;&nbsp;template&lt;class state&gt; class fpos;<br/>
+&nbsp;&nbsp;using streampos = fpos&lt;char_traits&lt;char&gt;::state_type&gt;;<br/>
+&nbsp;&nbsp;using wstreampos = fpos&lt;char_traits&lt;wchar_t&gt;::state_type&gt;;<br/>
+&nbsp;&nbsp;<ins>using u8streampos = fpos&lt;char_traits&lt;char8_t&gt;::state_type&gt;;</ins><br/>
 [&hellip;]<br/>
 </tt>
 </div>
@@ -2770,7 +2772,8 @@ P0372R0</a>
 </p>
 
 <p>Thanks to Alisdair Meredith for reviewing wording and providing feedback in
-advance of the Rapperswil meeting.
+advance of the Rapperswil meeting.  Thanks to Tim Song and Casey Carter for
+further "paper of the week" wording review prior to San Diego.
 </p>
 
 <h1 id="references">References</h1>
