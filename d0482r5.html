@@ -68,7 +68,7 @@ blockquote.stddel
   </tr>
   <tr>
     <th>Date:</th>
-    <td>2018-08-24</td>
+    <td>2018-08-26</td>
   </tr>
   <tr>
     <th>Audience:</th>
@@ -195,6 +195,14 @@ N2231</a>
       Tim Song's proposed &lt;string&gt; wording cleanup.</li>
   <li>Added a missing definition for <tt>u8streampos</tt> to the
       <tt>&lt;iosfwd&gt;</tt> synopsis.</li>
+  <li>Removed the <tt>basic_ostream&lt;char&gt;::operator&lt;&lt;()</tt> and
+      <tt>basic_istream&lt;char&gt;::operator&gt;&gt;()</tt> stream insertion
+      and extraction overloads for <tt>char8_t</tt>.  These were added in
+      P0482R2, but without any supporting motivation, rationale, or behavioral
+      specification.  While there are legitimate use cases for these overloads,
+      support for <tt>char16_t</tt> and <tt>char32_t</tt> overloads is
+      currently absent.  The addition of such overloads deserves additional
+      motivation and analysis not present in this proposal.</li>
 </ul>
 
 <h1 id="introduction">Introduction</h1>
@@ -499,11 +507,6 @@ facilitate these capabilities:
       type aliases.</li>
   <li>New <tt>operator ""s</tt> and <tt>operator ""sv</tt> <tt>char8_t</tt>
       based overloads for UTF-8 literals.</li>
-  <li>New <tt>basic_ostream&lt;char&gt;::operator&lt;&lt;()</tt> and
-      <tt>basic_istream&lt;char&gt;::operator&gt;&gt;()</tt> stream insertion
-      and extraction overloads for <tt>char8_t</tt>.  These are added for
-      consistency with the current <tt>signed char</tt> and
-      <tt>unsigned char</tt> overloads.
   <li>New <tt>char8_t</tt> based specializations of <tt>codecvt</tt> and
       <tt>codecvt_byname</tt> for converting between UTF-16, UTF-32, and
       UTF-8.  The existing <tt>char</tt> based specializations are deprecated.
@@ -1868,158 +1871,6 @@ from the specialized <tt>do_in</tt> or <tt>do_out</tt> members.
 &nbsp;&nbsp;using wstreampos = fpos&lt;char_traits&lt;wchar_t&gt;::state_type&gt;;<br/>
 &nbsp;&nbsp;<ins>using u8streampos = fpos&lt;char_traits&lt;char8_t&gt;::state_type&gt;;</ins><br/>
 [&hellip;]<br/>
-</tt>
-</div>
-</blockquote>
-</p>
-
-<p>Change in
-<a href="http://eel.is/c++draft/istream">
-27.7.4.1 [istream]</a>:
-<blockquote>
-<div style="margin-left: 1em;">
-<tt>
-namespace std {<br/>
-[&hellip;]<br/>
-&nbsp;&nbsp;// 30.7.4.2.3, character extraction templates<br/>
-&nbsp;&nbsp;template&lt;class charT, class traits&gt;<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;basic_istream&lt;charT, traits&gt;&amp; operator&gt;&gt;(basic_istream&lt;charT, traits&gt;&amp;, charT&amp;);<br/>
-&nbsp;&nbsp;template&lt;class traits&gt;<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;basic_istream&lt;char, traits&gt;&amp; operator&gt;&gt;(basic_istream&lt;char, traits&gt;&amp;, unsigned char&amp;);<br/>
-&nbsp;&nbsp;template&lt;class traits&gt;<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;basic_istream&lt;char, traits&gt;&amp; operator&gt;&gt;(basic_istream&lt;char, traits&gt;&amp;, signed char&amp;);<br/>
-<ins>&nbsp;&nbsp;template&lt;class traits&gt;<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;basic_istream&lt;char, traits&gt;&amp; operator&gt;&gt;(basic_istream&lt;char, traits&gt;&amp;, char8_t&amp;);</ins><br/>
-&nbsp;&nbsp;template&lt;class charT, class traits&gt;<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;basic_istream&lt;charT, traits&gt;&amp; operator&gt;&gt;(basic_istream&lt;charT, traits&gt;&amp;, charT*);<br/>
-&nbsp;&nbsp;template&lt;class traits&gt;<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;basic_istream&lt;char, traits&gt;&amp; operator&gt;&gt;(basic_istream&lt;char, traits&gt;&amp;, unsigned char*);<br/>
-&nbsp;&nbsp;template&lt;class traits&gt;<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;basic_istream&lt;char, traits&gt;&amp; operator&gt;&gt;(basic_istream&lt;char, traits&gt;&amp;, signed char*);<br/>
-<ins>&nbsp;&nbsp;template&lt;class traits&gt;<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;basic_istream&lt;char, traits&gt;&amp; operator&gt;&gt;(basic_istream&lt;char, traits&gt;&amp;, char8_t*);</ins><br/>
-}
-</tt>
-</div>
-</blockquote>
-</p>
-
-<p>Change in
-<a href="http://eel.is/c++draft/istream.extractors#7">
-27.7.4.2.3 [istream.extractors] paragraph 7</a>:
-<blockquote>
-<div style="margin-left: 1em;">
-<tt>
-template&lt;class charT, class traits&gt;<br/>
-&nbsp;&nbsp;basic_istream&lt;charT, traits&gt;&amp; operator&gt;&gt;(basic_istream&lt;charT, traits&gt;&amp; in, charT* s);<br/>
-template&lt;class traits&gt;<br/>
-&nbsp;&nbsp;basic_istream&lt;char, traits&gt;&amp; operator&gt;&gt;(basic_istream&lt;char, traits&gt;&amp; in, unsigned char* s);<br/>
-template&lt;class traits&gt;<br/>
-&nbsp;&nbsp;basic_istream&lt;char, traits&gt;&amp; operator&gt;&gt;(basic_istream&lt;char, traits&gt;&amp; in, signed char* s);<br/>
-<ins>template&lt;class traits&gt;<br/>
-&nbsp;&nbsp;basic_istream&lt;char, traits&gt;&amp; operator&gt;&gt;(basic_istream&lt;char, traits&gt;&amp; in, char8_t* s);</ins><br/>
-<br/>
-7 <em>Effects:</em> [&hellip;]
-</tt>
-</div>
-</blockquote>
-</p>
-
-<p>Change in
-<a href="http://eel.is/c++draft/istream.extractors#12">
-27.7.4.2.3 [istream.extractors] paragraph 12</a>:
-<blockquote>
-<div style="margin-left: 1em;">
-<tt>
-template&lt;class charT, class traits&gt;<br/>
-&nbsp;&nbsp;basic_istream&lt;charT, traits&gt;&amp; operator&gt;&gt;(basic_istream&lt;charT, traits&gt;&amp; in, charT&amp; c);<br/>
-template&lt;class traits&gt;<br/>
-&nbsp;&nbsp;basic_istream&lt;char, traits&gt;&amp; operator&gt;&gt;(basic_istream&lt;char, traits&gt;&amp; in, unsigned char&amp; c);<br/>
-template&lt;class traits&gt;<br/>
-&nbsp;&nbsp;basic_istream&lt;char, traits&gt;&amp; operator&gt;&gt;(basic_istream&lt;char, traits&gt;&amp; in, signed char&amp; c);<br/>
-<ins>template&lt;class traits&gt;<br/>
-&nbsp;&nbsp;basic_istream&lt;char, traits&gt;&amp; operator&gt;&gt;(basic_istream&lt;char, traits&gt;&amp; in, char8_t&amp; c);</ins><br/>
-<br/>
-12 <em>Effects:</em> [&hellip;]
-</tt>
-</div>
-</blockquote>
-</p>
-
-<p>Change in
-<a href="http://eel.is/c++draft/ostream">
-27.7.5.1 [ostream]</a>:
-<blockquote>
-<div style="margin-left: 1em;">
-<tt>
-namespace std {<br/>
-[&hellip;]<br/>
-&nbsp;&nbsp;template&lt;class traits&gt;<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;basic_ostream&lt;char, traits&gt;&amp; operator&lt;&lt;(basic_ostream&lt;char, traits&gt;&amp;, signed char);<br/>
-&nbsp;&nbsp;template&lt;class traits&gt;<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;basic_ostream&lt;char, traits&gt;&amp; operator&lt;&lt;(basic_ostream&lt;char, traits&gt;&amp;, unsigned char);<br/>
-<ins>&nbsp;&nbsp;template&lt;class traits&gt;<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;basic_ostream&lt;char, traits&gt;&amp; operator&lt;&lt;(basic_ostream&lt;char, traits&gt;&amp;, char8_t);</ins><br/>
-[&hellip;]<br/>
-&nbsp;&nbsp;template&lt;class traits&gt;<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;basic_ostream&lt;char, traits&gt;&amp; operator&lt;&lt;(basic_ostream&lt;char, traits&gt;&amp;, const signed char*);<br/>
-&nbsp;&nbsp;template&lt;class traits&gt;<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;basic_ostream&lt;char, traits&gt;&amp; operator&lt;&lt;(basic_ostream&lt;char, traits&gt;&amp;, const unsigned char*);<br/>
-<ins>&nbsp;&nbsp;template&lt;class traits&gt;<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;basic_ostream&lt;char, traits&gt;&amp; operator&lt;&lt;(basic_ostream&lt;char, traits&gt;&amp;, const char8_t*);</ins><br/>
-}
-</tt>
-</div>
-</blockquote>
-</p>
-
-<p>Change in
-<a href="http://eel.is/c++draft/ostream.inserters.character#1">
-27.7.5.2.4 [ostream.inserters.character] paragraph 1</a>:
-<blockquote>
-<div style="margin-left: 1em;">
-<tt>
-template&lt;class charT, class traits&gt;<br/>
-&nbsp;&nbsp;basic_ostream&lt;charT, traits&gt;&amp; operator&lt;&lt;(basic_ostream&lt;charT, traits&gt;&amp; out, charT c);<br/>
-template&lt;class charT, class traits&gt;<br/>
-&nbsp;&nbsp;basic_ostream&lt;charT, traits&gt;&amp; operator&lt;&lt;(basic_ostream&lt;charT, traits&gt;&amp; out, char c);<br/>
-<em>// specialization</em><br/>
-template&lt;class traits&gt;<br/>
-&nbsp;&nbsp;basic_ostream&lt;char, traits&gt;&amp; operator&lt;&lt;(basic_ostream&lt;char, traits&gt;&amp; out, char c);<br/>
-<em>// signed<del> and</del><ins>,</ins> unsigned<ins>, and char8_t</ins></em><br/>
-template&lt;class traits&gt;<br/>
-&nbsp;&nbsp;basic_ostream&lt;char, traits&gt;&amp; operator&lt;&lt;(basic_ostream&lt;char, traits&gt;&amp; out, signed char c);<br/>
-template&lt;class traits&gt;<br/>
-&nbsp;&nbsp;basic_ostream&lt;char, traits&gt;&amp; operator&lt;&lt;(basic_ostream&lt;char, traits&gt;&amp; out, unsigned char c);<br/>
-<ins>template&lt;class traits&gt;<br/>
-&nbsp;&nbsp;basic_ostream&lt;char, traits&gt;&amp; operator&lt;&lt;(basic_ostream&lt;char, traits&gt;&amp; out, char8_t c);</ins><br/>
-<br/>
-1 <em>Effects:</em> [&hellip;]
-</tt>
-</div>
-</blockquote>
-</p>
-
-<p>Change in
-<a href="http://eel.is/c++draft/ostream.inserters.character#3">
-27.7.5.2.4 [ostream.inserters.character] paragraph 3</a>:
-<blockquote>
-<div style="margin-left: 1em;">
-<tt>
-template&lt;class charT, class traits&gt;<br/>
-&nbsp;&nbsp;basic_ostream&lt;charT, traits&gt;&amp; operator&lt;&lt;(basic_ostream&lt;charT, traits&gt;&amp; out, const charT *s);<br/>
-template&lt;class charT, class traits&gt;<br/>
-&nbsp;&nbsp;basic_ostream&lt;charT, traits&gt;&amp; operator&lt;&lt;(basic_ostream&lt;charT, traits&gt;&amp; out, const char *s);<br/>
-template&lt;class traits&gt;<br/>
-&nbsp;&nbsp;basic_ostream&lt;char, traits&gt;&amp; operator&lt;&lt;(basic_ostream&lt;char, traits&gt;&amp; out, const char *s);<br/>
-template&lt;class traits&gt;<br/>
-&nbsp;&nbsp;basic_ostream&lt;char, traits&gt;&amp; operator&lt;&lt;(basic_ostream&lt;char, traits&gt;&amp; out, const signed char *s);<br/>
-template&lt;class traits&gt;<br/>
-&nbsp;&nbsp;basic_ostream&lt;char, traits&gt;&amp; operator&lt;&lt;(basic_ostream&lt;char, traits&gt;&amp; out, const unsigned char *s);<br/>
-<ins>template&lt;class traits&gt;<br/>
-&nbsp;&nbsp;basic_ostream&lt;char, traits&gt;&amp; operator&lt;&lt;(basic_ostream&lt;char, traits&gt;&amp; out, const char8_t *s);</ins><br/>
-<br/>
-3 <em>Requires:</em> <tt>s</tt> shall not be a null pointer.
 </tt>
 </div>
 </blockquote>
