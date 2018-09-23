@@ -205,6 +205,8 @@ N2231</a>
       motivation and analysis not present in this proposal.</li>
   <li>Added missing specifications for <tt>mbrtoc8</tt> and
       <tt>c8rtomb</tt> to [c.mb.wcs] (20.5.6).</li>
+  <li>Updated [depr.locale.category] and [depr.fs.path.factory] with changes
+      suggested by Tim Song to ensure behavior remains unchanged.</li>
 </ul>
 
 <h1 id="introduction">Introduction</h1>
@@ -2654,7 +2656,8 @@ The header <tt>&lt;filesystem&gt;</tt> has the following additions:
     <td>
 <em>Requires:</em> The source and <tt>[first, last)</tt> sequences are UTF-8
 encoded.  The value type of <tt>Source</tt> and <tt>InputIterator</tt> is
-<tt>char</tt>.
+<tt>char</tt>.  <tt>Source</tt> meets the requirements specified in
+<a href="http://eel.is/c++draft/fs.path.req">27.11.7.3</a>.
     </td>
   </tr>
 </table>
@@ -2677,7 +2680,8 @@ encoded.  The value type of <tt>Source</tt> and <tt>InputIterator</tt> is
     <td>(3.1)</td>
     <td>&mdash;</td>
     <td>
-If <tt>value_type</tt> is <tt>char</tt> and the current native narrow encoding
+If <tt>path::value_type</tt> is <tt>char</tt> and the current native narrow
+encoding
 <a href="http://eel.is/c++draft/fs.path.type.cvt">(27.11.7.2.2)</a>
 is UTF-8, return <tt>path(source)</tt> or
 <tt>path(first, last)</tt>; otherwise,
@@ -2692,10 +2696,11 @@ is UTF-8, return <tt>path(source)</tt> or
     <td>(3.2)</td>
     <td>&mdash;</td>
     <td>
-if <tt>value_type</tt> is <tt>wchar_t</tt> and the native wide encoding is
-UTF-16, or if <tt>value_type</tt> is <tt>char16_t</tt> or <tt>char32_t</tt>,
-convert <tt>source</tt> or <tt>[first, last)</tt> to a temporary, <tt>tmp</tt>,
-of type <tt>string_type</tt> and return <tt>path(tmp)</tt>; otherwise,
+if <tt>path::value_type</tt> is <tt>wchar_t</tt> and the native wide encoding is
+UTF-16, or if <tt>path::value_type</tt> is <tt>char16_t</tt> or
+<tt>char32_t</tt>, convert <tt>source</tt> or <tt>[first, last)</tt> to a
+temporary, <tt>tmp</tt>, of type <tt>path::string_type</tt> and return
+<tt>path(tmp)</tt>; otherwise,
     </td>
   </tr>
 </table>
