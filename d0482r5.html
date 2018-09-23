@@ -68,7 +68,7 @@ blockquote.stddel
   </tr>
   <tr>
     <th>Date:</th>
-    <td>2018-08-26</td>
+    <td>2018-09-22</td>
   </tr>
   <tr>
     <th>Audience:</th>
@@ -203,6 +203,8 @@ N2231</a>
       support for <tt>char16_t</tt> and <tt>char32_t</tt> overloads is
       currently absent.  The addition of such overloads deserves additional
       motivation and analysis not present in this proposal.</li>
+  <li>Added missing specifications for <tt>mbrtoc8</tt> and
+      <tt>c8rtomb</tt> to [c.mb.wcs] (20.5.6).</li>
 </ul>
 
 <h1 id="introduction">Introduction</h1>
@@ -1689,8 +1691,8 @@ namespace std {<br/>
 &nbsp;&nbsp;using mbstate_t = <em>see below</em>;<br/>
 &nbsp;&nbsp;using size_t = <em>see <a href="http://eel.is/c++draft/support.types.layout">16.2.4</a></em>;<br/>
 <br/>
-<ins>&nbsp;&nbsp;size_t mbrtoc8(char8_t* pc8, const char* s, size_t n, mbstate_t* ps);<br/>
-&nbsp;&nbsp;size_t c8rtomb(char* s, char8_t c8, mbstate_t* ps);<br/></ins>
+<ins>&nbsp;&nbsp;size_t mbrtoc8(char8_t* pc8, const char* s, size_t n, mbstate_t* ps);<br/></ins>
+<ins>&nbsp;&nbsp;size_t c8rtomb(char* s, char8_t c8, mbstate_t* ps);<br/></ins>
 &nbsp;&nbsp;size_t mbrtoc16(char16_t* pc16, const char* s, size_t n, mbstate_t* ps);<br/>
 &nbsp;&nbsp;size_t c16rtomb(char* s, char16_t c16, mbstate_t* ps);<br/>
 &nbsp;&nbsp;size_t mbrtoc32(char32_t* pc32, const char* s, size_t n, mbstate_t* ps);<br/>
@@ -1726,6 +1728,154 @@ those changes, then the updates to
 require modification to exclude a declaration of the <tt>char8_t</tt> typedef
 and to remove mention of the additional <tt>mbrtoc8</tt> and <tt>c8rtomb</tt>
 functions.</em></p>
+
+<p>Change in
+<a href="http://eel.is/c++draft/c.mb.wcs#1">
+20.5.6 [c.mb.wcs] paragraph 1</a>:
+<blockquote>
+<em>[Note: The headers &lt;cstdlib&gt; (16.2.2)<ins>, &lt;cuchar&gt;
+(20.5.5),</ins> and &lt;cwchar&gt; (20.5.4) declare the functions described
+in this subclause.  &mdash; end note]</em>
+</blockquote>
+</p>
+
+<p>Add the following paragraphs at the end of
+<a href="http://eel.is/c++draft/c.mb.wcs">
+20.5.6 [c.mb.wcs]</a>:
+<blockquote class="stdins">
+<tt>
+&nbsp;&nbsp;&nbsp;&nbsp;size_t mbrtoc8(char8_t* pc8, const char* s, size_t n, mbstate_t* ps);<br/>
+<br/>
+</tt>
+<table>
+  <tr>
+    <td style="vertical-align:top">7</td>
+    <td>
+<em>Effects:</em> if <tt>s</tt> is a null pointer, equivalent to<br/>
+<div style="margin-left: 1em;">
+<tt>mbrtoc8(nullptr, "", 1, ps)</tt>
+</div>
+Otherwise, the function inspects at most <tt>n</tt> bytes beginning with the
+byte pointed to by <tt>s</tt> to determine the number of bytes needed to
+complete the next multibyte character (including any shift sequences).  If
+the function determines that the next multibyte character is complete and
+valid, it determines the values of the corresponding UTF-8 code units and
+then, if <tt>pc8</tt> is not a null pointer, stores the value of the first
+(or only) such code unit in the object pointed to by <tt>pc8</tt>. Subsequent
+calls will store successive UTF-8 code units without consuming any additional
+input until all the code units have been stored.  If the corresponding Unicode
+character is <tt>U+0000</tt>, the resulting state described is the initial
+conversion state.
+<br/>
+    </td>
+  </tr>
+</table>
+<table>
+  <tr>
+    <td style="vertical-align:top">8</td>
+    <td>
+<em>Returns:</em> the first of the following that applies (given the current
+conversion state):
+    </td>
+  </tr>
+</table>
+<table>
+  <tr>
+    <td style="vertical-align:top">(8.1)</td>
+    <td><tt>0</tt></td>
+    <td>
+if the next <tt>n</tt> or fewer bytes complete the multibyte character that
+corresponds to the <tt>U+0000</tt> Unicode character (which is the value
+stored).
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align:top">(8.2)</td>
+    <td>between 1 and <tt>n</tt> inclusive</td>
+    <td>
+if the next <tt>n</tt> or fewer bytes complete a valid multibyte character
+(which is the value stored); the value returned is the number of bytes that
+complete the multibyte character.
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align:top">(8.3)</td>
+    <td><tt>(size_t)(-3)</tt></td>
+    <td>
+if the next character resulting from a previous call has been stored (no bytes from
+the input have been consumed by this call).
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align:top">(8.4)</td>
+    <td><tt>(size_t)(-2)</tt></td>
+    <td>
+if the next <tt>n</tt> bytes contribute to an incomplete (but potentially
+valid) multibyte character, and all <tt>n</tt> bytes have been processed
+(no value is stored).
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align:top">(8.5)</td>
+    <td><tt>(size_t)(-1)</tt></td>
+    <td>
+if an encoding error occurs, in which case the next <tt>n</tt> or fewer bytes
+do not contribute to a complete and valid multibyte character (no value is
+stored); the value of the macro <tt>EILSEQ</tt> is stored in <tt>errno</tt>,
+and the conversion state is unspecified.
+    </td>
+  </tr>
+</table>
+<tt>
+&nbsp;&nbsp;&nbsp;&nbsp;size_t c8rtomb(char* s, char8_t c8, mbstate_t* ps);<br/>
+<br/>
+</tt>
+<table>
+  <tr>
+    <td style="vertical-align:top">9</td>
+    <td>
+<em>Effects:</em> if <tt>s</tt> is a null pointer, equivalent to<br/>
+<div style="margin-left: 1em;">
+<tt>c8rtomb(buf, u8'\0', ps)</tt>
+</div>
+where <tt>buf</tt> is an internal buffer.  Otherwise, if <tt>c8</tt> completes
+a sequence of valid UTF-8 code units, determines the number of bytes needed to
+represent the multibyte character (including any shift sequences), and stores
+the multibyte character representation in the array whose first element
+is pointed to by <tt>s</tt>.  At most <tt>MB_CUR_MAX</tt> bytes are stored.  If
+the multibyte character is a null character, a null byte is stored, preceded by
+any shift sequence needed to restore the initial shift state; the resulting state
+described is the initial conversion state.
+    </td>
+  </tr>
+</table>
+<table>
+  <tr>
+    <td style="vertical-align:top">10</td>
+    <td>
+<em>Returns:</em> the number of bytes stored in the array object (including
+any shift sequences).  If <tt>c8</tt> does not contribute to a sequence of
+<tt>char8_t</tt> corresponding to a valid multibyte character, the value of
+the macro <tt>EILSEQ</tt> is stored in <tt>errno</tt>, <tt>(size_t) (−1)</tt>
+is returned, and the conversion state is unspecified.
+    </td>
+  </tr>
+</table>
+</blockquote>
+</p>
+
+<p><em>Drafting note: The wording for <tt>mbrtoc8</tt> and <tt>c8rtomb</tt> is
+derived from wording for <tt>mbrtoc16</tt> and <tt>c16rtomb</tt> in C18
+(<a href="http://www.open-std.org/jtc1/sc22/wg14/www/abq/c17_updated_proposed_fdis.pdf">WG14 N2176</a>),
+augmented by changes suggested in
+<a href="http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2040.htm">WG14 N2040</a>
+for
+<a href="http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2059.htm#dr_488">WG14 DR488</a>
+to properly account for UTF-8 being a variable length encoding, and lightly
+edited for formatting style.  The author was reluctant to stray from the
+existing C wording for related functions despite a belief that considerable
+improvements to the wording would be possible.
+</em></p>
 
 <p>Change in table 91 of
 <a href="http://eel.is/c++draft/locale.category#2">
