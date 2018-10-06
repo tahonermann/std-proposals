@@ -68,7 +68,7 @@ blockquote.stddel
   </tr>
   <tr>
     <th>Date:</th>
-    <td>2018-09-22</td>
+    <td>2018-10-06</td>
   </tr>
   <tr>
     <th>Audience:</th>
@@ -755,16 +755,18 @@ fork hosted on GitHub at
 <a href="https://github.com/tahonermann/gcc/tree/char8_t">
 https://github.com/tahonermann/gcc/tree/char8_t</a>.  This implementation is
 believed to be complete for both the proposed core language and library
-features.  New <tt>-fchar8_t</tt> and <tt>-fno-char8_t</tt> compiler options
+features with the exception of the proposed <tt>mbrtoc8</tt> and
+<tt>c8rtomb</tt> transcoding functions (the author expects to complete these
+shortly).  New <tt>-fchar8_t</tt> and <tt>-fno-char8_t</tt> compiler options
 support enabling and disabling the new features.  No backward compatibility
 features are currently implemented.</p>
 
 <p>Richard Smith implemented support for the proposed core wording changes
-for the next release of Clang.  The changes are guarded by new
-<tt>-fchar8_t</tt> and <tt>-fno-char8_t</tt> matching the gcc implementation.
-No backward compatibility features are currently implemented.  Support for
-the proposed library features has not yet been implemented in libc++.
-Richard's changes can be found at
+and they are present in the release of Clang 7.  The changes are guarded by new
+<tt>-fchar8_t</tt> and <tt>-fno-char8_t</tt> options matching the gcc
+implementation.  No backward compatibility features are currently implemented.
+Support for the proposed library features has not yet been implemented in
+libc++.  Richard's changes can be found at
 <a href="http://llvm.org/viewvc/llvm-project?view=revision&revision=331244">
 http://llvm.org/viewvc/llvm-project?view=revision&revision=331244</a>
 </p>
