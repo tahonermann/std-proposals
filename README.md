@@ -12,7 +12,6 @@ WG21 Number        | Title | Revisions
 
 Drafts In Progress | Title
 ------------------ | -----
-[D0482R5][]        | char8_t: A type for UTF-8 characters and strings (Revision 5)
 [DXXXXR0][]        | A survey of execution character encodings
 
 # WG14 Papers (C)
@@ -27,7 +26,6 @@ WG14 Number     | Title
 [P0482R2]: https://rawgit.com/tahonermann/std-proposals/master/p0482r2.html
 [P0482R3]: https://rawgit.com/tahonermann/std-proposals/master/p0482r3.html
 [P0482R4]: https://rawgit.com/tahonermann/std-proposals/master/p0482r4.html
-[D0482R5]: https://rawgit.com/tahonermann/std-proposals/master/d0482r5.html
 [P0482R5]: https://rawgit.com/tahonermann/std-proposals/master/p0482r5.html
 [P0696R0]: https://rawgit.com/tahonermann/std-proposals/master/p0696r0.html
 [P0696R1]: https://rawgit.com/tahonermann/std-proposals/master/p0696r1.html
