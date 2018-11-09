@@ -13,7 +13,6 @@ WG21 Number        | Title | Revisions
 Drafts In Progress | Title
 ------------------ | -----
 [DXXXXR0][]        | A survey of execution character encodings
-[D0482R6][]        | char8_t: A type for UTF-8 characters and strings
 
 # WG14 Papers (C)
 
@@ -34,4 +33,3 @@ WG14 Number     | Title
 [P0725R0]: https://rawgit.com/tahonermann/std-proposals/master/p0725r0.html
 [P0804R0]: https://rawgit.com/tahonermann/std-proposals/master/p0804r0.html
 [DXXXXR0]: https://rawgit.com/tahonermann/std-proposals/master/dXXXXr0-exec-char-encoding-survey.html
-[D0482R6]: https://rawgit.com/tahonermann/std-proposals/master/d0482r6.html
