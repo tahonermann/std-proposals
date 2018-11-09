@@ -68,7 +68,7 @@ blockquote.stddel
   </tr>
   <tr>
     <th>Date:</th>
-    <td>2018-11-05</td>
+    <td>2018-11-09</td>
   </tr>
   <tr>
     <th>Audience:</th>
@@ -168,7 +168,28 @@ blockquote.stddel
 <h1 id="changes_since_P0482R5">Changes since <a href="http://wg21.link/p0482r5">P0482R5</a></h1>
 
 <ul>
-  <li></li>
+  <li>Addressed CWG review feedback:
+    <ul>
+      <li>Updated the feature test macro values to 201811 and added a drafting
+          note that the final value will be chosen by the project editor to reflect
+          the date of approval.</li>
+    </ul>
+  </li>
+  <li>Addressed LWG review feedback:
+    <ul>
+      <li>Updated the specification for <tt>c8rtomb</tt> in 20.5.6 [c.mb.wcs] to
+          reflect that calls that pass a null pointer for argument <tt>buf</tt>
+          may introduce a data race.</li>
+      <li>Changed a use of <i>char8_t string literal</i> to
+          <i>UTF-8 string literal</i> in C.1.1 [diff.lex] paragraph 3 to
+	  align with C terminology.</li>
+      <li>Added an example of silent backward compatibility impact to
+          C.5.? [input.output] concerning passing UTF-8 literals to
+          ostream inserters.</li>
+      <li>Corrected missing monospace markup for <tt>source</tt> in
+          D.?? [depr.fs.path.factory].</li>
+    </ul>
+  </li>
 </ul>
 
 <h1 id="introduction">Introduction</h1>
@@ -1203,7 +1224,7 @@ The declaration of a literal operator shall have a
         </tr>
         <tr>
           <td><ins>__cpp_char8_t</ins></td>
-          <td><ins>201803L</ins></td>
+	  <td><ins>201811L</ins> <strong><em style="background-color: yellow">** placeholder **</em></strong></td>
         </tr>
         <tr>
           <td>__cpp_constexpr</td>
@@ -1219,6 +1240,11 @@ The declaration of a literal operator shall have a
 </table>
 </div>
 </blockquote>
+</p>
+
+<p><em>Drafting note: the final value for the <tt>__cpp_char8_t</tt> feature
+test macro will be selected by the project editor to reflect the date of
+approval.</em>
 </p>
 
 <h2 id="library_wording">Library wording</h2>
@@ -1283,7 +1309,7 @@ that provides the definitions specified in these Clauses.  &mdash;
         </tr>
         <tr>
           <td><ins>__cpp_lib_char8_t</ins></td>
-          <td><ins>201803L</ins></td>
+          <td><ins>201811L</ins> <strong><em style="background-color: yellow">** placeholder **</em></strong></td>
           <td><ins>&lt;atomic&gt;
                    &lt;filesystem&gt;
                    &lt;istream&gt;
@@ -1309,6 +1335,11 @@ that provides the definitions specified in these Clauses.  &mdash;
 </table>
 </div>
 </blockquote>
+</p>
+
+<p><em>Drafting note: the final value for the <tt>__cpp_lib_char8_t</tt> feature
+test macro will be selected by the project editor to reflect the date of
+approval.</em>
 </p>
 
 <p>Change in
@@ -1717,7 +1748,7 @@ in this subclause.  &mdash; end note]</em>
   <tr>
     <td style="vertical-align:top">7</td>
     <td>
-<em>Effects:</em> if <tt>s</tt> is a null pointer, equivalent to<br/>
+<em>Effects:</em> If <tt>s</tt> is a null pointer, equivalent to<br/>
 <div style="margin-left: 1em;">
 <tt>mbrtoc8(nullptr, "", 1, ps)</tt>
 </div>
@@ -1740,7 +1771,7 @@ conversion state.
   <tr>
     <td style="vertical-align:top">8</td>
     <td>
-<em>Returns:</em> the first of the following that applies (given the current
+<em>Returns:</em> The first of the following that applies (given the current
 conversion state):
     </td>
   </tr>
@@ -1800,7 +1831,7 @@ and the conversion state is unspecified.
   <tr>
     <td style="vertical-align:top">9</td>
     <td>
-<em>Effects:</em> if <tt>s</tt> is a null pointer, equivalent to<br/>
+<em>Effects:</em> If <tt>s</tt> is a null pointer, equivalent to<br/>
 <div style="margin-left: 1em;">
 <tt>c8rtomb(buf, u8'\0', ps)</tt>
 </div>
@@ -1810,8 +1841,20 @@ represent the multibyte character (including any shift sequences), and stores
 the multibyte character representation in the array whose first element
 is pointed to by <tt>s</tt>.  At most <tt>MB_CUR_MAX</tt> bytes are stored.  If
 the multibyte character is a null character, a null byte is stored, preceded by
-any shift sequence needed to restore the initial shift state; the resulting state
-described is the initial conversion state.
+any shift sequence needed to restore the initial shift state; the resulting
+state described is the initial conversion state.
+    </td>
+  </tr>
+</table>
+<table>
+  <tr>
+    <td style="vertical-align:top">11</td>
+    <td>
+<em>Returns:</em> The number of bytes stored in the array object (including
+any shift sequences).  If <tt>c8</tt> does not contribute to a sequence of
+<tt>char8_t</tt> corresponding to a valid multibyte character, the value of
+the macro <tt>EILSEQ</tt> is stored in <tt>errno</tt>, <tt>(size_t) (−1)</tt>
+is returned, and the conversion state is unspecified.
     </td>
   </tr>
 </table>
@@ -1819,11 +1862,11 @@ described is the initial conversion state.
   <tr>
     <td style="vertical-align:top">10</td>
     <td>
-<em>Returns:</em> the number of bytes stored in the array object (including
-any shift sequences).  If <tt>c8</tt> does not contribute to a sequence of
-<tt>char8_t</tt> corresponding to a valid multibyte character, the value of
-the macro <tt>EILSEQ</tt> is stored in <tt>errno</tt>, <tt>(size_t) (−1)</tt>
-is returned, and the conversion state is unspecified.
+<em>Remarks:</em> Calls to <tt>c8rtomb</tt> with a null pointer argument for
+<tt>buf</tt> may introduce a data race
+<a href="http://eel.is/c++draft/res.on.data.races">(15.5.5.9)</a>
+with other calls to <tt>c8rtomb</tt> with a null pointer argument for
+<tt>buf</tt>.
     </td>
   </tr>
 </table>
@@ -2416,7 +2459,7 @@ C.1.1 [diff.lex] paragraph 3</a>:
 <strong>Affected subclause:</strong> <a href="http://eel.is/c++draft/lex.string">5.13.5</a><br/>
 <strong>Change</strong>: String literals made const.<br/>
 The type of a string literal is changed from "array of <tt>char</tt>" to
-"array of <tt>const char</tt>". <ins>The type of a <tt>char8_t</tt> string
+"array of <tt>const char</tt>". <ins>The type of a UTF-8 string
 literal is changed from "array of <tt>char</tt>" to "array of
 <tt>const char8_t</tt>". </ins>The type of a <tt>char16_t</tt> string literal
 is changed from "array of <em>some-integer-type</em>" to "array of
@@ -2491,9 +2534,30 @@ ct&lt;decltype(u8'c')&gt;::type x;  <em>// ill-formed; previously well-formed.</
 <p>Add a new subclause after
 <a href="http://eel.is/c++draft/diff.cpp17#containers">
 C.5.8 [diff.cpp17.containers]</a>:
+
 <blockquote class=stdins>
 C.5.? [input.output]: Input/output library [diff.cpp17.input.output]<br/>
 <br/>
+<strong>Affected subclause:</strong> <a href="http://eel.is/c++draft/ostream.inserters.character">27.7.5.2.4</a><br/>
+<strong>Change</strong>: Overload resolution for ostream inserters
+used with UTF-8 literals.<br/>
+<strong>Rationale</strong>: Required for new features.<br/>
+<strong>Effect on original feature</strong>: Valid ISO C++ 2017 code that
+passes UTF-8 literals to <tt>basic_ostream::operator&lt;&lt;</tt>
+no longer calls character related overloads.
+<br/>
+<div style="margin-left: 1em;">
+<tt>
+<pre>std::cout &lt;&lt; u8"text";       <em>// Previously called operator&lt;&lt;(const char*) and printed a string.</em>
+			     <em>// Now calls operator&lt;&lt;(const void*) and prints a pointer value.</em>
+std::cout &lt;&lt; u8'X';          <em>// Previously called operator&lt;&lt;(char) and printed a character.</em>
+			     <em>// Now calls operator&lt;&lt;(int) and prints an integer value.</em>
+</pre>
+</tt>
+</div>
+</blockquote>
+
+<blockquote class=stdins>
 <strong>Affected subclause:</strong> <a href="http://eel.is/c++draft/fs.class.path">27.11.7</a><br/>
 <strong>Change</strong>: Return type of filesystem path format
 observer member functions.<br/>
@@ -2512,6 +2576,7 @@ std::string s2 = p.generic_u8string();  <em>// ill-formed; previously well-forme
 </tt>
 </div>
 </blockquote>
+
 </p>
 
 
@@ -2618,7 +2683,7 @@ The header <tt>&lt;filesystem&gt;</tt> has the following additions:
   <tr>
     <td>2</td>
     <td>
-<em>Requires:</em> The source and <tt>[first, last)</tt> sequences are UTF-8
+<em>Requires:</em> The <tt>source</tt> and <tt>[first, last)</tt> sequences are UTF-8
 encoded.  The value type of <tt>Source</tt> and <tt>InputIterator</tt> is
 <tt>char</tt>.  <tt>Source</tt> meets the requirements specified in
 <a href="http://eel.is/c++draft/fs.path.req">27.11.7.3</a>.
