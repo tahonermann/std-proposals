@@ -15,7 +15,7 @@ WG21 Number        | Title | Revisions
 
 Drafts In Progress | Title
 ------------------ | -----
-[DXXXXR0][]        | A survey of execution character encodings
+[DAAAAR0][]        | A survey of execution character encodings
 
 
 # WG14 Papers (C)
@@ -50,4 +50,4 @@ Drafts In Progress | Title
 [P2029R2]: https://rawgit.com/tahonermann/std-proposals/master/p2029r2.html
 [P2029R3]: https://rawgit.com/tahonermann/std-proposals/master/p2029r3.html
 [P2029R4]: https://rawgit.com/tahonermann/std-proposals/master/p2029r4.html
-[DXXXXR0]: https://rawgit.com/tahonermann/std-proposals/master/dXXXXr0-exec-char-encoding-survey.html
+[DAAAAR0]: https://rawgit.com/tahonermann/std-proposals/master/daaaar0-exec-char-encoding-survey.html
