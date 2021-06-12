@@ -20,9 +20,12 @@ Drafts In Progress | Title
 
 # WG14 Papers (C)
 
-WG14 Number     | Title
---------------- | -----
-[N2653][]       | char8\_t: A type for UTF-8 characters and strings | [R1:N2653][N2653] [R0:N2231][N2231]
+WG14 Number        | Title | Revisions
+------------------ | ----- | ----
+[N2653][]          | char8\_t: A type for UTF-8 characters and strings | [R1:N2653][N2653] [R0:N2231][N2231]
+
+Drafts In Progress | Title
+------------------ | -----
 
 
 [N2231]: https://rawgit.com/tahonermann/std-proposals/n2231.html
