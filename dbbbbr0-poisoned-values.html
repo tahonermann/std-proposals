@@ -1,0 +1,226 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+
+<head>
+
+<title>Poisoned values</title>
+
+<style type="text/css">
+pre {
+    display: inline;
+}
+
+table#header th,
+table#header td
+{
+    text-align: left;
+}
+table#references th,
+table#references td
+{
+    vertical-align: top;
+}
+
+ins, ins * { text-decoration:none; font-weight:bold; background-color:#A0FFA0 }
+del, del * { text-decoration:line-through; background-color:#FFA0A0 }
+#hidedel:checked ~ * del, #hidedel:checked ~ * del * { display:none; visibility:hidden }
+
+blockquote
+{
+    color: #000000;
+    background-color: #F1F1F1;
+    border: 1px solid #D1D1D1;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+}
+blockquote.stdins
+{
+    text-decoration: underline;
+    color: #000000;
+    background-color: #C8FFC8;
+    border: 1px solid #B3EBB3;
+    padding: 0.5em;
+}
+blockquote.stddel
+{
+    text-decoration: line-through;
+    color: #000000;
+    background-color: #FFEBFF;
+    border: 1px solid #ECD7EC;
+    padding-left: 0.5empadding-right: 0.5em;
+}
+
+blockquote.quote
+{
+    margin-top: 0em;
+    margin-left: 0em;
+    border-style: solid;
+    background-color: lemonchiffon;
+    color: #000000;
+    border: 1px solid black;
+}
+
+div.compare {
+  padding-left: 40px;
+  display: table; /* undo float:left effect */
+}
+div.compare_item {
+  float: left;
+  margin: 2px;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+<table id="header">
+  <tr>
+    <th>Document Number</th>
+    <td>DXXXXR0 <em>Draft</em></td>
+  </tr>
+  <tr>
+    <th>Date:</th>
+    <td>2021-06-12</td>
+  </tr>
+  <tr>
+    <th>Audience:</th>
+    <td>Evolution Working Group</td>
+  </tr>
+  <tr>
+    <th>Reply-to:</th>
+    <td>Tom Honermann &lt;tom@honermann.net&gt;</td>
+  </tr>
+</table>
+
+
+<p>
+<strong>Abstract:</strong>
+Use of uninitialized variables or data members is a well known source of
+undefined behavior (UB) in C++.
+Tools like
+<a title="MemorySanitizer"
+  href="https://clang.llvm.org/docs/MemorySanitizer.html">MemorySanitizer</a>
+<sup><a title="MemorySanitizer"
+        href="#ref_msan">[MSAN]</a></sup>
+rely on UB to detect use of uninitialized memory and provide a diagnostic
+(tools are free to assume that UB is never intentional).
+Programmers that use these tools may resist adding initializers when a default
+value is not desirable since doing so interferes with the ability to diagnose
+an unintended use before an appropriate value has been determined and assigned.
+Compilers and static analysis tools diagnose uninitialized variables and data
+members as potential sources of UB; these diagnostics are undesriable when
+omission of an initializer is intentional.
+Failure to identify and correct use of uninitialized memory results in a
+program that exhibits UB at run-time.
+The observed behavior may not be consistent if the uninitialized memory contents
+differ from one execution of the program to another; this complicates debugging.
+Enclosed is a proposal to allow a programmer to provide a "poisoned" or
+"tainted" value in an initializer or expression so as to avoid UB without
+compromising the ability of tools to diagnose use of such values.
+</p>
+
+
+<h1>
+Poisoned values
+</h1>
+
+
+<ul>
+  <li><a href="#introduction">
+      Introduction</a></li>
+  <li><a href="#motivation">
+      Motivation</a></li>
+  <li><a href="#design_options">
+      Design Options</a></li>
+  <li><a href="#proposal">
+      Proposal</a></li>
+  <li><a href="#implementation_exp">
+      Implementation Experience</a></li>
+  <li><a href="#acknowledgements">
+      Acknowledgements</a></li>
+  <li><a href="#references">
+      References</a></li>
+  <li><a href="#wording">
+      Formal Wording</a></li>
+</ul>
+
+
+<h1 id="introduction">Introduction</h1>
+
+<p>
+Original proposal message:
+<a href="https://lists.isocpp.org/std-proposals/2021/06/2682.php">https://lists.isocpp.org/std-proposals/2021/06/2682.php</a>
+</p>
+
+
+<h1 id="motivation">Motivation</h1>
+
+<p>
+Discuss LLVM and Coverity.
+<a href="https://lists.llvm.org/pipermail/llvm-dev/2021-June/151036.html">https://lists.llvm.org/pipermail/llvm-dev/2021-June/151036.html</a>
+Apparently my replies to the mailing list don't preserve quoting properly :(
+</p>
+
+
+<h1 id="design_options">Design Options</h1>
+
+<ul>
+  <li>A keyword?</li>
+  <li>A magic library function or intrinsic?</li>
+  <li>An attribute?  Would need to be able to annotate expressions.</li>
+</ul>
+
+
+<h1 id="proposal">Proposal</h1>
+
+
+<h1 id="implementation_exp">Implementation Experience</h1>
+
+
+<h1 id="acknowledgements">Acknowledgements</h1>
+
+<p>
+Thank you to Ville Voutilainen for initial proposal feedback.
+</p>
+
+
+<h1 id="references">References</h1>
+
+<table id="references">
+  <tr>
+    <td id="ref_n4885"><sup>[N4885]</sup></td>
+    <td>
+      "Working Draft, Standard for Programming Language C++", N4885, 2021.<br/>
+      <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/n4885.pdf">
+      http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/n4885.pdf</a></td>
+  </tr>
+  <tr>
+    <td id="ref_msan"><sup>[MSAN]</sup></td>
+    <td>
+      The Clang Team,
+      "MemorySanitizer", 2021.<br/>
+      <a href="https://clang.llvm.org/docs/MemorySanitizer.html">
+      https://clang.llvm.org/docs/MemorySanitizer.html</a></td>
+  </tr>
+</table>
+
+
+<h1 id="wording">Formal Wording</h1>
+
+<input type="checkbox" id="hidedel">Hide deleted text</input>
+
+<p>
+These changes are relative to
+<a title="Working Draft, Standard for Programming Language C++"
+   href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/n4885.pdf">
+N4885</a>
+<sup><a title="Working Draft, Standard for Programming Language C++"
+        href="#ref_n4885">
+[N4885]</a></sup>
+</p>
+
+
+</body>
