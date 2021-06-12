@@ -167,11 +167,77 @@ Apparently my replies to the mailing list don't preserve quoting properly :(
 
 <h1 id="design_options">Design Options</h1>
 
+<p>
 <ul>
   <li>A keyword?</li>
   <li>A magic library function or intrinsic?</li>
   <li>An attribute?  Would need to be able to annotate expressions.</li>
 </ul>
+</p>
+
+<p>
+Example:
+<blockquote><pre style="display:inline;">
+struct S {
+  S() {}
+  S(int v) : dm(v) {}
+
+  // dm may only be used if a value was provided during construction.
+  int dm = POISON(-1);
+};
+
+int f(bool b) {
+  S s = b ? S() : S(42);
+  // The following access of s.dm violates preconditions if b is true.
+  // Would like MemorySanitizer to diagnose as an access of an uninitialized
+  // data member.  But if MemorySanitizer is not enabled, then would like to
+  // reliably return -1.
+  return s.dm;
+}
+</pre></blockquote>
+</p>
+
+<p>
+It may be useful to annotate a portion of an initializer:
+
+<blockquote><pre style="display:inline;">
+struct aggregate {
+  const char *desc;
+  int value;
+};
+aggregate a = { "the thing", POISON(-1) };
+</pre></blockquote>
+</p>
+
+<p>
+Likewise, applying poison outside of initialization context could be useful:
+
+<blockquote><pre style="display:inline;">
+int *p = new int;
+...
+delete p;
+p = POISON(nullptr);
+</pre></blockquote>
+</p>
+
+<p>
+Poison must be propagated, but copying it must not be considered a defect.
+According to
+<a href="https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwis_vv2wZLxAhU2ElkFHVApDj0QFjAAegQIAxAD&url=https%3A%2F%2Fresearch.google.com%2Fpubs%2Farchive%2F43308.pdf&usg=AOvVaw1ptDBQhYiiv4wb7SFV3s8R">this paper</a>
+, this is consistent with how MemorySanitizer
+works.
+When copying a poisoned value, it propagates the poison.
+
+<blockquote><pre style="display:inline;">
+struct S {
+  S() {}
+  S(int v) : dm(v) {}
+
+  // dm may only be used if a value was provided during construction.
+  int dm = POISON(-1);
+};
+</pre></blockquote>
+</p>
 
 
 <h1 id="proposal">Proposal</h1>
