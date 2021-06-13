@@ -83,11 +83,13 @@ div.compare_item {
   </tr>
   <tr>
     <th>Date:</th>
-    <td>2021-06-12</td>
+    <td>2021-06-13</td>
   </tr>
   <tr>
     <th>Audience:</th>
-    <td>Evolution Working Group</td>
+    <td>SG12<br/>
+        SSRG<br/>
+        Evolution Working Group</td>
   </tr>
   <tr>
     <th>Reply-to:</th>
@@ -173,6 +175,14 @@ Apparently my replies to the mailing list don't preserve quoting properly :(
   <li>A magic library function or intrinsic?</li>
   <li>An attribute?  Would need to be able to annotate expressions.</li>
 </ul>
+</p>
+
+<p>
+Should support for other kinds of tainted values be supported?
+For example, the ability to mark the buffer filled by a call to
+<tt>fread()</tt>?
+If so, support is needed to enable inspection of tainted values by a sanitizer
+and to declare the values no longer tainted.
 </p>
 
 <p>
