@@ -1,0 +1,321 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+
+<head>
+
+<title>
+Modules Build System Scenarios
+</title>
+
+<style type="text/css">
+
+table#header th,
+table#header td
+{
+    text-align: left;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+<table id="header">
+  <tr>
+    <th>Document Number:</th>
+    <td>D2566R0 <em>Draft</em></td>
+  </tr>
+  <tr>
+    <th>Date:</th>
+    <td>2022-03-17</td>
+  </tr>
+  <tr>
+    <th>Audience:</th>
+    <td>SG15 Tooling</td>
+  </tr>
+  <tr>
+    <th>Reply-to:</th>
+    <td>Tom Honermann &lt;tom@honermann.net&gt;</td>
+  </tr>
+</table>
+
+
+<h1>
+Modules Build System Scenarios
+</h1>
+
+
+<ul>
+  <li><a href="#introduction">Introduction</a></li>
+  <li><a href="#terminology">Terminology</a></li>
+  <li><a href="#scenario1">Scenario 1: In-project dependent modules</a></li>
+  <li><a href="#scenario2">Scenario 2: External dependent source-only modules</a></li>
+  <li><a href="#scenario3">Scenario 3: External dependent packaged modules</a></li>
+</ul>
+
+
+<h1 id="introduction">Introduction</h1>
+
+<p>
+Presented here are several scenarios that are intended to be familiar to those
+with experience creating, maintaining, and using build systems within the C++
+ecosystem.
+Discussion focuses on problems and possible solutions for supporting C++20
+modules within each scenario.
+Topics discussed include:
+<ol>
+  <li>How to resolve a module import to either:
+    <ol style="list-style-type:lower-alpha">
+      <li>A pre-built binary module interface (BMI) that is compatible with
+          the importing tool chain and build configuration.</li>
+      <li>One or more module interface unit source files that define the
+          required module and from which a BMI can be constructed.</li>
+    </ol>
+  </li>
+  <li>How to build a BMI for a module interface unit source file when a
+      compatible pre-existing BMI is not available.</li>
+</ol>
+</p>
+
+<p>
+Tangential topics include:
+<ol>
+  <li>How to determine if a pre-existing BMI is or is not compatible with the
+      importing tool chain.</li>
+  <li>How to determine if a pre-existing BMI is or is not compatible with the
+      build configuration (including compatibility with code to be compiled
+      and pre-compiled code linked via an existing object file, static library,
+      or dynamic library).</li>
+  <li>How to determine a suitable order in which to build BMIs for module
+      interface unit source files.</li>
+</ol>
+</p>
+
+<p>
+This paper focuses on scenarios involving module interface units due to the
+imposed requirement that they be built before source files that import the
+modules they define can be successfully translated.
+Module implementation units are discussed only with regard to pre-compiled
+code and BMI compatibility.
+</p>
+
+<p>
+Within this document, "compile" refers to the act of producing object code
+for a given source file and "build" is used to refer to both
+1) construction of a BMI for a given module interface unit, and
+2) the suite of compiler or tool invocations initiated to construct all
+derived artifacts for a given project.
+"Translation" refers to the act of parsing and semantically analyzing a
+source file.
+</p>
+
+<p>
+For the purposes of this document, please note that a BMI need not be a file
+persisted on a file system.
+Rather, a BMI is a semantic representation of a module interface that may be
+constructed eagerly or lazily, in memory or on disk, locally or remotely.
+However, it is often convenient to think of a BMI as a file that holds the
+cached result of a previous build of a module interface unit.
+</p>
+
+<p>
+The presented scenarios are intended to apply to all build systems.
+This includes traditional build systems that invoke compilers to produce
+executable files as well as the processes that are used by IDEs,
+static analyzers, or code review tools to find and translate C++ source
+code for presentation or analytical purposes.
+C++20 modules will require all tools that purport to accurately parse and
+semantically analyze C++ code to be able to dynamically navigate a translation
+unit dependency graph since C++ code that imports a module can no longer be
+processed as a single translation unit.
+</p>
+
+
+<h1 id="terminology">Terminology</h1>
+
+<p>
+<ul>
+  <li><b>Build System</b><br/>
+      A tool or set of tools that translate libraries into desired outputs.
+      This may include production of executable files.
+      Single-purpose tools that produce other kinds of artifacts, such as
+      API documentation or source analysis results, also qualify as build
+      systems for the purposes of this document.</li>
+  <li><b>Library</b><br/>
+      A collection of source files that, together, provide a cohesive set of
+      features.
+      A library might or might not include source files that must be separately
+      compiled (e.g., a traditional “header-only” library would not include
+      such files).
+      A library might or might not be dependent on one or more other
+      libraries.</li>
+  <li><b>Package</b><br/>
+      A collection of source files (header files, module interface units),
+      derived artifacts (BMIs, object files, static/dynamic libraries, etc…)
+      pre-built for one or more targets, and configuration files that describe
+      the package, its dependencies, and requirements for consumption.
+      A package usually corresponds to a library and includes a subset of its
+      files; generally those that comprise the library interface
+      (e.g., header files, module interface units).</li>
+  <li><b>Project</b><br/>
+      A combination of a build system and one or more libraries for which the
+      build system has direct knowledge of how to build for one or more
+      targets or configurations.</li>
+</ul>
+</p>
+
+
+<h1 id="scenario1">Scenario 1: In-project dependent modules</h1>
+
+<p>
+In this scenario, a build system is tasked with translating a collection of
+source files, some of which import a module <em>M</em> that is defined by
+module interface unit source files that are known to the build system.
+</p>
+
+<p>
+<b>Problems</b><br/>
+<ol>
+  <li>The build system may lack knowledge of which source file(s) define
+      module <em>M</em>.</li>
+  <li>The build system may lack knowledge of which modules a source file
+      imports.</li>
+  <li>The build system may lack knowledge of module dependencies and implied
+      module build order requirements.</li>
+</ol>
+</p>
+
+<p>
+<b>Solution</b><br/>
+<ol>
+  <li>Scan all source files within the project to
+      1) identify source files that define modules,
+      2) identify which modules each source file imports, and
+      3) construct a DAG of module dependencies to be used to execute a build
+         plan that ensures that, for each module <em>M</em>, a BMI is built for
+         the module interface unit source file(s) that define <em>M</em> before
+         any source file that imports <em>M</em> is translated.
+         See
+         <a href="https://github.com/llvm/llvm-project/tree/main/clang/tools/clang-scan-deps">clang-scan-deps</a>.</li>
+</ol>
+</p>
+
+
+<h1 id="scenario2">Scenario 2: External dependent source-only modules</h1>
+
+<p>
+In this scenario, a build system is tasked with translating a collection of
+source files, some of which import a module <em>M</em> that is not defined by
+a module interface unit source file that is known to the build system.
+In this case, the build system must follow a protocol that facilitates
+discovery of such source files and requirements for building a BMI.
+</p>
+
+<p>
+<b>Problems</b><br/>
+<ol>
+  <li>The build system lacks a mechanism to:
+    <ol style="list-style-type:lower-alpha">
+      <li>Discover the external source file(s) that define module
+          <em>M</em>.</li>
+      <li>Discover the requirements for building a BMI for module <em>M</em>
+          (language dialect, include paths, macros, etc…)</li>
+    </ol>
+  </li>
+</ol>
+</p>
+
+<p>
+<b>Solution</b><br/>
+<ol>
+  <li>Allow for a sequence of library identifiers to be provided to the build
+      system such that each library identifier has an associated path
+      (either well-known to the build system or user-provided) where the source
+      files and other artifacts of the library are located.</li>
+  <li>Specify a name and format for a library description file to be provided
+      by cooperating libraries that provides the following
+      (note that these configurations may need to vary by the consuming tool
+      chain, target, or build configuration):
+    <ol style="list-style-type:lower-alpha">
+      <li>Paths relative to the library description file that contain public
+          header files.</li>
+      <li>Paths relative to the library description file that contain private
+          header files (to be used when building module interface units).</li>
+      <li>Paths relative to the library description file that contain module
+          interface unit source files (to be used when searching for source
+          files that define modules).</li>
+      <li>Language dialect requirements for building module interface
+          units.</li>
+      <li>Macro requirements for building module interface units.</li>
+      <li>Libraries directly required by the library.</li>
+    </ol>
+  </li>
+  <li>Search for library description files in each of the library search paths.
+      For each library description file found, scan all source files within
+      the relative module interface unit source path(s) as is done in
+      scenario 1.</li>
+  <li>Once scanning is complete, if any imported modules remain unresolved,
+      issue an error.</li>
+</ol>
+</p>
+
+
+<h1 id="scenario3">Scenario 3: External dependent packaged modules</h1>
+
+<p>
+This scenario is similar to scenario 2, but differs in that the external
+package <b>might</b> include compatible pre-built BMIs that can be used to
+1) obviate the need to build BMIs for module interface unit source files
+included in the package, and
+2) ensure that BMIs are used that are compatible with any object files or
+static/dynamic libraries linked from the package.
+</p>
+
+<p>
+<b>Problems</b><br/>
+<ol>
+  <li>The package might provide BMIs for numerous tool chains, targets, and
+      build configurations and the build system will have to select the right
+      one.</li>
+  <li>The package might not provide BMIs that are compatible with the consuming
+      tool chain, target, or build configuration.</li>
+  <li>The build system and tool chain must collaborate to select BMIs that are
+      compatible with both the tool chain and build configuration
+      (e.g., any object files or static/dynamic libraries to be linked in).</li>
+  <li>There is no obvious best solution to determine if a BMI is compatible at
+      a build configuration level.
+      Two BMIs that reflect minor declaration differences indicate the presence
+      of ODR differences, but do not necessarily indicate an ABI difference
+      that would be problematic in practice.
+      There is a practical benefit to not being overly strict.</li>
+</ol>
+</p>
+
+<p>
+<b>Solution</b><br/>
+<ol>
+  <li>Extend the library description file from scenario 2 to include additional
+      tool chain, target, and build configuration dependent information
+      including:
+    <ol style="list-style-type:lower-alpha">
+      <li>Paths relative to the library description file that contain BMIs,
+          object files and static/dynamic libraries.</li>
+      <li>Maps from module name to the name of a BMI.</li>
+      <li>Linker options.</li>
+    </ol>
+  </li>
+  <li>Issue warnings/errors if multiple maps are found for the same module name
+      to distinct BMIs
+      (e.g., to ones that do not reflect a consistent interface).</li>
+  <li>Embed either a BMI or BMI signature for each imported module <em>M</em>
+      when building an object file.
+      At link time, compare BMIs or BMI signatures across link units.
+      Issue warnings/errors if mismatches are found among BMIs that are
+      compatible with the tool chain (ignore those that are not).</li>
+</ol>
+</p>
+
+
+</body>
