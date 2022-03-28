@@ -1,5 +1,12 @@
 This repository maintains versions of the following
-ISO JTC1/SC22 WG21 and WG14 papers:
+Unicode, ISO JTC1/SC22 WG21 and WG14 papers:
+
+
+# Unicode Papers
+
+Document Number    | Title | Formats
+------------------ | ----- | -------
+[L2/21-038][]      | Clarify guidance for use of a BOM as a UTF-8 encoding signature | [PDF][L2/21-038-PDF] [ODT][L2/21-038-ODT]
 
 
 # WG21 Papers (C++)
@@ -31,6 +38,9 @@ Drafts In Progress | Title
 ------------------ | -----
 
 
+[L2/21-038]: https://rawgit.com/tahonermann/std-proposals/master/Unicode-BOM-guidance.pdf
+[L2/21-038-PDF]: https://rawgit.com/tahonermann/std-proposals/master/Unicode-BOM-guidance.pdf
+[L2/21-038-ODT]: https://rawgit.com/tahonermann/std-proposals/master/Unicode-BOM-guidance.odt
 [N2231]: https://rawgit.com/tahonermann/std-proposals/master/n2231.html
 [N2653]: https://rawgit.com/tahonermann/std-proposals/master/n2653.html
 [P0482R0]: https://rawgit.com/tahonermann/std-proposals/master/p0482r0.html
