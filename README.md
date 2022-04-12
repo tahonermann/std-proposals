@@ -23,6 +23,7 @@ WG21 Number        | Title | Revisions
 
 Drafts In Progress | Title
 ------------------ | -----
+[D2572R0][]        | `std::format()` fill character allowances
 [D2566R0][]        | Modules Build System Scenarios
 [DAAAAR0][]        | A survey of execution character encodings
 [DBBBBR0][]        | Poisoned values
@@ -66,4 +67,5 @@ Drafts In Progress | Title
 [P2071R0]: https://rawgit.com/tahonermann/std-proposals/master/p2071r0.html
 [DAAAAR0]: https://rawgit.com/tahonermann/std-proposals/master/daaaar0-exec-char-encoding-survey.html
 [DBBBBR0]: https://rawgit.com/tahonermann/std-proposals/master/dbbbbr0-poisoned-values.html
+[D2572R0]: https://rawgit.com/tahonermann/std-proposals/master/d2572r0.html
 [D2566R0]: https://rawgit.com/tahonermann/std-proposals/master/d2566r0.html
