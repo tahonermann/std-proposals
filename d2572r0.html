@@ -92,7 +92,7 @@ blockquote.stdnop
   </tr>
   <tr>
     <th>Date:</th>
-    <td>2022-06-07</td>
+    <td>2022-06-08</td>
   </tr>
   <tr>
     <th>Audience:</th>
@@ -789,20 +789,23 @@ Change in
 <a href="http://eel.is/c++draft/format.string.std#2">22.14.2.2 [format.string.std] paragraph 2</a>:
 <blockquote>
 <ins>The <em>fill character</em> is the character denoted by the <em>fill</em>
-specifier or, if the <em>fill</em> specifier is absent, the space
-character.<br/>
+option or, if the <em>fill</em> option is absent, the space
+character.
+For a format specification in a Unicode encoding, the fill character is a
+single UCS scalar value.
+<br/>
 <br/>
 </ins>
 [<em>Note 2</em>:
 <del>The <em>fill</em> character can be any character other than { or }.</del>
 The presence of a
-<del>fill character</del><ins><em>fill</em> specifier</ins>
+<del>fill character</del><ins><em>fill</em> option</ins>
 is signaled by the character following it,
 which must be one of the alignment options.
 If the second character of <em>std-format-spec</em> is not a valid alignment
 option, then it is assumed that
 <del>both the fill character and the alignment option are</del><ins>the
-<em>fill-and-align</em> specifier is</ins>
+<em>fill-and-align</em> option is</ins>
 absent. &mdash; <em>end note</em>]
 </blockquote>
 </p>
@@ -814,7 +817,8 @@ Change in
 <em>Drafting note:</em> The notes that follow <em>Note X</em> will require
 renumbering.
 <blockquote>
-The <em>align</em> specifier applies to all argument types.
+The <em>align</em> <del>specifier</del><ins>option</ins> applies to all
+argument types.
 The meaning of the various alignment options is as specified in
 <a href="http://eel.is/c++draft/format.string.std#tab:format.align">Table 64</a>.
 <br/><br/>
@@ -828,17 +832,18 @@ string s3 = format("{:*&gt;6}", 'x');        // value of s3 is "*****x"
 string s4 = format("{:*^6}", 'x');        // value of s4 is "**x***"
 string s5 = format("{:6d}", c);           // value of s5 is "   120"
 string s6 = format("{:6}", true);         // value of s6 is "true  "
-<ins>string s7 = format("{:*&gt;6}", "12345678"); // value of s7 is "12345678"</ins>
+<ins>string s7 = format("{:&#x1F921;^6}", 'x');       // value of s8 is "&#x1F921;&#x1F921;x&#x1F921;&#x1F921;&#x1F921;"</ins>
+<ins>string s8 = format("{:*&gt;6}", "12345678"); // value of s7 is "12345678"</ins>
 </pre></div>
 &mdash; <em>end example</em> ]
 <br/><br/>
 [ <em>Note 3</em>:
 <del>Unless a minimum field width is defined, the field width is determined by
 the size of the content and the alignment option has no effect.</del><ins>If
-the <em>width</em> specifier is absent, then the field width is the estimated
+the <em>width</em> option is absent, then the field width is the estimated
 width of the formatted argument and the alignment option has no effect.
-If the estimated width of the formatted argument exceeds the field width, then
-both the alignment and width options have no effect.</ins>
+If the estimated width of the formatted argument matches or exceeds the field
+width, then both the alignment and width options have no effect.</ins>
 &mdash; <em>end note</em> ]
 <br/><br/>
 <table>
