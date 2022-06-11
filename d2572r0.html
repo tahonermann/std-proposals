@@ -92,7 +92,7 @@ blockquote.stdnop
   </tr>
   <tr>
     <th>Date:</th>
-    <td>2022-06-08</td>
+    <td>2022-06-11</td>
   </tr>
   <tr>
     <th>Audience:</th>
@@ -743,8 +743,8 @@ that fill characters encoded with more than one code unit are correctly decoded.
 <h1 id="ack">Acknowledgements</h1>
 
 <p>
-Thank you to Victor Zverovich, Corentin Jabot, and Peter Brett for their
-insights; their commentary shaped much of this proposal.
+Thank you to Victor Zverovich, Corentin Jabot, Peter Brett, and Mark de Wever
+for their insights; their commentary shaped much of this proposal.
 </p>
 
 
@@ -814,8 +814,24 @@ absent. &mdash; <em>end note</em>]
 <p>
 Change in
 <a href="http://eel.is/c++draft/format.string.std#3">22.14.2.2 [format.string.std] paragraph 3</a>:<br/>
-<em>Drafting note:</em> The notes that follow <em>Note X</em> will require
-renumbering.
+<em>Drafting note:</em> The change of "specifier" to "option" for the
+<em>align</em> grammar element is intended to improve consistency with
+other grammar elements.
+Inconsistencies remain however.
+The terms currently used for each of the grammar elements are below.
+LWG may wish to review further.
+<ul>
+  <li><em>fill-and-align</em>: none (neither specifier nor option)</li>
+  <li><em>fill</em>: none (neither specifier nor option)</li>
+  <li><em>align</em>: specifier</li>
+  <li><em>sign</em>: option</li>
+  <li><em>#</em>: option</li>
+  <li><em>0</em>: none (neither specifier nor option).</li>
+  <li><em>width</em>: none (neither specifier nor option)</li>
+  <li><em>precision</em>: none (neither specifier nor option)</li>
+  <li><em>L</em>: option</li>
+  <li><em>type</em>: option</li>
+</ul>
 <blockquote>
 The <em>align</em> <del>specifier</del><ins>option</ins> applies to all
 argument types.
@@ -832,8 +848,9 @@ string s3 = format("{:*&gt;6}", 'x');        // value of s3 is "*****x"
 string s4 = format("{:*^6}", 'x');        // value of s4 is "**x***"
 string s5 = format("{:6d}", c);           // value of s5 is "   120"
 string s6 = format("{:6}", true);         // value of s6 is "true  "
-<ins>string s7 = format("{:&#x1F921;^6}", 'x');       // value of s7 is "&#x1F921;&#x1F921;x&#x1F921;&#x1F921;&#x1F921;"</ins>
-<ins>string s8 = format("{:*&gt;6}", "12345678"); // value of s8 is "12345678"</ins>
+<ins>string s7 = format("{:&#x1F921;^6}", "x");       // value of s7 is "&#x1F921;&#x1F921;x&#x1F921;&#x1F921;&#x1F921;"</ins>
+<ins>string s8 = format("{:*^6}", "&#x1F921;&#x1F921;&#x1F921;");    // value of s8 is "&#x1F921;&#x1F921;&#x1F921;"</ins>
+<ins>string s9 = format("{:*&gt;6}", "12345678"); // value of s9 is "12345678"</ins>
 </pre></div>
 &mdash; <em>end example</em> ]
 <br/><br/>
@@ -843,7 +860,12 @@ the size of the content and the alignment option has no effect.</del><ins>If
 the <em>width</em> option is absent, then the field width is the estimated
 width of the formatted argument and the alignment option has no effect.
 If the estimated width of the formatted argument matches or exceeds the field
-width, then both the alignment and width options have no effect.</ins>
+width, then both the alignment and width options have no effect.
+The width of any fill character is assumed to be 1.
+The &#x1F921; (U+1F921 CLOWN FACE) emoji has an estimated width of 2.
+The examples above that include that character illustrate the effect of the
+estimated width when that character is used as a fill character as opposed to
+when it is used as a formatting argument.</ins>
 &mdash; <em>end note</em> ]
 <br/><br/>
 <table>
@@ -905,10 +927,6 @@ width, then both the alignment and width options have no effect.</ins>
     </td>
   </tr>
 </table>
-<br/>
-<ins>[ <em>Note X</em>: The estimated width of the fill character is assumed to
-be 1.
-&mdash; <em>end note</em> ]</ins>
 </blockquote>
 </p>
 
@@ -920,7 +938,7 @@ Change in
 unrelated to the primary goals of this proposal.
 <blockquote>
 For a string in a Unicode encoding, implementations should estimate the width
-of a string as the sum of estimated widths of the first
+of a string as the sum of <ins>the </ins>estimated widths of the first
 <del>code points</del><ins>UCS scalar values</ins>
 in its extended grapheme clusters.
 The extended grapheme clusters of a string are defined by UAX #29.
