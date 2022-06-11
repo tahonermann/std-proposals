@@ -20,6 +20,7 @@ WG21 Number        | Title | Revisions
 [P1423R3][]        | char8\_t backward compatibility remediation | [R3][P1423R3] [R2][P1423R2] [R1][P1423R1] [R0][P1423R0]
 [P2029R4][]        | Proposed resolution for core issues 411, 1656, and 2333; numeric and universal character escapes in character and string literals | [R4][P2029R4] [R3][P2029R3] [R2][P2029R2] [R1][P2029R1] [R0][P2029R0]
 [P2071R0][]        | Named universal character escapes | [R0][P2071R0]<br/>Later revisions of this paper were authored by Steve Downey.
+[P2572R0][]        | `std::format()` fill character allowances | [R0][P2572R0]
 
 Drafts In Progress | Title
 ------------------ | -----
@@ -65,6 +66,7 @@ Drafts In Progress | Title
 [P2029R3]: https://rawcdn.githack.com/tahonermann/std-proposals/987667432726b9d9b748084e0c0f0cc114e3b408/p2029r3.html
 [P2029R4]: https://rawcdn.githack.com/tahonermann/std-proposals/987667432726b9d9b748084e0c0f0cc114e3b408/p2029r4.html
 [P2071R0]: https://rawcdn.githack.com/tahonermann/std-proposals/987667432726b9d9b748084e0c0f0cc114e3b408/p2071r0.html
+[P2572R0]: https://rawcdn.githack.com/tahonermann/std-proposals/fd0f168775e74ff65fbf2a9ba8fc51e7f33b379a/p2572r0.html
 [DAAAAR0]: https://raw.githack.com/tahonermann/std-proposals/master/daaaar0-exec-char-encoding-survey.html
 [DBBBBR0]: https://raw.githack.com/tahonermann/std-proposals/master/dbbbbr0-poisoned-values.html
 [D2566R0]: https://raw.githack.com/tahonermann/std-proposals/master/d2566r0.html
