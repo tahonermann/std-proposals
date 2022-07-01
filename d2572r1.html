@@ -330,6 +330,11 @@ or an extended grapheme cluster of unbounded length.
 
 <p>
 <ul>
+  <li>Removed the proposed wording changes to
+      <a href="http://eel.is/c++draft/format.string.std#11">22.14.2.2 [format.string.std] paragraph 11</a>
+      that replaced the existing uses of "code points" with "UCS scalar values";
+      the change was intended as an unrelated fix, but encountered
+      resistance.</li>
 </ul>
 </p>
 
@@ -936,30 +941,6 @@ when it is used as a formatting argument.</ins>
     </td>
   </tr>
 </table>
-</blockquote>
-</p>
-
-
-<p>
-Change in
-<a href="http://eel.is/c++draft/format.string.std#11">22.14.2.2 [format.string.std] paragraph 11</a>:<br/>
-<em>Drafting note:</em> This change is a minor terminology correction
-unrelated to the primary goals of this proposal.
-<blockquote>
-For a string in a Unicode encoding, implementations should estimate the width
-of a string as the sum of <ins>the </ins>estimated widths of the first
-<del>code points</del><ins>UCS scalar values</ins>
-in its extended grapheme clusters.
-The extended grapheme clusters of a string are defined by UAX #29.
-The estimated width of the following
-<del>code points</del><ins>UCS scalar values</ins>
-is 2:<br/>
-<br/>
-<em>[ &hellip; ]</em><br/>
-<br/>
-The estimated width of other
-<del>code points</del><ins>UCS scalar values</ins>
-is 1.
 </blockquote>
 </p>
 
