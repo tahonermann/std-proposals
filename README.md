@@ -13,14 +13,14 @@ Document Number    | Title | Formats
 
 WG21 Number        | Title | Revisions
 ------------------ | ----- | ----
-[P0482R6][]        | char8\_t: A type for UTF-8 characters and strings | [R6][P0482R6] [R5][P0482R5] [R4][P0482R4] [R3][P0482R3] [R2][P0482R2] [R1][P0482R1] [R0][P0482R0]
-[P0696R1][]        | Remove abbreviated functions and template-introduction syntax from the Concepts TS | [R1][P0696R1] [R0][P0696R0]
-[P0725R0][]        | Remove the requirement for constrained-type-specifiers to be deduced to the same type from the Concepts TS | [R0][P0725R0]
-[P0804R0][]        | Impact of the modules TS on the C++ tools ecosystem | [R0][P0804R0]
-[P1423R3][]        | char8\_t backward compatibility remediation | [R3][P1423R3] [R2][P1423R2] [R1][P1423R1] [R0][P1423R0]
-[P2029R4][]        | Proposed resolution for core issues 411, 1656, and 2333; numeric and universal character escapes in character and string literals | [R4][P2029R4] [R3][P2029R3] [R2][P2029R2] [R1][P2029R1] [R0][P2029R0]
-[P2071R0][]        | Named universal character escapes | [R0][P2071R0]<br/>Later revisions of this paper were authored by Steve Downey.
 [P2572R0][]        | `std::format()` fill character allowances | [DR1][D2572R1] [R0][P2572R0]
+[P2071R0][]        | Named universal character escapes | [R0][P2071R0]<br/>Later revisions of this paper were authored by Steve Downey.
+[P2029R4][]        | Proposed resolution for core issues 411, 1656, and 2333; numeric and universal character escapes in character and string literals | [R4][P2029R4] [R3][P2029R3] [R2][P2029R2] [R1][P2029R1] [R0][P2029R0]
+[P1423R3][]        | char8\_t backward compatibility remediation | [R3][P1423R3] [R2][P1423R2] [R1][P1423R1] [R0][P1423R0]
+[P0804R0][]        | Impact of the modules TS on the C++ tools ecosystem | [R0][P0804R0]
+[P0725R0][]        | Remove the requirement for constrained-type-specifiers to be deduced to the same type from the Concepts TS | [R0][P0725R0]
+[P0696R1][]        | Remove abbreviated functions and template-introduction syntax from the Concepts TS | [R1][P0696R1] [R0][P0696R0]
+[P0482R6][]        | char8\_t: A type for UTF-8 characters and strings | [R6][P0482R6] [R5][P0482R5] [R4][P0482R4] [R3][P0482R3] [R2][P0482R2] [R1][P0482R1] [R0][P0482R0]
 
 Drafts In Progress | Title
 ------------------ | -----
