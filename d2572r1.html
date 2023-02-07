@@ -150,6 +150,7 @@ This proposal follows prior discussion as recorded in the:
   <li><a href="https://lists.isocpp.org/sg16/2021/12/2887.php">SG16 mailing list archives beginning 2021-12-02 with subject "Use of U+3000 IDEOGRAPHIC SPACE is common practice"</a>.</li>
   <li><a href="https://lists.isocpp.org/sg16/2021/12/2889.php">SG16 mailing list archives beginning 2021-12-02 with subject "More Ruminations about fill characters and alignement (LWG3639)"</a>.</li>
   <li><a href="https://wiki.edg.com/bin/view/Wg21kona2022/LWG20221110-EM">LWG minutes for the 2022-11-10 LWG review in Kona</a>.</li>
+  <li><a href="https://wiki.edg.com/bin/view/Wg21issaquah2023/D2572R1-20230206">LWG minutes for the 2023-02-06 LWG review in Issaquah</a>.</li>
 </ul>
 </p>
 
@@ -799,25 +800,16 @@ for their insights; their commentary shaped much of this proposal.
 
 <h1 id="wording">Wording</h1>
 
-<p>These changes are relative to
-<a title="Working Draft, Standard for Programming Language C++"
-   href="https://wg21.link/n4928">
-N4928</a>
-<sup><a title="Working Draft, Standard for Programming Language C++"
-        href="#ref_n4928">[N4928]</a></sup>.
-</p>
-
-<input type="checkbox" id="hideins">Hide inserted text</input><br/>
-<input type="checkbox" id="hidedel">Hide deleted text</input>
-
-<p>
-For ease of review, unchanged paragraphs in the wording below is introduced
-with "<em>No</em> changes to ..." and are <nop>highlighted with
-a blue background</nop>.
-</p>
-
 <p>
 <em>Drafting note 1</em>:
+Some intentionally unchanged paragraphs are included in the wording below in
+order to ease review. These paragraphs are introduced with
+"<em>No</em> changes to ..." and are
+<nop>highlighted with a blue background</nop>.
+</p>
+
+<p>
+<em>Drafting note 2</em>:
 The previous wording was inconsistent with regard to the terminology used when
 defining and referring to the grammar elements specified in
 <a href="http://eel.is/c++draft/format.string.std#1">22.14.2.2 [format.string.std] paragraph 1</a>.
@@ -828,15 +820,27 @@ previously present.
 </p>
 
 <p>
-<em>Drafting note 2</em>:
+<em>Drafting note 3</em>:
 The wording changes introduce the following new definitions:
 <ul>
+  <li>fill character</li>
   <li>minimum field width</li>
   <li>maximum field width</li>
   <li>estimated field width</li>
   <li>formatted field width</li>
 </ul>
 </p>
+
+<p>These changes are relative to
+<a title="Working Draft, Standard for Programming Language C++"
+   href="https://wg21.link/n4928">
+N4928</a>
+<sup><a title="Working Draft, Standard for Programming Language C++"
+        href="#ref_n4928">[N4928]</a></sup>.
+</p>
+
+<input type="checkbox" id="hideins">Hide inserted text</input><br/>
+<input type="checkbox" id="hidedel">Hide deleted text</input>
 
 <p>
 Change in
@@ -904,7 +908,7 @@ any character other than <tt>{</tt> or <tt>}</tt>
 <br/>
 <em>precision</em>:
 <div style="margin-left: 1em;">
-<tt>.</tt> <em>positive-integer</em>
+<tt>.</tt> <em>nonnegative-integer</em>
 </div>
 <div style="margin-left: 1em;">
 <tt>.</tt> <tt>{</tt> <em>arg-id</em><sub>opt</sub> <tt>}</tt>
@@ -964,7 +968,7 @@ positions in a terminal that are required to display that character.
 
 Change in
 <a href="http://eel.is/c++draft/format.string.std#2">22.14.2.2 [format.string.std] paragraph 2</a>:<br/>
-<em>Drafting note 3:</em> The first sentence of the note was removed because it
+<em>Drafting note 4:</em> The first sentence of the note was removed because it
 is redundant; it repeats information present in the grammar for the
 <em>fill</em> option.
 <blockquote>
