@@ -1,0 +1,1337 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+
+<head>
+
+<title>
+std::format() fill character allowances;
+proposed resolution for LWG issues 3576 and 3639
+</title>
+
+<style type="text/css">
+
+pre {
+    display: inline;
+}
+
+table#header th,
+table#header td
+{
+    text-align: left;
+}
+
+table#references th,
+table#references td
+{
+    vertical-align: top;
+}
+
+#hideins:checked ~ * ins, #hideins:checked ~ * ins * { display:none; visibility:hidden }
+#hidedel:checked ~ * del, #hidedel:checked ~ * del * { display:none; visibility:hidden }
+
+ins, ins *
+{
+    text-decoration: underline;
+    color: #000000;
+    background-color:#C8FFC8
+}
+del, del *
+{
+    text-decoration: line-through;
+    color: #000000;
+    background-color:#FFA0A0
+}
+nop, nop *
+{
+    color: #000000;
+    background-color:#B0B0FF
+}
+
+blockquote
+{
+    color: #000000;
+    background-color: #F1F1F1;
+    border: 1px solid #D1D1D1;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+}
+blockquote.stdins
+{
+    /* text-decoration: underline; */
+    color: #000000;
+    background-color: #C8FFC8;
+    border: 1px solid #B3EBB3;
+    padding: 0.5em;
+}
+blockquote.stddel
+{
+    text-decoration: line-through;
+    color: #000000;
+    background-color: #FFA0A0;
+    border: 1px solid #ECD7EC;
+    padding-left: 0.5empadding-right: 0.5em;
+}
+blockquote.stdnop
+{
+    color: #000000;
+    background-color: #B0B0FF;
+    border: 1px solid #ECD7EC;
+    padding-left: 0.5empadding-right: 0.5em;
+}
+</style>
+
+</head>
+
+
+<body style="max-width: 8.5in">
+
+<table id="header">
+  <tr>
+    <th>Document Number:</th>
+    <td>P2572R1</td>
+  </tr>
+  <tr>
+    <th>Date:</th>
+    <td>2023-02-08</td>
+  </tr>
+  <tr>
+    <th>Audience:</th>
+    <td>LWG</td>
+  </tr>
+  <tr>
+    <th>Reply-to:</th>
+    <td>Tom Honermann &lt;tom@honermann.net&gt;</td>
+  </tr>
+</table>
+
+
+<h1 style="margin-bottom: 0.0em"><tt>std::format()</tt> fill character allowances</h1>
+<h2 style="margin-top: 0.0em">(Proposed resolution for LWG issues 3576 and 3639)</h2>
+
+
+<ul>
+  <li><a href="#introduction">Introduction</a></li>
+  <li><a href="#changes">Changes from P2572R0</a></li>
+  <li><a href="#design">Design considerations</a>
+    <ul>
+      <li><a href="#design-char-restrict">Character encoding restrictions</li>
+      <li><a href="#design-width-restrict">Estimated display width restrictions</li>
+    </ul>
+  </li>
+  <li><a href="#existing-practice">Existing practice</a></li>
+  <li><a href="#proposal">Proposal</a></li>
+  <li><a href="#future">Future considerations and ABI</a></li>
+  <li><a href="#implementation-exp">Implementation experience</a></li>
+  <li><a href="#impact">Implementation impact</a></li>
+  <li><a href="#ack">Acknowledgements</a></li>
+  <li><a href="#references">References</a></li>
+  <li><a href="#wording">Wording</a></li>
+</ul>
+
+
+<h1 id="introduction">Introduction</h1>
+
+<p>
+Presented is a proposed resolution for the following LWG issues concerning
+the specification of fill characters in <tt>std::format()</tt>.
+<ul>
+  <li><a href="https://wg21.link/lwg3576">LWG issue 3576: Clarifying fill character in std::format</a></li>
+  <li><a href="https://wg21.link/lwg3639">LWG issue 3639: Handling of fill character width is underspecified in std::format</a></li>
+</ul>
+</p>
+
+<p>
+This proposal follows prior discussion as recorded in the:
+<ul>
+  <li><a href="https://github.com/sg16-unicode/sg16-meetings/blob/master/README-2021.md#august-25th-2021">SG16 meeting summary for 2021-08-25</a>.</li>
+  <li><a href="https://lists.isocpp.org/sg16/2021/11/2851.php">SG16 mailing list archives beginning 2021-11-27 with subject "Agenda for the 2021-12-01 SG16 telecon"</a>.</li>
+  <li><a href="https://lists.isocpp.org/sg16/2021/11/2867.php">SG16 mailing list archives beginning 2021-12-01 with subject "Proposed resolution for LWG3639: Handling of fill character width is underspecified in std::format"</a>.</li>
+  <li><a href="https://github.com/sg16-unicode/sg16-meetings/blob/master/README-2021.md#december-1st-2021">SG16 meeting summary for 2021-12-01</a>.</li>
+  <li><a href="https://lists.isocpp.org/sg16/2021/12/2887.php">SG16 mailing list archives beginning 2021-12-02 with subject "Use of U+3000 IDEOGRAPHIC SPACE is common practice"</a>.</li>
+  <li><a href="https://lists.isocpp.org/sg16/2021/12/2889.php">SG16 mailing list archives beginning 2021-12-02 with subject "More Ruminations about fill characters and alignement (LWG3639)"</a>.</li>
+  <li><a href="https://wiki.edg.com/bin/view/Wg21kona2022/LWG20221110-EM">LWG minutes for the 2022-11-10 LWG review in Kona</a>.</li>
+  <li><a href="https://wiki.edg.com/bin/view/Wg21issaquah2023/D2572R1-20230206">LWG minutes for the 2023-02-06 LWG review in Issaquah</a>.</li>
+  <li><a href="https://wiki.edg.com/bin/view/Wg21issaquah2023/P2572r1-20230208">LWG minutes for the 2023-02-08 LWG review in Issaquah</a>.</li>
+</ul>
+</p>
+
+<p>
+The current wording in
+<a href="http://eel.is/c++draft/format.string.std#1">[format.string.std]p1</a>
+restricts fill characters to
+"any character other than <tt>{</tt> or <tt>}</tt>".
+Depending on how "character" is interpreted, this may permit
+characters with a negative display width,
+characters with no display width,
+characters with a display width greater than one,
+chraracters with a varying display width,
+characters with an actual display width that differs from their estimated width,
+combining characters (with or without a non-combining lead character),
+decomposed characters,
+characters with right-to-left directionality,
+control characters,
+formatting characters, and
+emoji.
+The following table presents some examples of such characters.
+<table border="1">
+  <tr>
+    <th>Glyph</th>
+    <th>Estimated&nbsp;width</th>
+    <th>Code&nbsp;point(s)</th>
+    <th>Character name</th>
+  </tr>
+  <tr>
+    <td><tt>&gt;&#x07;&lt;</tt></td>
+    <td>1</td>
+    <td>U+0007</td>
+    <td>BELL</td>
+  </tr>
+  <tr>
+    <td><tt>&gt;&#x08;&lt;</tt></td>
+    <td>1</td>
+    <td>U+0008</td>
+    <td>BACKSPACE</td>
+  </tr>
+  <tr>
+    <td><tt>&gt;&#x7F;&lt;</tt></td>
+    <td>1</td>
+    <td>U+007F</td>
+    <td>DELETE</td>
+  </tr>
+  <tr>
+    <td><tt>&gt;&#x0009;&lt;</tt></td>
+    <td>1</td>
+    <td>U+0009</td>
+    <td>CHARACTER TABULATION</td>
+  </tr>
+  <tr>
+    <td><tt>&gt;&#x200B;&lt;</tt></td>
+    <td>1</td>
+    <td>U+200B</td>
+    <td>ZERO WIDTH SPACE</td>
+  </tr>
+  <tr>
+    <td><tt>&gt;&#x301;&lt;</tt></td>
+    <td>1</td>
+    <td>U+0301</td>
+    <td>COMBINING ACCUTE ACCENT</td>
+  </tr>
+  <tr>
+    <td><tt>&gt;&#xE9;&lt;</tt></td>
+    <td>1</td>
+    <td>U+00E9</td>
+    <td>LATIN SMALL LETTER E WITH ACUTE</td>
+  </tr>
+  <tr>
+    <td><tt>&gt;&#x65;&#x301;&lt;</tt></td>
+    <td>1</td>
+    <td>U+0065<br/>U+0301</td>
+    <td>LATIN SMALL LETTER E<br/>COMBINING ACCUTE ACCENT</td>
+  </tr>
+  <tr>
+    <td><tt>&gt;&#x65;&#x300;&#x301;&#x302;&#x303;&#x304;&lt;</tt></td>
+    <td>1</td>
+    <td>U+0065<br/>U+0300<br/>U+0301<br/>U+0302<br/>U+0303<br/>U+0304</td>
+    <td>LATIN SMALL LETTER E<br/>COMBINING GRAVE ACCENT<br/>COMBINING ACUTE ACCENT<br/>COMBINING CIRCUMFLEX ACCENT<br/>COMBINING TILDE<br/>COMBINING MACRON</td>
+  </tr>
+  <tr>
+    <td><tt>&gt;&#xFF45;&lt;</tt></td>
+    <td>2</td>
+    <td>U+FF45</td>
+    <td>FULLWIDTH LATIN SMALL LETTER E</td>
+  </tr>
+  <tr>
+    <td><tt>&gt;&#x30A7;&lt;</tt></td>
+    <td>2</td>
+    <td>U+30A7</td>
+    <td>KATAKANA LETTER SMALL E</td>
+  </tr>
+  <tr>
+    <td><tt>&gt;&#xFF6A;&lt;</tt></td>
+    <td>1</td>
+    <td>U+FF6A</td>
+    <td>HALFWIDTH KATAKANA LETTER SMALL E</td>
+  </tr>
+  <tr>
+    <td><tt>&gt;&#x3000;&lt;</tt></td>
+    <td>2</td>
+    <td>U+3000</td>
+    <td>IDEOGRAPHIC SPACE</td>
+  </tr>
+  <tr>
+    <td><tt>&gt;&#x05EA;&lt;</tt></td>
+    <td>1</td>
+    <td>U+05EA</td>
+    <td>HEBREW LETTER TAV (a right-to-left character)</td>
+  </tr>
+  <tr>
+    <td><tt>&gt;&#x1F921;&lt;</tt></td>
+    <td>2</td>
+    <td>U+1F921</td>
+    <td>CLOWN FACE</td>
+  </tr>
+  <tr>
+    <td><tt>&gt;&#xFDFD;&lt;</tt></td>
+    <td>1</td>
+    <td>U+FDFD</td>
+    <td><spane style="white-space:nowrap;">ARABIC LIGATURE BISMILLAH AR-RAHMAN AR-RAHEEM</span></td>
+  </tr>
+</table>
+[ <em>Note:</em>
+The glyphs are presented in monospace font and may render inconsistently across
+browsers and operating systems.
+The glyphs are displayed between '&gt;' and '&lt;' characters to make it easier
+to see their presentation width.
+The estimated width value corresponds to
+<a href="http://eel.is/c++draft/format.string.std#11">[format.string.std]p11</a>;
+that paragraph associates an estimated width of either one or two with all
+characters.
+In each case, the code point sequence constitutes a single extended grapheme
+cluster.
+&mdash; <em>end note</em> ]
+</p>
+
+<p>
+It is likely that the displayed character differs from the estimated width for
+at least some cases above; most likely the last case.
+Unfortunately, there is no specification currently available that governs
+character display width; actual width may vary based on font selection.
+</p>
+
+<p>
+Use of a fill character with a display width other than one potentially
+prevents a <tt>std::format()</tt> implementation from properly aligning
+fields.
+Consider a format specification for a field of width four and a field argument
+with an estimated field width of one.
+The implementation is expected to insert fill characters to consume an estimated
+field width of three, but that is not possible if the fill character has an
+estimated field width of two.
+Portable behavior requires that the standard clarify the intended behavior
+for such characters.
+</p>
+
+<p>
+A <tt>std::format()</tt> implementation must store or reference a fill character
+in some way.
+Fill character allowances may impose dynamic memory management requirements or
+increase the complexity of parsing standard format specifiers depending on
+implementation choices.
+Implementation choices may also cause fill character restrictions to be
+reflected in the ABI thus making it difficult to relax restrictions later.
+Portable behavior requires that the standard specify whether fill characters are
+restricted to those that are encoded as, for example, a single code unit, a
+single UCS scalar value, a
+<a href="https://unicode.org/reports/tr15/#Stream_Safe_Text_Format">stream-safe extended grapheme cluster</a>
+<sup><a title="Unicode Standard Annex #15 - Unicode Normalization Forms"
+        href="#ref_uax15">[UAX#15]</a></sup>,
+or an extended grapheme cluster of unbounded length.
+</p>
+
+
+<h1 id="changes">Changes from <a href="https://wg21.link/p2572r0">P2572R0</a></h1>
+
+<p>
+<ul>
+  <li>Rebased the proposed wording on N4928.</li>
+  <li>Updated the existing practice to reflect the current generation of
+      implementations and added gcc trunk with libstdc++.</li>
+  <li>Addressed feedback provided during the 2022-11-10 LWG review in Kona.</li>
+  <li>Addressed feedback provided during the 2023-02-06 LWG review in
+      Issaquah.</li>
+  <li>Added formal definitions for
+      <em>field width unit</em>,
+      <em>minimum field width</em>,
+      <em>estimated field width</em>, and
+      <em>padding width</em>.</li>
+  <li>Modified several paragraphs to use the new terms above.</li>
+  <li>Replaced the wording for the <tt>0</tt> option for better consistency with
+      the wording for the <em>align</em> option.</li>
+  <li>Added additional wording to use consistent terminology to refer to the
+      <em>std-format-spec</em> grammar elements.</li>
+  <li>Removed the proposed wording changes to
+      <a href="http://eel.is/c++draft/format.string.std#11">22.14.2.2 [format.string.std] paragraph 11</a>
+      that replaced the existing uses of "code points" with "UCS scalar values".
+      This change was intended as an unrelated fix, but encountered
+      resistance.</li>
+  <li>Added additional drafting notes to better explain the wording
+      changes.</li>
+</ul>
+</p>
+
+
+<h1 id="design">Design considerations</h1>
+
+
+<h2 id="design-char-restrict">Character encoding restrictions</h2>
+
+<p>
+Fill character allowances pose a performance and overhead tradeoff.
+Consider the following four options for fill character support.
+<ol>
+  <li>Allow any extended grapheme cluster (EGC).</li>
+  <li>Allow any
+      <a href="https://unicode.org/reports/tr15/#Stream_Safe_Text_Format">stream-safe EGC</a>
+      <sup><a title="Unicode Standard Annex #15 - Unicode Normalization Forms"
+              href="#ref_uax15">[UAX#15]</a></sup>.
+  <li>Allow any single UCS scalar value.</li>
+  <li>Allow any single UCS scalar value that is encoded using a single code
+      unit.</li>
+</ol>
+</p>
+
+<p>
+The first option (any EGC) would require implementations to support EGCs that
+consist of an unbounded number of code points.
+This option implies dynamic memory management and would require implementations
+to identify EGC boundaries in the format string; a requirement that otherwise
+does not exist at present (implementations are currently required to identify
+EGC boundaries in formatted field arguments for the purpose of computing the
+estimated width, but not in the format string itself).
+</p>
+
+<p>
+The second option (any stream-safe EGC) would require implementations to support
+EGCs that consist of up to 32 code points.
+This option allows an implementation to trade off dynamic memory allocation in
+favor of larger data structures, but still requires EGC boundary analysis of
+format strings.
+</p>
+
+<p>
+The third option (any single UCS scalar value) avoids dynamic memory
+requirements and significant increases to sizes of data structures;
+the fill character could be stored in a single <tt>char32_t</tt> object.
+</p>
+
+<p>
+The fourth option (any single code unit) reduces fill character storage
+requirements to a single code unit (<tt>char</tt> or <tt>wchar_t</tt>), but has
+the unfortunate side effect of making the permissible set of fill characters
+dependent on encoding. For example, U+00E9 (LATIN SMALL LETTER E WITH ACUTE)
+would be rejected in a UTF-8 encoded format string, but would be accepted in a
+UTF-16 encoded one. Similarly, U+1F921 (CLOWN FACE) would be rejected in a
+UTF-16 encoded format string, but accepted in a UTF-32 encoded one.
+</p>
+
+
+<h2 id="design-width-restrict">Estimated display width restrictions</h2>
+
+<p>
+The following behaviors represent possible options for formatting fields when
+the fill character has an estimated width other than one.
+<ol>
+  <li>Use an estimated width of one for the fill character regardless of the
+      value specified in
+      <a href="http://eel.is/c++draft/format.string.std#11">[format.string.std]p11</a>.</li>
+  <li>Overfill<br/>
+      Insert fill characters until the estimated width of the formatted field
+      argument and the fill characters meets or exceeds the field width.</li>
+  <li>Underfill<br/>
+      Insert fill characters so long as the estimated width of the formatted
+      field argument and the fill characters does not exceed the field
+      width.</li>
+  <li>Pad with a different fill character<br/>
+      Insert an alternate fill character known to have an estimated width of
+      one when inserting the requested fill character would have caused the
+      field width to be exceeded.</li>
+  <li>Undefined, unspecified, or implementation-defined behavior<br/>
+      Impose no portable behavior.</li>
+  <li>Error unconditionally<br/>
+      Throw a <tt>format_error</tt> exception.</li>
+  <li>Error if the alignment to the field width is not possible<br/>
+      Throw a <tt>format_error</tt> exception if the remainder of the field
+      width after subtracting the estimated width of the formatted field
+      argument is not evenly divisible by the estimated width of the fill
+      character.</li>
+</ol>
+</p>
+
+<p>
+The following table illustrates the above options for
+<tt>std::format("&gt;{:&#x1F921;^4}&lt;\n", 'X')</tt>.
+Font selection will determine to what degree the results shown deviate from
+the reference alignment.
+<table border="1">
+  <tr>
+    <th>Behavioral choice</th>
+    <th>Result</th>
+  </tr>
+  <tr>
+    <td>(reference alignment)
+    <td><tt>&gt;-X--&lt;</tt></td>
+  </tr>
+  <tr>
+    <td>Use an estimated width of one</th>
+    <td><tt>&gt;&#x1F921;X&#x1F921;&#x1F921;&lt;</tt></td>
+  </tr>
+  <tr>
+    <td>Overfill</th>
+    <td><tt>&gt;&#x1F921;X&#x1F921;&lt;</tt></td>
+  </tr>
+  <tr>
+    <td>Underfill</th>
+    <td><tt>&gt;X&#x1F921;&lt;</tt></td>
+  </tr>
+  <tr>
+    <td>Pad with a different fill character (space)</th>
+    <td><tt>&gt; X&#x1F921;&lt;</tt></td>
+  </tr>
+  <tr>
+    <td>Undefined, unspecified, or implementation-defined behavior</th>
+    <td>???</td>
+  </tr>
+  <tr>
+    <td>Error (unconditionally or due to inability to align)</th>
+    <td>N/A</td>
+  </tr>
+</table>
+</p>
+
+
+<h1 id="existing-practice">Existing practice</h1>
+
+<p>
+The following table illustrates existing behavior for several
+<tt>std::format()</tt> implementations when the example characters from the
+<a href="#introduction">introduction</a>
+are used as the fill character with a directionally neutral field argument of
+<tt>'#'</tt> (the directionality affects the behavior of the U+05EA example).
+The first row illustrates a reference alignment.
+<table border="`">
+  <tr>
+    <th>Code point(s)</th>
+    <th>Format string</th>
+    <th>Clang 15<br/>with libc++</th>
+    <th>Gcc 13 trunk<br/>with libstdc++</th>
+    <th>Gcc 12.2<br/>with fmt 9.1.0</th>
+    <th>MSVC 19.31</th>
+  </tr>
+  <tr>
+    <td>U+002D HYPHEN-MINUS</td>
+    <td><tt>"&gt;{:-^4}&lt;"</tt></td>
+    <td><tt>&gt;-#--&lt;</tt></td>
+    <td><tt>&gt;-#--&lt;</tt></td>
+    <td><tt>&gt;-#--&lt;</tt></td>
+    <td><tt>&gt;-#--&lt;</tt></td>
+  </tr>
+  <tr>
+    <td>U+0007 BELL</td>
+    <td><tt>"&gt;{:&#x07;^4}&lt;"</tt></td>
+    <td><tt>&gt;&#x07;#&#x07;&#x07;&lt;</tt></td>
+    <td><tt>&gt;&#x07;#&#x07;&#x07;&lt;</tt></td>
+    <td><tt>&gt;&#x07;#&#x07;&#x07;&lt;</tt></td>
+    <td><tt>&gt;&#x07;#&#x07;&#x07;&lt;</tt></td>
+  </tr>
+  <tr>
+    <td>U+0008 BACKSPACE</td>
+    <td><tt>"&gt;{:&#x08;^4}&lt;"</tt></td>
+    <td><tt>&gt;&#x08;#&#x08;&#x08;&lt;</tt></td>
+    <td><tt>&gt;&#x08;#&#x08;&#x08;&lt;</tt></td>
+    <td><tt>&gt;&#x08;#&#x08;&#x08;&lt;</tt></td>
+    <td><tt>&gt;&#x08;#&#x08;&#x08;&lt;</tt></td>
+  </tr>
+  <tr>
+    <td>U+007F DELETE</td>
+    <td><tt>"&gt;{:&#x7F;^4}&lt;"</tt></td>
+    <td><tt>&gt;&#x7F;#&#x7F;&#x7F;&lt;</tt></td>
+    <td><tt>&gt;&#x7F;#&#x7F;&#x7F;&lt;</tt></td>
+    <td><tt>&gt;&#x7F;#&#x7F;&#x7F;&lt;</tt></td>
+    <td><tt>&gt;&#x7F;#&#x7F;&#x7F;&lt;</tt></td>
+  </tr>
+  <tr>
+    <td>U+0009 CHARACTER TABULATION</td>
+    <td><tt>"&gt;{:&#x0009;^4}&lt;"</tt></td>
+    <td><tt>&gt;<span style="white-space: pre">&#x0009;#&#x0009;&#x0009;</span>&lt;</tt></td>
+    <td><tt>&gt;<span style="white-space: pre">&#x0009;#&#x0009;&#x0009;</span>&lt;</tt></td>
+    <td><tt>&gt;<span style="white-space: pre">&#x0009;#&#x0009;&#x0009;</span>&lt;</tt></td>
+    <td><tt>&gt;<span style="white-space: pre">&#x0009;#&#x0009;&#x0009;</span>&lt;</tt></td>
+  </tr>
+  <tr>
+    <td>U+200B ZERO WIDTH SPACE</td>
+    <td><tt>"&gt;{:&#x200B;^4}&lt;"</tt></td>
+    <td><b>Error</b><sup>1</sup></td>
+    <td><b>Error</b><sup>2</sup></td>
+    <td><tt>&gt;&#x200B;#&#x200B;&#x200B;&lt;</tt></td>
+    <td><tt>&gt;&#x200B;#&#x200B;&#x200B;&lt;</tt></td>
+  </tr>
+  <tr>
+    <td>U+0301 COMBINING ACCUTE ACCENT</td>
+    <td><tt>"&gt;{:&#x0301;^4}&lt;"</tt></td>
+    <td><b>Error</b><sup>1</sup></td>
+    <td><b>Error</b><sup>2</sup></td>
+    <td><tt>&gt;&#x0301;#&#x0301;&#x0301;&lt;</tt></td>
+    <td><tt>&gt;&#x0301;#&#x0301;&#x0301;&lt;</tt></td>
+  </tr>
+  <tr>
+    <td>U+00E9 LATIN SMALL LETTER E WITH ACUTE</td>
+    <td><tt>"&gt;{:&#xE9;^4}&lt;"</tt></td>
+    <td><b>Error</b><sup>1</sup></td>
+    <td><b>Error</b><sup>2</sup></td>
+    <td><tt>&gt;&#xe9;#&#xe9;&#xe9;&lt;</tt></td>
+    <td><tt>&gt;&#xe9;#&#xe9;&#xe9;&lt;</tt></td>
+  </tr>
+  <tr>
+    <td>U+0065 LATIN SMALL LETTER E<br/>U+0301 COMBINING ACCUTE ACCENT</td>
+    <td><tt>"&gt;{:&#x65;&#x301;^4}&lt;"</tt></td>
+    <td><b>Error</b><sup>1</sup></td>
+    <td><b>Error</b><sup>2</sup></td>
+    <td><b>Error</b><sup>3</sup></td>
+    <td><b>Error</b><sup>4</sup></td>
+  </tr>
+  <tr>
+    <td>U+0065 LATIN SMALL LETTER E<br/>U+0300 COMBINING GRAVE ACCENT<br/>U+0301 COMBINING ACUTE ACCENT<br/>U+0302 COMBINING CIRCUMFLEX ACCENT<br/>U+0303 COMBINING TILDE<br/>U+0304 COMBINING MACRON</td>
+    <td><tt>"&gt;{:&#x65;&#x300;&#x301;&#x302;&#x303;&#x304;^4}&lt;"</tt></td>
+    <td><b>Error</b><sup>1</sup></td>
+    <td><b>Error</b><sup>2</sup></td>
+    <td><b>Error</b><sup>3</sup></td>
+    <td><b>Error</b><sup>4</sup></td>
+  </tr>
+  <tr>
+    <td>U+FF45 FULLWIDTH LATIN SMALL LETTER E</td>
+    <td><tt>"&gt;{:&#xFF45;^4}&lt;"</tt></td>
+    <td><b>Error</b><sup>1</sup></td>
+    <td><b>Error</b><sup>2</sup></td>
+    <td><tt>&gt;&#xFF45;#&#xFF45;&#xFF45;&lt;</tt></td>
+    <td><tt>&gt;&#xFF45;#&#xFF45;&#xFF45;&lt;</tt></td>
+  </tr>
+  <tr>
+    <td>U+30A7 KATAKANA LETTER SMALL E</td>
+    <td><tt>"&gt;{:&#x30A7;^4}&lt;"</tt></td>
+    <td><b>Error</b><sup>1</sup></td>
+    <td><b>Error</b><sup>2</sup></td>
+    <td><tt>&gt;&#x30A7;#&#x30A7;&#x30A7;&lt;</tt></td>
+    <td><tt>&gt;&#x30A7;#&#x30A7;&#x30A7;&lt;</tt></td>
+  </tr>
+  <tr>
+    <td>U+FF6A HALFWIDTH KATAKANA LETTER SMALL E</td>
+    <td><tt>"&gt;{:&#xFF6A;^4}&lt;"</tt></td>
+    <td><b>Error</b><sup>1</sup></td>
+    <td><b>Error</b><sup>2</sup></td>
+    <td><tt>&gt;&#xFF6A;#&#xFF6A;&#xFF6A;&lt;</tt></td>
+    <td><tt>&gt;&#xFF6A;#&#xFF6A;&#xFF6A;&lt;</tt></td>
+  </tr>
+  <tr>
+    <td>U+3000 IDEOGRAPHIC SPACE</td>
+    <td><tt>"&gt;{:&#x3000;^4}&lt;"</tt></td>
+    <td><b>Error</b><sup>1</sup></td>
+    <td><b>Error</b><sup>2</sup></td>
+    <td><tt>&gt;&#x3000;#&#x3000;&#x3000;&lt;</tt></td>
+    <td><tt>&gt;&#x3000;#&#x3000;&#x3000;&lt;</tt></td>
+  </tr>
+  <tr>
+    <td>U+05EA HEBREW LETTER TAV</td>
+    <td><tt>"&gt;{:&#x05EA;&#x200E;^4}&lt;"</tt></td>
+    <td><b>Error</b><sup>1</sup></td>
+    <td><b>Error</b><sup>2</sup></td>
+    <td><tt>&gt;&#x05EA;#&#x05EA;&#x05EA;&lt;&#x200E;<sup>5</sup></tt><br/>
+        <tt>&gt;&#x05EA;X&#x05EA;&#x05EA;&lt;&#x200E;<sup>5</sup></tt></td>
+    <td><tt>&gt;&#x05EA;#&#x05EA;&#x05EA;&lt;&#x200E;<sup>5</sup></tt><br/>
+        <tt>&gt;&#x05EA;X&#x05EA;&#x05EA;&lt;&#x200E;<sup>5</sup></tt></td>
+  </tr>
+  <tr>
+    <td>U+1F921 CLOWN FACE</td>
+    <td><tt>"&gt;{:&#x1F921;^4}&lt;"</tt></td>
+    <td><b>Error</b><sup>1</sup></td>
+    <td><b>Error</b><sup>2</sup></td>
+    <td><tt>&gt;&#x1F921;#&#x1F921;&#x1F921;&lt;</tt></td>
+    <td><tt>&gt;&#x1F921;#&#x1F921;&#x1F921;&lt;</tt></td>
+  </tr>
+  <tr>
+    <td><span style="white-space:nowrap;">U+FDFD ARABIC LIGATURE BISMILLAH AR-RAHMAN AR-RAHEEM</span></td>
+    <td><tt>"&gt;{:&#xFDFD;^4}&lt;"</tt></td>
+    <td><b>Error</b><sup>1</sup></td>
+    <td><b>Error</b><sup>2</sup></td>
+    <td><tt>&gt;&#xFDFD;#&#xFDFD;&#xFDFD;&lt;</tt></td>
+    <td><tt>&gt;&#xFDFD;#&#xFDFD;&#xFDFD;&lt;</tt></td>
+  </tr>
+</table>
+
+<p>
+1) Clang with libc++ restricts fill characters to characters that are encoded
+   as a single code unit. Compilation fails with the following error message.
+<div style="margin-left:1em; background-color:lemonchiffon"><tt>
+error: call to consteval function 'std::basic_format_string&lt;char, char&gt;::basic_format_string&lt;char[11]&gt;' is not a constant expression
+</tt></div>
+</p>
+
+<p>
+2) Gcc with libstdc++ restricts fill characters to characters that are encoded as a
+   single code point. Compilation fails with the following error message.
+<div style="margin-left:1em; background-color:lemonchiffon"><tt>
+error: call to non-'constexpr' function 'void std::__format::__failed_to_parse_format_spec()'
+</tt></div>
+</p>
+
+<p>
+3) Gcc with fmt restricts fill characters to characters that are encoded as a
+   single code point. Compilation fails with the following error message.
+<div style="margin-left:1em; background-color:lemonchiffon"><tt>
+error: call to non-'constexpr' function 'void fmt::v9::detail::error_handler::on_error(const char*)'
+</tt></div>
+</p>
+
+<p>
+4) MSVC restricts fill characters to characters that are encoded as a single
+   code point. Compilation is successful, but program execution terminates
+   with an exit code of
+   3221226505 (0xC0000409: <tt>STATUS_STACK_BUFFER_OVERRUN</tt>).
+   The buffer overflow has been corrected for the next MSVC release and these
+   cases are now rejected with the following error message.
+<div style="margin-left:1em; background-color:lemonchiffon"><tt>
+error C7595: 'std::_Basic_format_string&lt;char,char&gt;::_Basic_format_string': call to immediate function is not a constant expression
+</tt></div>
+</p>
+
+<p>
+5) Use of a fill character with right-to-left directionality potentially causes
+   the formatted field to be rendered right to left depending on the formatted
+   field argument.
+   Two examples are provided, one in which the directionally neutral character
+   <tt>'#'</tt> is used as the formatted field argument and one in which the
+   left-to-right character <tt>'X'</tt> is used.
+   U+200E LEFT-TO-RIGHT MARK characters have been inserted by the paper
+   author to negate the right-to-left effect on surrounding text.
+   In practice, the right-to-left directionality may affect how surrounding
+   text from the format string or other format fields are presented.
+</p>
+
+<p>
+All surveyed implementations assume an estimated width of 1 for fill characters
+regardless of the estimated width values specified in
+<a href="http://eel.is/c++draft/format.string.std#11">[format.string.std]p11</a>.
+</p>
+
+
+<h1 id="proposal">Proposal</h1>
+
+<p>
+Standardize the behavior exhibited by gcc with fmt and by MSVC:
+<ul>
+  <li>Restrict fill characters to a single UCS scalar value.<br/>
+      (This restriction can be lifted in the future if motivation arises for
+      support of EGCs that contain multiple UCS scalar values but may require
+      an ABI break depending on implementation details)</li>
+  <li>Always use an estimated width of one for fill characters.<br/>
+      (Ignore 
+      <a href="http://eel.is/c++draft/format.string.std#11">[format.string.std]p11</a>
+      when determining how many fill characters to insert)</li>
+  <li>Add a note that alignment options have no effect if the estimated width
+      of the formatted field argument exceeds the field width.</li>
+  <li>Clarify wording to explicitly describe how fill characters are inserted
+      in order to achieve field alignment.</li>
+</ul>
+</p>
+
+
+<h1 id="future">Future considerations and ABI</h1>
+
+<p>
+Programmers may find use cases where it is necessary for the number of inserted
+fill characters to depend on the estimated width of the fill character.
+Some of those use cases may warrant support in the standard.
+If such motivation arises, there are at least two methods by which support
+could be added.
+<ol>
+  <li>The
+      <a href="http://eel.is/c++draft/format.string.std"><em>std-format-spec</em> format specification</a>
+      could be extended to allow an additional option to be specified to opt-in
+      to the desired behavior.</li>
+  <li>Specializations of <tt>std::formatter</tt> could be defined to provide
+      custom formatting on a per-type basis as is done for the chrono
+      library.</li>
+</ol>
+</p>
+
+<p>
+Motivation may arise in the future to permit the use of an EGC that consists of
+multiple code points as a fill character.
+Implementations that store a single <tt>char32_t</tt> or short sequence of code
+units in their <tt>formatter</tt> class specializations
+(<a href="http://eel.is/c++draft/format#formatter.spec">[format.formatter.spec]</a>)
+may be unable to accommodate such a change without an ABI break.
+Implementations are encouraged to instead store a view (an iterator pair, start
+and end index, or start index and length) into the <em>std-format-spec</em>
+(<a href="http://eel.is/c++draft/format#string.std-1">[format.string.std]p1</a>)
+string so that code unit sequences of arbitrary length can be referenced.
+However, since format strings are evaluated at compile-time, there is currently
+no need for them to be persisted until run-time, so storing a view may impose
+storage overhead.
+</p>
+
+<p>
+It appears that the Microsoft implementation is currently susceptible to such
+ABI breaks based on the implementation of their
+<a href="https://github.com/microsoft/STL/blob/1a20fe1133d711a647bbb135d98743f91b7be323/stl/inc/format#L1327-L1340"><tt>_Basic_format_specs</tt> class template</a>.
+Specializations of <tt>_Basic_format_specs</tt> form the base class of their
+<a href="https://github.com/microsoft/STL/blob/1a20fe1133d711a647bbb135d98743f91b7be323/stl/inc/format#L1342-L1349"><tt>_Dynamic_format_specs</tt> class template</a>
+for which a specialization is stored in their
+<a href="https://github.com/microsoft/STL/blob/1a20fe1133d711a647bbb135d98743f91b7be323/stl/inc/format#L3263-L3297"><tt>_Formatter_base</tt> class template</a>
+that forms the base class of their
+<a href="https://github.com/microsoft/STL/blob/1a20fe1133d711a647bbb135d98743f91b7be323/stl/inc/format#L3299-L3347"><tt>std::formatter</tt> specializations</a>.
+Microsoft is already shipping their implementation and is thus already locked
+into their current ABI.
+</p>
+
+<p>
+The author has not researched the ABI break susceptibility of other
+implementations.
+</p>
+
+
+<h1 id="implementation-exp">Implementation experience</h1>
+
+<p>
+This proposal standardizes the behavior exhibited by both gcc with fmt and MSVC
+and therefore reflects existing practice.
+However the ABI mitigations described in the prior section are not known to have
+been implemented.
+</p>
+
+
+<h1 id="impact">Implementation impact</h1>
+
+<p>
+Some implementations, libstdc++ and libc++ for example, will require changes to
+allow any single UCS scalar value to be specified as a fill character.
+This may impose new encoding awareness requirements on format string parsers so
+that fill characters encoded with more than one code unit are correctly decoded.
+</p>
+
+
+<h1 id="ack">Acknowledgements</h1>
+
+<p>
+Thank you to Victor Zverovich, Corentin Jabot, Peter Brett, and Mark de Wever
+for their insights; their commentary shaped much of this proposal.
+</p>
+
+
+<h1 id="references">References</h1>
+
+<table id="references">
+  <tr>
+    <td id="ref_n4928"><sup>[N4928]</sup></td>
+    <td>
+      "Working Draft, Standard for Programming Language C++", N4928, 2022.<br/>
+      <a href="https://wg21.link/n4928">
+      https://wg21.link/n4928</a></td>
+  </tr>
+  <tr>
+    <td id="ref_uax15"><sup>[UAX#15]</sup></td>
+    <td>
+      Ken Whistler,<br/>
+      "Unicode Standard Annex #15 - Unicode Normalization Forms",<br/>
+      Revision 51, Unicode 14.0.0, 2021.<br/>
+      <a href="https://www.unicode.org/reports/tr15/tr15-51.html">https://www.unicode.org/reports/tr15/tr15-51.html</a>
+    </td>
+  </tr>
+</table>
+
+
+<h1 id="wording">Wording</h1>
+
+<p>
+<em>Drafting note 1</em>:
+Some intentionally unchanged paragraphs are included in the wording below in
+order to ease review. These paragraphs are introduced with
+"<em>No</em> changes to ..." and are
+<nop>highlighted with a blue background</nop>.
+</p>
+
+<p>
+<em>Drafting note 2</em>:
+The previous wording was inconsistent with regard to the terminology used when
+defining and referring to the grammar elements specified in
+<a href="http://eel.is/c++draft/format.string.std#1">22.14.2.2 [format.string.std] paragraph 1</a>.
+The dominant term used was "option".
+The proposed wording changes substitute or insert "option" in places where
+"specifier" or "field" was previously used or where no descriptor was
+previously present.
+</p>
+
+<p>
+<em>Drafting note 3</em>:
+The wording changes introduce the following new definitions:
+<ul>
+  <li>fill character</li>
+  <li>field width unit</li>
+  <li>minimum field width</li>
+  <li>estimated field width</li>
+  <li>padding width</li>
+</ul>
+</p>
+
+<p>
+<em>Drafting note 4</em>:
+The following papers contain changes to some of the same paragraphs changed
+in this paper; merging will be required.
+<ul>
+  <li><a href="https://wg21.link/p2736">P2736 (Referencing The Unicode Standard)</a></li>
+  <li><a href="https://wg21.link/p2675">P2675 (LWG3780: The Paper)</a></li>
+</ul>
+</p>
+
+<p>These changes are relative to
+<a title="Working Draft, Standard for Programming Language C++"
+   href="https://wg21.link/n4928">
+N4928</a>
+<sup><a title="Working Draft, Standard for Programming Language C++"
+        href="#ref_n4928">[N4928]</a></sup>.
+</p>
+
+<input type="checkbox" id="hideins">Hide inserted text</input><br/>
+<input type="checkbox" id="hidedel">Hide deleted text</input>
+
+<p>
+Change in
+<a href="http://eel.is/c++draft/format.string.std#1">22.14.2.2 [format.string.std] paragraph 1</a>:<br/>
+<p>
+<blockquote>
+Each <tt>formatter</tt> specialization described in
+<a href="http://eel.is/c++draft/format.formatter.spec">[format.formatter.spec]</a>
+for fundamental and string types interprets <em>format-spec</em> as a <em>std-format-spec</em>.
+<br/>
+<br/>
+[<em>Note 1</em>: The format specification can be used to specify such details
+as <ins>minimum </ins>field width, alignment, padding, and decimal precision.
+Some of the formatting options are only supported for arithmetic types.
+&mdash; <em>end note</em>]
+<br/>
+<br/>
+The syntax of format specifications is as follows:<br/>
+<br/>
+<div style="margin-left: 1em;">
+<em>std-format-spec</em>:
+<div style="margin-left: 1em;">
+<em>fill-and-align</em><sub>opt</sub>
+<em><a href="http://eel.is/c++draft/lex.fcon#nt:sign">sign</a></em><sub>opt</sub>
+<tt>#</tt><sub>opt</sub>
+<tt>0</tt><sub>opt</sub>
+<em>width</em><sub>opt</sub>
+<em>precision</em><sub>opt</sub>
+<tt>L</tt><sub>opt</sub>
+<em>type</em><sub>opt</sub>
+</div>
+<br/>
+<em>fill-and-align</em>:
+<div style="margin-left: 1em;">
+<em>fill</em><sub>opt</sub>
+<em>align</em>
+</div>
+<br/>
+<em>fill</em>:
+<div style="margin-left: 1em;">
+any character other than <tt>{</tt> or <tt>}</tt>
+</div>
+<br/>
+<em>align</em>: one of
+<div style="margin-left: 1em;">
+<tt>&lt;</tt>
+<tt>&gt;</tt>
+<tt>^</tt>
+</div>
+<br/>
+<em><a href="http://eel.is/c++draft/lex.fcon#nt:sign">sign</a></em>: one of
+<div style="margin-left: 1em;">
+<tt>+</tt>
+<tt>-</tt>
+<tt>space</tt>
+</div>
+<br/>
+<em>width</em>:
+<div style="margin-left: 1em;">
+<em>positive-integer</em>
+</div>
+<div style="margin-left: 1em;">
+<tt>{</tt> <em>arg-id</em><sub>opt</sub> <tt>}</tt>
+</div>
+<br/>
+<em>precision</em>:
+<div style="margin-left: 1em;">
+<tt>.</tt> <em>nonnegative-integer</em>
+</div>
+<div style="margin-left: 1em;">
+<tt>.</tt> <tt>{</tt> <em>arg-id</em><sub>opt</sub> <tt>}</tt>
+</div>
+<br/>
+<em>type</em>: one of
+<div style="margin-left: 1em;">
+<tt>a</tt>
+<tt>A</tt>
+<tt>b</tt>
+<tt>B</tt>
+<tt>c</tt>
+<tt>d</tt>
+<tt>e</tt>
+<tt>E</tt>
+<tt>f</tt>
+<tt>F</tt>
+<tt>g</tt>
+<tt>G</tt>
+<tt>o</tt>
+<tt>p</tt>
+<tt>s</tt>
+<tt>x</tt>
+<tt>X</tt>
+<tt>?</tt>
+</div>
+</div>
+</blockquote>
+</p>
+
+<p>
+Add a new paragraph after
+<a href="http://eel.is/c++draft/format.string.std#1">22.14.2.2 [format.string.std] paragraph 1</a>:<br/>
+<blockquote>
+<ins>Field widths are specified in <em>field width unit</em>s; the number of
+column positions required to display a sequence of characters in a terminal.
+The <em>minimum field width</em> is the number of field width units
+a replacement field minimally requires of the formatted sequence of characters
+produced for a format argument.
+The <em>estimated field width</em> is the number of field width units
+that are required for the formatted sequence of characters produced for a format
+argument independent of the effects of the <em>width</em> option.
+The <em>padding width</em> is the greater of <tt>0</tt> and the difference of
+the minimum field width and the estimated field width.
+<br/>
+<br/>
+[<em>Note ?</em>: The POSIX <tt>wcswidth</tt> function is an example of a
+function that, given a string, returns the number of column positions required
+by a terminal to display the string.
+&mdash; <em>end note</em>]</ins>
+</blockquote>
+</p>
+
+Change in
+<a href="http://eel.is/c++draft/format.string.std#2">22.14.2.2 [format.string.std] paragraph 2</a>:<br/>
+<em>Drafting note 5:</em> The first sentence of the note was removed because it
+is redundant; it repeats information present in the grammar for the
+<em>fill</em> option.
+<blockquote>
+<ins>The <em>fill character</em> is the character denoted by the <em>fill</em>
+option or, if the <em>fill</em> option is absent, the space
+character.
+For a format specification in a Unicode encoding, the fill character
+corresponds to a single UCS scalar value.
+<br/>
+<br/>
+</ins>
+[<em>Note 2</em>:
+<del>The <em>fill</em> character can be any character other than { or }. </del>The
+presence of a
+<del>fill character</del><ins><em>fill</em> option</ins>
+is signaled by the character following it,
+which must be one of the alignment options.
+If the second character of <em>std-format-spec</em> is not a valid alignment
+option, then it is assumed that
+<del>both the fill character and the alignment option are</del><ins>the
+<em>fill</em> and <em>align</em> options are both</ins>
+absent. &mdash; <em>end note</em>]
+</blockquote>
+</p>
+
+<p>
+Change in
+<a href="http://eel.is/c++draft/format.string.std#3">22.14.2.2 [format.string.std] paragraph 3</a>:<br/>
+<blockquote>
+The <em>align</em> <del>specifier</del><ins>option</ins> applies to all
+argument types.
+The meaning of the various alignment options is as specified in
+<a href="http://eel.is/c++draft/format.string.std#tab:format.align">Table 66</a>.
+<br/><br/>
+[ <em>Example 1</em>:
+<div style="margin-left: 1em;"><pre>
+char c = 120;
+string s0 = format("{:6}", 42);           // value of s0 is "    42"
+string s1 = format("{:6}", 'x');          // value of s1 is "x     "
+string s2 = format("{:*&lt;6}", 'x');        // value of s2 is "x*****"
+string s3 = format("{:*&gt;6}", 'x');        // value of s3 is "*****x"
+string s4 = format("{:*^6}", 'x');        // value of s4 is "**x***"
+string s5 = format("{:6d}", c);           // value of s5 is "   120"
+string s6 = format("{:6}", true);         // value of s6 is "true  "
+<ins>string s7 = format("{:*&lt;6.3}", "123456"); // value of s7 is "123***"</ins>
+<ins>string s8 = format("{:02}", 1234);        // value of s8 is "1234"</ins>
+<ins>string s9 = format("{:*&lt;}", "12");        // value of s9 is "12"</ins>
+<ins>string sA = format("{:*&lt;6}", "12345678"); // value of sA is "12345678"</ins>
+<ins>string sB = format("{:&#x1F921;^6}", "x");       // value of sB is "&#x1F921;&#x1F921;x&#x1F921;&#x1F921;&#x1F921;"</ins>
+<ins>string sC = format("{:*^6}", "&#x1F921;&#x1F921;&#x1F921;");    // value of sC is "&#x1F921;&#x1F921;&#x1F921;"</ins>
+</pre></div>
+&mdash; <em>end example</em> ]
+<br/><br/>
+[ <em>Note 3</em>:
+<del>Unless a minimum field width is defined, the field width is determined by
+the size of the content and the alignment option has no effect.</del><ins>The
+<em>fill</em>, <em>align</em>, and <tt>0</tt> options have no effect when the
+minimum field width is not greater than the estimated field width because
+padding width is 0 in that case.
+Since fill characters are assumed to have a field width of 1, use of a
+character with a different field width can produce misaligned output.
+The &#x1F921; (U+1F921 CLOWN FACE) character has a field width of 2.
+The examples above that include that character illustrate the effect of the
+field width when that character is used as a fill character as opposed to
+when it is used as a formatting argument.</ins>
+&mdash; <em>end note</em> ]
+<br/><br/>
+<table>
+  <tr>
+    <td>
+      <table style="width:100%">
+        <tr>
+          <td style="text-align:center">Table
+              <a href="http://eel.is/c++draft/format.string.std#tab:format.align">66</a>:
+              Meaning of align options</td>
+          <td>[<a href="http://eel.is/c++draft/tab:format.align">tab:format.align</a>]</td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <table style="width:100%; border:1px solid black">
+        <tr style="border:1px solid black">
+          <th style="border-bottom:1px solid black">Option</th>
+          <th style="border-bottom:1px solid black">Meaning</th>
+        </tr>
+        <tr>
+          <td style="border-bottom:1px solid black">&lt;</td>
+          <td style="border-bottom:1px solid black">
+              Forces the
+              <del>field</del><ins>formatted argument</ins>
+              to be aligned to the start of the
+              <del>available space</del><ins>field by inserting <em>n</em>
+              fill characters after the formatted argument where <em>n</em>
+              is the padding width</ins>.
+              This is the default for non-arithmetic non-pointer types,
+              <tt>charT</tt>, and <tt>bool</tt>, unless an integer presentation
+              type is specified.</td>
+        </tr>
+        <tr>
+          <td style="border-bottom:1px solid black">&gt;</td>
+          <td style="border-bottom:1px solid black">
+              Forces the
+              <del>field</del><ins>formatted argument</ins>
+              to be aligned to the end of the
+              <del>available space</del><ins>field by inserting <em>n</em>
+              fill characters before the formatted argument where <em>n</em>
+              is the padding width</ins>.
+              This is the default for arithmetic types other than
+              <tt>charT</tt> and <tt>bool</tt>, pointer types, or when an integer
+              presentation type is specified.</td>
+        </tr>
+        <tr>
+          <td style="border-bottom:1px solid black">^</td>
+          <td style="border-bottom:1px solid black">
+              Forces the
+              <del>field</del><ins>formatted argument</ins>
+              to be centered within the
+              <del>available space</del><ins>field</ins>
+              by inserting ⌊<em>n</em>/2⌋ <ins>fill</ins> characters before and
+              ⌈<em>n</em>/2⌉ <ins>fill </ins>characters after the
+              <ins>formatted argument</ins><del>value</del>, where <em>n</em> is
+              <del>the total number of fill characters to insert</del><ins>the
+              padding width</ins>.</td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+</blockquote>
+</p>
+
+<p>
+<em>No</em> changes to
+<a href="http://eel.is/c++draft/format.string.std#4">22.14.2.2 [format.string.std] paragraph 4</a>:<br/>
+<blockquote class="stdnop">
+The <em>sign</em> option is only valid &hellip;<br/>
+[ &hellip; ]
+</blockquote>
+</p>
+
+<p>
+<em>No</em> changes to
+<a href="http://eel.is/c++draft/format.string.std#5">22.14.2.2 [format.string.std] paragraph 5</a>:<br/>
+<blockquote class="stdnop">
+The <em>sign</em> option applies to &hellip;<br/>
+[ &hellip; ]
+</blockquote>
+</p>
+
+<p>
+<em>No</em> changes to
+<a href="http://eel.is/c++draft/format.string.std#6">22.14.2.2 [format.string.std] paragraph 6</a>:<br/>
+<blockquote class="stdnop">
+The <tt>#</tt> option causes &hellip;<br/>
+[ &hellip; ]
+</blockquote>
+</p>
+
+<p>
+Change in
+<a href="http://eel.is/c++draft/format.string.std#7">22.14.2.2 [format.string.std] paragraph 7</a>:<br/>
+<blockquote>
+<del>A zero (<tt>0</tt>) character preceding the <em>width</em> field pads the
+field with leading zeros (following any indication of sign or base) to the field
+width, except when applied to an infinity or NaN.
+This option is only valid for arithmetic types other than <tt>charT</tt> and
+<tt>bool</tt> or when an integer presentation type is specified.
+If the <tt>0</tt> character and an <em>align</em> option both appear, the
+<tt>0</tt> character is ignored.</del><br/>
+<ins>The <tt>0</tt> option is valid for arithmetic types other than
+<tt>charT</tt> and <tt>bool</tt> or when an integer presentation type is
+specified.
+For formatting arguments that have a value other than an infinity or a NaN, this
+option pads the formatted argument by inserting the <tt>0</tt> character
+<em>n</em> times following the sign or base prefix indicators (if any) where
+<em>n</em> is <tt>0</tt> if the <em>align</em> option is present and is the
+padding width otherwise</ins>.
+<br/><br/>
+[ <em>Example 3</em>:
+<div style="margin-left: 1em;"><pre>
+char c = 120;
+double inf = numeric_limits&lt;double&gt;::infinity();
+string s1 = format("{:+06d}", c);       // value of s1 is "+00120"
+string s2 = format("{:#06x}", 0xa);     // value of s2 is "0x000a"
+string s3 = format("{:&lt;06}", -42);      // value of s3 is "-42   " (0 <del>is ignored because of &lt; alignment</del><ins>has no effect</ins>)
+<ins>string s4 = format("{:06}", inf);       // value of s4 is "   inf" (0 has no effect)</ins>
+</pre></div>
+&mdash; <em>end example</em> ]
+<br/><br/>
+</blockquote>
+</p>
+
+<p>
+Add a new paragraph before
+<a href="http://eel.is/c++draft/format.string.std#8">22.14.2.2 [format.string.std] paragraph 8</a>:<br/>
+<blockquote class="stdins">
+The <em>width</em> option specifies the minimum field width.
+If the <em>width</em> option is absent, the minimum field width is
+<tt>0</tt>.</ins>
+</blockquote>
+</p>
+
+<p>
+Change in
+<a href="http://eel.is/c++draft/format.string.std#8">22.14.2.2 [format.string.std] paragraph 8</a>:<br/>
+<blockquote>
+If <tt>{</tt> <em>arg-id</em><sub>opt</sub> <tt>}</tt> is used in a
+<em>width</em> or <em>precision</em><ins> option</ins>,
+the value of the corresponding formatting argument is used
+<del>in its place</del><ins>as the value of the option</ins>.
+If the corresponding formatting argument is not of integral type, or its value
+is negative, an exception of type <tt>format_error</tt> is thrown.
+</blockquote>
+</p>
+
+<p>
+Change in
+<a href="http://eel.is/c++draft/format.string.std#9">22.14.2.2 [format.string.std] paragraph 9</a>:<br/>
+<blockquote>
+<del>The</del><ins>If</ins> <em>positive-integer</em>
+<del>in</del><ins>is used in a</ins> <em>width</em>
+<del>is a</del><ins>option, the value of the</ins> decimal integer
+<del>defining the minimum field width</del><ins>is used as the value of the
+option</ins>.<del>If width is not specified, there is no minimum field width,
+and the field width is determined based on the content of the field.</del>
+</blockquote>
+</p>
+
+<p>
+Remove
+<a href="http://eel.is/c++draft/format.string.std#10">22.14.2.2 [format.string.std] paragraph 10</a>:<br/>
+<em>Drafting note 6:</em> The content of this paragraph was incoporated into
+the new paragraph added after paragraph 1.
+<blockquote class="stddel">
+The <em>width</em> of a string is defined as the estimated number of column
+positions appropriate for displaying it in a terminal.<br/>
+<br/>
+[<em>Note 5</em>: This is similar to the semantics of the POSIX
+<tt>wcswidth</tt> function. &mdash; <em>end note</em>]
+</blockquote>
+</p>
+
+<p>
+<em>No</em> changes to
+<a href="http://eel.is/c++draft/format.string.std#11">22.14.2.2 [format.string.std] paragraph 11</a>:<br/>
+<blockquote class="stdnop">
+For the purposes of width computation, a string is assumed to be in a
+locale-independent, implementation-defined encoding.
+Implementations should use a Unicode encoding on platforms capable of
+displaying Unicode text in a terminal.<br/>
+<br/>
+[<em>Note 6</em>: This is the case for Windows<sup>209</sup>-based and many
+POSIX-based operating systems. &mdash; <em>end note</em>]
+</blockquote>
+</p>
+
+<p>
+Change in
+<a href="http://eel.is/c++draft/format.string.std#12">22.14.2.2 [format.string.std] paragraph 12</a>:<br/>
+<blockquote>
+<del>For a string in a Unicode encoding, implementations should estimate the
+width of a string as the sum of estimated widths of the first code points in its
+extended grapheme clusters.</del><ins>For a sequence of characters in a Unicode
+encoding, an implementation should use as its field width the sum of the
+field widths of the first code point of each extended grapheme
+cluster.</ins>
+<del>The e</del><ins>E</ins>xtended grapheme clusters <del>of a string </del>are
+defined by UAX #29.
+<del>The estimated width of the following code points is 2:</del><ins>The
+following code points have a field width of 2:</ins>
+<br/>
+<br/>
+<div style="margin-left: 1em;">
+[ &hellip; ]<br/>
+</div>
+<br/>
+The <del>estimated width of</del><ins>field width of all</ins>
+other code points is 1.
+</blockquote>
+</p>
+
+<p>
+Change in
+<a href="http://eel.is/c++draft/format.string.std#13">22.14.2.2 [format.string.std] paragraph 13</a>:<br/>
+<blockquote>
+For a <del>string</del><ins>sequence of characters</ins> in a non-Unicode
+encoding, the <ins>field </ins>width <del>of a string </del>is unspecified.
+</blockquote>
+</p>
+
+<p>
+Change in
+<a href="http://eel.is/c++draft/format.string.std#14">22.14.2.2 [format.string.std] paragraph 14</a>:<br/>
+<blockquote>
+<del>The <em>nonnegative-integer</em> in <em>precision</em> is a decimal integer
+defining the precision or maximum field size.
+It can only be used with floating-point and string types.
+For floating-point types this field specifies the formatting precision.
+For string types, this field provides an upper bound for the estimated width of
+the prefix of the input string that is copied into the output.
+For a string in a Unicode encoding, the formatter copies to the output the
+longest prefix of whole extended grapheme clusters whose estimated width is no
+greater than the precision.</del><br/>
+<ins>The <em>precision</em> option is valid for floating-point and string types.
+For floating-point types, the value of this option specifies the precision to
+be used for the floating-point presentation type.
+For string types, this option specifies the longest prefix of the formatted
+argument to be included in the replacement field such that the field width of
+the prefix is no greater than the value of this option.
+</ins>
+</blockquote>
+</p>
+
+<p>
+Add a new paragraph after
+<a href="http://eel.is/c++draft/format.string.std#14">22.14.2.2 [format.string.std] paragraph 14</a>:<br/>
+<em>Drafting note 7:</em> The wording for this paragraph closely follows
+paragraph 9.
+<blockquote class="stdins">
+If <em>nonnegative-integer</em> is used in a <em>precision</em>
+option, the value of the decimal integer is used as the value of the
+option.
+</blockquote>
+</p>
+
+
+</body>
