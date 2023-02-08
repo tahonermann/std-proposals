@@ -985,15 +985,14 @@ Add a new paragraph after
 <blockquote>
 <ins>Field widths are specified in <em>field width unit</em>s; the number of
 column positions required to display a sequence of characters in a terminal.
-The <em>minimum field width</em> is the number of <em>field width unit</em>s
-a replacememt field minimally requires of the formatted sequence of characters
+The <em>minimum field width</em> is the number of field width units
+a replacement field minimally requires of the formatted sequence of characters
 produced for a format argument.
-The <em>estimated field width</em> is the number of <em>field width unit</em>s
+The <em>estimated field width</em> is the number of field width units
 that are required for the formatted sequence of characters produced for a format
-argument independent of the effects of the <em>fill</em>, <tt>0</tt>, or
-<em>width</em> options.
+argument independent of the effects of the <em>width</em> option.
 The <em>padding width</em> is the greater of <tt>0</tt> and the difference of
-the <em>minimum field width</em> and the <em>estimated field width</em>.
+the minimum field width and the estimated field width.
 <br/>
 <br/>
 [<em>Note ?</em>: The POSIX <tt>wcswidth</tt> function is an example of a
@@ -1026,7 +1025,7 @@ which must be one of the alignment options.
 If the second character of <em>std-format-spec</em> is not a valid alignment
 option, then it is assumed that
 <del>both the fill character and the alignment option are</del><ins>the
-<em>fill-and-align</em> option is</ins>
+<em>fill</em> and <em>align</em> options are both</ins>
 absent. &mdash; <em>end note</em>]
 </blockquote>
 </p>
@@ -1050,7 +1049,7 @@ string s3 = format("{:*&gt;6}", 'x');        // value of s3 is "*****x"
 string s4 = format("{:*^6}", 'x');        // value of s4 is "**x***"
 string s5 = format("{:6d}", c);           // value of s5 is "   120"
 string s6 = format("{:6}", true);         // value of s6 is "true  "
-<ins>string s7 = format("{:*&lt;6.3}", "123456"); // value of s7 is "123xxx"</ins>
+<ins>string s7 = format("{:*&lt;6.3}", "123456"); // value of s7 is "123***"</ins>
 <ins>string s8 = format("{:02}", 1234);        // value of s8 is "1234"</ins>
 <ins>string s9 = format("{:*&lt;}", "12");        // value of s9 is "12"</ins>
 <ins>string sA = format("{:*&lt;6}", "12345678"); // value of sA is "12345678"</ins>
@@ -1180,11 +1179,11 @@ If the <tt>0</tt> character and an <em>align</em> option both appear, the
 <ins>The <tt>0</tt> option is valid for arithmetic types other than
 <tt>charT</tt> and <tt>bool</tt> or when an integer presentation type is
 specified.
-For formatting arguments that have a value other than infinity or NaN, this
-option aligns the formatted argument to the start and end of the field by
-inserting the <tt>0</tt> character <em>n</em> times following the sign or
-base prefix indicators (if any) where <em>n</em> is <tt>0</tt> if the
-<em>align</em> option is present and is the padding width otherwise</ins>.
+For formatting arguments that have a value other than an infinity or a NaN, this
+option pads the formatted argument by inserting the <tt>0</tt> character
+<em>n</em> times following the sign or base prefix indicators (if any) where
+<em>n</em> is <tt>0</tt> if the <em>align</em> option is present and is the
+padding width otherwise</ins>.
 <br/><br/>
 [ <em>Example 3</em>:
 <div style="margin-left: 1em;"><pre>
@@ -1312,11 +1311,11 @@ For a string in a Unicode encoding, the formatter copies to the output the
 longest prefix of whole extended grapheme clusters whose estimated width is no
 greater than the precision.</del><br/>
 <ins>The <em>precision</em> option is valid for floating-point and string types.
-For floating-point types, this option specifies the precision to be used for
-the floating-point presentation type.
-For string types, this option specifies the maximum number of characters or,
-for strings in a Unicode encoding, the number of extended grapheme clusters,
-to be formatted in terms of field width units.
+For floating-point types, the value of this option specifies the precision to
+be used for the floating-point presentation type.
+For string types, this option specifies the longest prefix of the formatted
+argument to be included in the replacement field such that the field width of
+the prefix is no greater than the value of this option.
 </ins>
 </blockquote>
 </p>
