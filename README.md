@@ -70,4 +70,3 @@ Drafts In Progress | Title
 [DAAAAR0]: https://raw.githack.com/tahonermann/std-proposals/master/daaaar0-exec-char-encoding-survey.html
 [DBBBBR0]: https://raw.githack.com/tahonermann/std-proposals/master/dbbbbr0-poisoned-values.html
 [D2566R0]: https://raw.githack.com/tahonermann/std-proposals/master/d2566r0.html
-[D2572R1]: https://raw.githack.com/tahonermann/std-proposals/master/d2572r1.html
