@@ -333,8 +333,11 @@ or an extended grapheme cluster of unbounded length.
 <p>
 <ul>
   <li>Rebased the proposed wording on N4928.</li>
-  <li>Addressed LWG review feedback provided during the 2022-11-10 LWG Kona
-      meeting.</li>
+  <li>Updated the existing practice to reflect the current generation of
+      implementations and added gcc trunk with libstdc++.</li>
+  <li>Addressed feedback provided during the 2022-11-10 LWG review in Kona.</li>
+  <li>Addressed feedback provided during the 2023-02-06 LWG review in
+      Issaquah.</li>
   <li>Added formal definitions for
       <em>field width unit</em>,
       <em>minimum field width</em>,
@@ -498,13 +501,15 @@ The first row illustrates a reference alignment.
   <tr>
     <th>Code point(s)</th>
     <th>Format string</th>
-    <th>Clang 15 trunk<br/>with libc++</th>
-    <th>Gcc 12.1<br/>with fmt 8.1.1</th>
+    <th>Clang 15<br/>with libc++</th>
+    <th>Gcc 13 trunk<br/>with libstdc++</th>
+    <th>Gcc 12.2<br/>with fmt 9.1.0</th>
     <th>MSVC 19.31</th>
   </tr>
   <tr>
     <td>U+002D HYPHEN-MINUS</td>
     <td><tt>"&gt;{:-^4}&lt;"</tt></td>
+    <td><tt>&gt;-#--&lt;</tt></td>
     <td><tt>&gt;-#--&lt;</tt></td>
     <td><tt>&gt;-#--&lt;</tt></td>
     <td><tt>&gt;-#--&lt;</tt></td>
@@ -515,10 +520,12 @@ The first row illustrates a reference alignment.
     <td><tt>&gt;&#x07;#&#x07;&#x07;&lt;</tt></td>
     <td><tt>&gt;&#x07;#&#x07;&#x07;&lt;</tt></td>
     <td><tt>&gt;&#x07;#&#x07;&#x07;&lt;</tt></td>
+    <td><tt>&gt;&#x07;#&#x07;&#x07;&lt;</tt></td>
   </tr>
   <tr>
     <td>U+0008 BACKSPACE</td>
     <td><tt>"&gt;{:&#x08;^4}&lt;"</tt></td>
+    <td><tt>&gt;&#x08;#&#x08;&#x08;&lt;</tt></td>
     <td><tt>&gt;&#x08;#&#x08;&#x08;&lt;</tt></td>
     <td><tt>&gt;&#x08;#&#x08;&#x08;&lt;</tt></td>
     <td><tt>&gt;&#x08;#&#x08;&#x08;&lt;</tt></td>
@@ -529,10 +536,12 @@ The first row illustrates a reference alignment.
     <td><tt>&gt;&#x7F;#&#x7F;&#x7F;&lt;</tt></td>
     <td><tt>&gt;&#x7F;#&#x7F;&#x7F;&lt;</tt></td>
     <td><tt>&gt;&#x7F;#&#x7F;&#x7F;&lt;</tt></td>
+    <td><tt>&gt;&#x7F;#&#x7F;&#x7F;&lt;</tt></td>
   </tr>
   <tr>
     <td>U+0009 CHARACTER TABULATION</td>
     <td><tt>"&gt;{:&#x0009;^4}&lt;"</tt></td>
+    <td><tt>&gt;<span style="white-space: pre">&#x0009;#&#x0009;&#x0009;</span>&lt;</tt></td>
     <td><tt>&gt;<span style="white-space: pre">&#x0009;#&#x0009;&#x0009;</span>&lt;</tt></td>
     <td><tt>&gt;<span style="white-space: pre">&#x0009;#&#x0009;&#x0009;</span>&lt;</tt></td>
     <td><tt>&gt;<span style="white-space: pre">&#x0009;#&#x0009;&#x0009;</span>&lt;</tt></td>
@@ -541,6 +550,7 @@ The first row illustrates a reference alignment.
     <td>U+200B ZERO WIDTH SPACE</td>
     <td><tt>"&gt;{:&#x200B;^4}&lt;"</tt></td>
     <td><b>Error</b><sup>1</sup></td>
+    <td><b>Error</b><sup>2</sup></td>
     <td><tt>&gt;&#x200B;#&#x200B;&#x200B;&lt;</tt></td>
     <td><tt>&gt;&#x200B;#&#x200B;&#x200B;&lt;</tt></td>
   </tr>
@@ -548,6 +558,7 @@ The first row illustrates a reference alignment.
     <td>U+0301 COMBINING ACCUTE ACCENT</td>
     <td><tt>"&gt;{:&#x0301;^4}&lt;"</tt></td>
     <td><b>Error</b><sup>1</sup></td>
+    <td><b>Error</b><sup>2</sup></td>
     <td><tt>&gt;&#x0301;#&#x0301;&#x0301;&lt;</tt></td>
     <td><tt>&gt;&#x0301;#&#x0301;&#x0301;&lt;</tt></td>
   </tr>
@@ -555,6 +566,7 @@ The first row illustrates a reference alignment.
     <td>U+00E9 LATIN SMALL LETTER E WITH ACUTE</td>
     <td><tt>"&gt;{:&#xE9;^4}&lt;"</tt></td>
     <td><b>Error</b><sup>1</sup></td>
+    <td><b>Error</b><sup>2</sup></td>
     <td><tt>&gt;&#xe9;#&#xe9;&#xe9;&lt;</tt></td>
     <td><tt>&gt;&#xe9;#&#xe9;&#xe9;&lt;</tt></td>
   </tr>
@@ -564,6 +576,7 @@ The first row illustrates a reference alignment.
     <td><b>Error</b><sup>1</sup></td>
     <td><b>Error</b><sup>2</sup></td>
     <td><b>Error</b><sup>3</sup></td>
+    <td><b>Error</b><sup>4</sup></td>
   </tr>
   <tr>
     <td>U+0065 LATIN SMALL LETTER E<br/>U+0300 COMBINING GRAVE ACCENT<br/>U+0301 COMBINING ACUTE ACCENT<br/>U+0302 COMBINING CIRCUMFLEX ACCENT<br/>U+0303 COMBINING TILDE<br/>U+0304 COMBINING MACRON</td>
@@ -571,11 +584,13 @@ The first row illustrates a reference alignment.
     <td><b>Error</b><sup>1</sup></td>
     <td><b>Error</b><sup>2</sup></td>
     <td><b>Error</b><sup>3</sup></td>
+    <td><b>Error</b><sup>4</sup></td>
   </tr>
   <tr>
     <td>U+FF45 FULLWIDTH LATIN SMALL LETTER E</td>
     <td><tt>"&gt;{:&#xFF45;^4}&lt;"</tt></td>
     <td><b>Error</b><sup>1</sup></td>
+    <td><b>Error</b><sup>2</sup></td>
     <td><tt>&gt;&#xFF45;#&#xFF45;&#xFF45;&lt;</tt></td>
     <td><tt>&gt;&#xFF45;#&#xFF45;&#xFF45;&lt;</tt></td>
   </tr>
@@ -583,6 +598,7 @@ The first row illustrates a reference alignment.
     <td>U+30A7 KATAKANA LETTER SMALL E</td>
     <td><tt>"&gt;{:&#x30A7;^4}&lt;"</tt></td>
     <td><b>Error</b><sup>1</sup></td>
+    <td><b>Error</b><sup>2</sup></td>
     <td><tt>&gt;&#x30A7;#&#x30A7;&#x30A7;&lt;</tt></td>
     <td><tt>&gt;&#x30A7;#&#x30A7;&#x30A7;&lt;</tt></td>
   </tr>
@@ -590,6 +606,7 @@ The first row illustrates a reference alignment.
     <td>U+FF6A HALFWIDTH KATAKANA LETTER SMALL E</td>
     <td><tt>"&gt;{:&#xFF6A;^4}&lt;"</tt></td>
     <td><b>Error</b><sup>1</sup></td>
+    <td><b>Error</b><sup>2</sup></td>
     <td><tt>&gt;&#xFF6A;#&#xFF6A;&#xFF6A;&lt;</tt></td>
     <td><tt>&gt;&#xFF6A;#&#xFF6A;&#xFF6A;&lt;</tt></td>
   </tr>
@@ -597,6 +614,7 @@ The first row illustrates a reference alignment.
     <td>U+3000 IDEOGRAPHIC SPACE</td>
     <td><tt>"&gt;{:&#x3000;^4}&lt;"</tt></td>
     <td><b>Error</b><sup>1</sup></td>
+    <td><b>Error</b><sup>2</sup></td>
     <td><tt>&gt;&#x3000;#&#x3000;&#x3000;&lt;</tt></td>
     <td><tt>&gt;&#x3000;#&#x3000;&#x3000;&lt;</tt></td>
   </tr>
@@ -604,15 +622,17 @@ The first row illustrates a reference alignment.
     <td>U+05EA HEBREW LETTER TAV</td>
     <td><tt>"&gt;{:&#x05EA;&#x200E;^4}&lt;"</tt></td>
     <td><b>Error</b><sup>1</sup></td>
-    <td><tt>&gt;&#x05EA;#&#x05EA;&#x05EA;&lt;&#x200E;<sup>4</sup></tt><br/>
-        <tt>&gt;&#x05EA;X&#x05EA;&#x05EA;&lt;&#x200E;<sup>4</sup></tt></td>
-    <td><tt>&gt;&#x05EA;#&#x05EA;&#x05EA;&lt;&#x200E;<sup>4</sup></tt><br/>
-        <tt>&gt;&#x05EA;X&#x05EA;&#x05EA;&lt;&#x200E;<sup>4</sup></tt></td>
+    <td><b>Error</b><sup>2</sup></td>
+    <td><tt>&gt;&#x05EA;#&#x05EA;&#x05EA;&lt;&#x200E;<sup>5</sup></tt><br/>
+        <tt>&gt;&#x05EA;X&#x05EA;&#x05EA;&lt;&#x200E;<sup>5</sup></tt></td>
+    <td><tt>&gt;&#x05EA;#&#x05EA;&#x05EA;&lt;&#x200E;<sup>5</sup></tt><br/>
+        <tt>&gt;&#x05EA;X&#x05EA;&#x05EA;&lt;&#x200E;<sup>5</sup></tt></td>
   </tr>
   <tr>
     <td>U+1F921 CLOWN FACE</td>
     <td><tt>"&gt;{:&#x1F921;^4}&lt;"</tt></td>
     <td><b>Error</b><sup>1</sup></td>
+    <td><b>Error</b><sup>2</sup></td>
     <td><tt>&gt;&#x1F921;#&#x1F921;&#x1F921;&lt;</tt></td>
     <td><tt>&gt;&#x1F921;#&#x1F921;&#x1F921;&lt;</tt></td>
   </tr>
@@ -620,6 +640,7 @@ The first row illustrates a reference alignment.
     <td><span style="white-space:nowrap;">U+FDFD ARABIC LIGATURE BISMILLAH AR-RAHMAN AR-RAHEEM</span></td>
     <td><tt>"&gt;{:&#xFDFD;^4}&lt;"</tt></td>
     <td><b>Error</b><sup>1</sup></td>
+    <td><b>Error</b><sup>2</sup></td>
     <td><tt>&gt;&#xFDFD;#&#xFDFD;&#xFDFD;&lt;</tt></td>
     <td><tt>&gt;&#xFDFD;#&#xFDFD;&#xFDFD;&lt;</tt></td>
   </tr>
@@ -627,36 +648,42 @@ The first row illustrates a reference alignment.
 
 <p>
 1) Clang with libc++ restricts fill characters to characters that are encoded
-   as a single code unit; an exception is thrown that, if not caught, aborts
-   the process with the following error message.
+   as a single code unit. Compilation fails with the following error message.
 <div style="margin-left:1em; background-color:lemonchiffon"><tt>
-libc++abi: terminating with uncaught exception of type std::__1::format_error: The format-spec should consume the input or end with a '}'
+error: call to consteval function 'std::basic_format_string&lt;char, char&gt;::basic_format_string&lt;char[11]&gt;' is not a constant expression
 </tt></div>
 </p>
 
 <p>
-2) Gcc with fmt restricts fill characters to characters that are encoded as a
+2) Gcc with libstdc++ restricts fill characters to characters that are encoded as a
    single code point. Compilation fails with the following error message.
 <div style="margin-left:1em; background-color:lemonchiffon"><tt>
-error: call to non-'constexpr' function 'void fmt::v8::detail::error_handler::on_error(const char*)'
+error: call to non-'constexpr' function 'void std::__format::__failed_to_parse_format_spec()'
 </tt></div>
 </p>
 
 <p>
-3) MSVC restricts fill characters to characters that are encoded as a single
+3) Gcc with fmt restricts fill characters to characters that are encoded as a
+   single code point. Compilation fails with the following error message.
+<div style="margin-left:1em; background-color:lemonchiffon"><tt>
+error: call to non-'constexpr' function 'void fmt::v9::detail::error_handler::on_error(const char*)'
+</tt></div>
+</p>
+
+<p>
+4) MSVC restricts fill characters to characters that are encoded as a single
    code point. Compilation is successful, but program execution terminates
    with an exit code of
    3221226505 (0xC0000409: <tt>STATUS_STACK_BUFFER_OVERRUN</tt>).
    The buffer overflow has been corrected for the next MSVC release and these
    cases are now rejected with the following error message.
 <div style="margin-left:1em; background-color:lemonchiffon"><tt>
-error C7595: 'std::_Basic_format_string&lt;char,char&gt;::_Basic_format_string': call to immediate function is not a constant expression<br/>
-.../msvc/14.32.31302/include\format(1378): note: failure was caused by evaluating a throw sub-expression
+error C7595: 'std::_Basic_format_string&lt;char,char&gt;::_Basic_format_string': call to immediate function is not a constant expression
 </tt></div>
 </p>
 
 <p>
-4) Use of a fill character with right-to-left directionality potentially causes
+5) Use of a fill character with right-to-left directionality potentially causes
    the formatted field to be rendered right to left depending on the formatted
    field argument.
    Two examples are provided, one in which the directionally neutral character
@@ -764,8 +791,8 @@ been implemented.
 <h1 id="impact">Implementation impact</h1>
 
 <p>
-Some implementations, libc++ for example, will require changes to allow any
-single UCS scalar value to be specified as a fill character.
+Some implementations, libstdc++ and libc++ for example, will require changes to
+allow any single UCS scalar value to be specified as a fill character.
 This may impose new encoding awareness requirements on format string parsers so
 that fill characters encoded with more than one code unit are correctly decoded.
 </p>
