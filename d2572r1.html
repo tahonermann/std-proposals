@@ -92,7 +92,7 @@ blockquote.stdnop
   </tr>
   <tr>
     <th>Date:</th>
-    <td>2023-02-06</td>
+    <td>2023-02-08</td>
   </tr>
   <tr>
     <th>Audience:</th>
@@ -336,10 +336,13 @@ or an extended grapheme cluster of unbounded length.
   <li>Addressed LWG review feedback provided during the 2022-11-10 LWG Kona
       meeting.</li>
   <li>Added formal definitions for
+      <em>field width unit</em>,
       <em>minimum field width</em>,
-      <em>maximum field width</em>,
       <em>estimated field width</em>, and
-      <em>formatted field width</em>.</li>
+      <em>padding width</em>.</li>
+  <li>Modified several paragraphs to use the new terms above.</li>
+  <li>Replaced the wording for the <tt>0</tt> option for better consistency with
+      the wording for the <em>align</em> option.</li>
   <li>Added additional wording to use consistent terminology to refer to the
       <em>std-format-spec</em> grammar elements.</li>
   <li>Removed the proposed wording changes to
@@ -824,10 +827,20 @@ previously present.
 The wording changes introduce the following new definitions:
 <ul>
   <li>fill character</li>
+  <li>field width unit</li>
   <li>minimum field width</li>
-  <li>maximum field width</li>
   <li>estimated field width</li>
-  <li>formatted field width</li>
+  <li>padding width</li>
+</ul>
+</p>
+
+<p>
+<em>Drafting note 4</em>:
+The following papers contain changes to some of the same paragraphs changed
+in this paper; merging will be required.
+<ul>
+  <li><a href="https://wg21.link/p2736">P2736 (Referencing The Unicode Standard)</a></li>
+  <li><a href="https://wg21.link/p2675">P2675 (LWG3780: The Paper)</a></li>
 </ul>
 </p>
 
@@ -943,46 +956,43 @@ any character other than <tt>{</tt> or <tt>}</tt>
 Add a new paragraph after
 <a href="http://eel.is/c++draft/format.string.std#1">22.14.2.2 [format.string.std] paragraph 1</a>:<br/>
 <blockquote>
-<ins>Field widths are specified as the number of column positions required
-to display a sequence of characters in a terminal.
-The <em>minimum field width</em> is the number of column positions that are
-minimally required for the sequence of characters in the formatted output of
-a format argument.
-The <em>maximum field width</em> is the number of column positions that are
-maximally required.
-The <em>estimated field width</em> is the number of column positions that are
-required by the sequence of characters in the formatted output of a format
-argument independent of the effects of the <em>fill</em> or <em>width</em>
-options, or the <em>precision</em> option when specified for a
-string type.
-The <em>formatted field width</em> is the lesser of the maximum field width
-and the greater of the minimum field width and the estimated field width.
+<ins>Field widths are specified in <em>field width unit</em>s; the number of
+column positions required to display a sequence of characters in a terminal.
+The <em>minimum field width</em> is the number of <em>field width unit</em>s
+a replacememt field minimally requires of the formatted sequence of characters
+produced for a format argument.
+The <em>estimated field width</em> is the number of <em>field width unit</em>s
+that are required for the formatted sequence of characters produced for a format
+argument independent of the effects of the <em>fill</em>, <tt>0</tt>, or
+<em>width</em> options.
+The <em>padding width</em> is the greater of <tt>0</tt> and the difference of
+the <em>minimum field width</em> and the <em>estimated field width</em>.
 <br/>
 <br/>
 [<em>Note ?</em>: The POSIX <tt>wcswidth</tt> function is an example of a
-function that, given a character, attempts to determine the number of column
-positions in a terminal that are required to display that character.
+function that, given a string, returns the number of column positions required
+by a terminal to display the string.
 &mdash; <em>end note</em>]</ins>
 </blockquote>
 </p>
 
 Change in
 <a href="http://eel.is/c++draft/format.string.std#2">22.14.2.2 [format.string.std] paragraph 2</a>:<br/>
-<em>Drafting note 4:</em> The first sentence of the note was removed because it
+<em>Drafting note 5:</em> The first sentence of the note was removed because it
 is redundant; it repeats information present in the grammar for the
 <em>fill</em> option.
 <blockquote>
 <ins>The <em>fill character</em> is the character denoted by the <em>fill</em>
 option or, if the <em>fill</em> option is absent, the space
 character.
-For a format specification in a Unicode encoding, the fill character is a
-single UCS scalar value.
+For a format specification in a Unicode encoding, the fill character
+corresponds to a single UCS scalar value.
 <br/>
 <br/>
 </ins>
 [<em>Note 2</em>:
-<del>The <em>fill</em> character can be any character other than { or }.</del>
-The presence of a
+<del>The <em>fill</em> character can be any character other than { or }. </del>The
+presence of a
 <del>fill character</del><ins><em>fill</em> option</ins>
 is signaled by the character following it,
 which must be one of the alignment options.
@@ -1013,24 +1023,26 @@ string s3 = format("{:*&gt;6}", 'x');        // value of s3 is "*****x"
 string s4 = format("{:*^6}", 'x');        // value of s4 is "**x***"
 string s5 = format("{:6d}", c);           // value of s5 is "   120"
 string s6 = format("{:6}", true);         // value of s6 is "true  "
-<ins>string s7 = format("{:0}", "12");         // value of s7 is "12"</ins>
-<ins>string s8 = format("{:*&lt;}", "12");        // value of s8 is "12"</ins>
-<ins>string s9 = format("{:*&lt;6}", "12345678"); // value of s9 is "12345678"</ins>
-<ins>string sA = format("{:&#x1F921;^6}", "x");       // value of sA is "&#x1F921;&#x1F921;x&#x1F921;&#x1F921;&#x1F921;"</ins>
-<ins>string sB = format("{:*^6}", "&#x1F921;&#x1F921;&#x1F921;");    // value of sB is "&#x1F921;&#x1F921;&#x1F921;"</ins>
+<ins>string s7 = format("{:*&lt;6.3}", "123456"); // value of s7 is "123xxx"</ins>
+<ins>string s8 = format("{:02}", 1234);        // value of s8 is "1234"</ins>
+<ins>string s9 = format("{:*&lt;}", "12");        // value of s9 is "12"</ins>
+<ins>string sA = format("{:*&lt;6}", "12345678"); // value of sA is "12345678"</ins>
+<ins>string sB = format("{:&#x1F921;^6}", "x");       // value of sB is "&#x1F921;&#x1F921;x&#x1F921;&#x1F921;&#x1F921;"</ins>
+<ins>string sC = format("{:*^6}", "&#x1F921;&#x1F921;&#x1F921;");    // value of sC is "&#x1F921;&#x1F921;&#x1F921;"</ins>
 </pre></div>
 &mdash; <em>end example</em> ]
 <br/><br/>
 [ <em>Note 3</em>:
 <del>Unless a minimum field width is defined, the field width is determined by
 the size of the content and the alignment option has no effect.</del><ins>The
-<em>fill</em>, <em>align</em>, and <tt>0</tt> options have no effect if the
-minimum field width is less than the estimated width of the formatted argument.
-Since fill characters are assumed to have an estimated width of 1, use of a
-character with a different estimated width can produce misaligned output.
-The &#x1F921; (U+1F921 CLOWN FACE) emoji character has an estimated width of 2.
+<em>fill</em>, <em>align</em>, and <tt>0</tt> options have no effect when the
+minimum field width is not greater than the estimated field width because
+padding width is 0 in that case.
+Since fill characters are assumed to have a field width of 1, use of a
+character with a different field width can produce misaligned output.
+The &#x1F921; (U+1F921 CLOWN FACE) character has a field width of 2.
 The examples above that include that character illustrate the effect of the
-estimated width when that character is used as a fill character as opposed to
+field width when that character is used as a fill character as opposed to
 when it is used as a formatting argument.</ins>
 &mdash; <em>end note</em> ]
 <br/><br/>
@@ -1057,10 +1069,12 @@ when it is used as a formatting argument.</ins>
         <tr>
           <td style="border-bottom:1px solid black">&lt;</td>
           <td style="border-bottom:1px solid black">
-              Forces the field to be aligned to the start of the available
-              space<ins> by inserting <em>n</em> fill characters after the
-              formatted argument where <em>n</em> is the minimum field width
-              minus the estimated field width</ins>.
+              Forces the
+              <del>field</del><ins>formatted argument</ins>
+              to be aligned to the start of the
+              <del>available space</del><ins>field by inserting <em>n</em>
+              fill characters after the formatted argument where <em>n</em>
+              is the padding width</ins>.
               This is the default for non-arithmetic non-pointer types,
               <tt>charT</tt>, and <tt>bool</tt>, unless an integer presentation
               type is specified.</td>
@@ -1068,10 +1082,12 @@ when it is used as a formatting argument.</ins>
         <tr>
           <td style="border-bottom:1px solid black">&gt;</td>
           <td style="border-bottom:1px solid black">
-              Forces the field to be aligned to the end of the available
-              space<ins> by inserting <em>n</em> fill characters before the
-              formatted argument where <em>n</em> is the minimum field width
-              minus the estimated field width</ins>.
+              Forces the
+              <del>field</del><ins>formatted argument</ins>
+              to be aligned to the end of the
+              <del>available space</del><ins>field by inserting <em>n</em>
+              fill characters before the formatted argument where <em>n</em>
+              is the padding width</ins>.
               This is the default for arithmetic types other than
               <tt>charT</tt> and <tt>bool</tt>, pointer types, or when an integer
               presentation type is specified.</td>
@@ -1079,12 +1095,15 @@ when it is used as a formatting argument.</ins>
         <tr>
           <td style="border-bottom:1px solid black">^</td>
           <td style="border-bottom:1px solid black">
-              Forces the field to be centered within the available space by
-              inserting ⌊<em>n</em>/2⌋ <ins>fill</ins> characters before and
+              Forces the
+              <del>field</del><ins>formatted argument</ins>
+              to be centered within the
+              <del>available space</del><ins>field</ins>
+              by inserting ⌊<em>n</em>/2⌋ <ins>fill</ins> characters before and
               ⌈<em>n</em>/2⌉ <ins>fill </ins>characters after the
               <ins>formatted argument</ins><del>value</del>, where <em>n</em> is
               <del>the total number of fill characters to insert</del><ins>the
-              minimum field width minus the estimated field width</ins>.</td>
+              padding width</ins>.</td>
         </tr>
       </table>
     </td>
@@ -1125,26 +1144,29 @@ Change in
 <a href="http://eel.is/c++draft/format.string.std#7">22.14.2.2 [format.string.std] paragraph 7</a>:<br/>
 <blockquote>
 <del>A zero (<tt>0</tt>) character preceding the <em>width</em> field pads the
-field</del><ins>The <tt>0</tt> option causes the field to be padded</ins>
-with leading
-<del>zeros</del><ins><tt>0</tt> characters</ins>
-(following any indication of sign or base) to the field
+field with leading zeros (following any indication of sign or base) to the field
 width, except when applied to an infinity or NaN.
 This option is only valid for arithmetic types other than <tt>charT</tt> and
 <tt>bool</tt> or when an integer presentation type is specified.
-If the <tt>0</tt>
-<del>character</del><ins>option</ins>
-and an <em>align</em> option both appear, the
-<tt>0</tt>
-<del>character</del><ins>option</ins>
-is ignored.
+If the <tt>0</tt> character and an <em>align</em> option both appear, the
+<tt>0</tt> character is ignored.</del><br/>
+<ins>The <tt>0</tt> option is valid for arithmetic types other than
+<tt>charT</tt> and <tt>bool</tt> or when an integer presentation type is
+specified.
+For formatting arguments that have a value other than infinity or NaN, this
+option aligns the formatted argument to the start and end of the field by
+inserting the <tt>0</tt> character <em>n</em> times following the sign or
+base prefix indicators (if any) where <em>n</em> is <tt>0</tt> if the
+<em>align</em> option is present and is the padding width otherwise</ins>.
 <br/><br/>
 [ <em>Example 3</em>:
 <div style="margin-left: 1em;"><pre>
 char c = 120;
+double inf = numeric_limits&lt;double&gt;::infinity();
 string s1 = format("{:+06d}", c);       // value of s1 is "+00120"
 string s2 = format("{:#06x}", 0xa);     // value of s2 is "0x000a"
-string s3 = format("{:&lt;06}", -42);      // value of s3 is "-42   " (0 is ignored because of &lt; alignment)
+string s3 = format("{:&lt;06}", -42);      // value of s3 is "-42   " (0 <del>is ignored because of &lt; alignment</del><ins>has no effect</ins>)
+<ins>string s4 = format("{:06}", inf);       // value of s4 is "   inf" (0 has no effect)</ins>
 </pre></div>
 &mdash; <em>end example</em> ]
 <br/><br/>
@@ -1156,8 +1178,8 @@ Add a new paragraph before
 <a href="http://eel.is/c++draft/format.string.std#8">22.14.2.2 [format.string.std] paragraph 8</a>:<br/>
 <blockquote class="stdins">
 The <em>width</em> option specifies the minimum field width.
-If the <em>width</em> option is absent, the minimum field width is the
-estimated field width.</ins>
+If the <em>width</em> option is absent, the minimum field width is
+<tt>0</tt>.</ins>
 </blockquote>
 </p>
 
@@ -1190,6 +1212,8 @@ and the field width is determined based on the content of the field.</del>
 <p>
 Remove
 <a href="http://eel.is/c++draft/format.string.std#10">22.14.2.2 [format.string.std] paragraph 10</a>:<br/>
+<em>Drafting note 6:</em> The content of this paragraph was incoporated into
+the new paragraph added after paragraph 1.
 <blockquote class="stddel">
 The <em>width</em> of a string is defined as the estimated number of column
 positions appropriate for displaying it in a terminal.<br/>
@@ -1214,28 +1238,36 @@ POSIX-based operating systems. &mdash; <em>end note</em>]
 </p>
 
 <p>
-<em>No</em> changes to
+Change in
 <a href="http://eel.is/c++draft/format.string.std#12">22.14.2.2 [format.string.std] paragraph 12</a>:<br/>
-<blockquote class="stdnop">
-For a string in a Unicode encoding, implementations should estimate the width
-of a string as the sum of estimated widths of the first code points in its
-extended grapheme clusters.
-The extended grapheme clusters of a string are defined by UAX #29.
-The estimated width of the following code points is 2:<br/>
+<blockquote>
+<del>For a string in a Unicode encoding, implementations should estimate the
+width of a string as the sum of estimated widths of the first code points in its
+extended grapheme clusters.</del><ins>For a sequence of characters in a Unicode
+encoding, an implementation should use as its field width the sum of the
+field widths of the first code point of each extended grapheme
+cluster.</ins>
+<del>The e</del><ins>E</ins>xtended grapheme clusters <del>of a string </del>are
+defined by UAX #29.
+<del>The estimated width of the following code points is 2:</del><ins>The
+following code points have a field width of 2:</ins>
+<br/>
 <br/>
 <div style="margin-left: 1em;">
 [ &hellip; ]<br/>
 </div>
 <br/>
-The estimated width of other code points is 1.
+The <del>estimated width of</del><ins>field width of all</ins>
+other code points is 1.
 </blockquote>
 </p>
 
 <p>
-<em>No</em> changes to
+Change in
 <a href="http://eel.is/c++draft/format.string.std#13">22.14.2.2 [format.string.std] paragraph 13</a>:<br/>
-<blockquote class="stdnop">
-For a string in a non-Unicode encoding, the width of a string is unspecified.
+<blockquote>
+For a <del>string</del><ins>sequence of characters</ins> in a non-Unicode
+encoding, the <ins>field </ins>width <del>of a string </del>is unspecified.
 </blockquote>
 </p>
 
@@ -1243,17 +1275,34 @@ For a string in a non-Unicode encoding, the width of a string is unspecified.
 Change in
 <a href="http://eel.is/c++draft/format.string.std#14">22.14.2.2 [format.string.std] paragraph 14</a>:<br/>
 <blockquote>
-The <em>nonnegative-integer</em> in <em>precision</em> is a decimal integer
-defining the precision or maximum field <del>size</del><ins>width</ins>.
+<del>The <em>nonnegative-integer</em> in <em>precision</em> is a decimal integer
+defining the precision or maximum field size.
 It can only be used with floating-point and string types.
 For floating-point types this field specifies the formatting precision.
 For string types, this field provides an upper bound for the estimated width of
 the prefix of the input string that is copied into the output.
 For a string in a Unicode encoding, the formatter copies to the output the
 longest prefix of whole extended grapheme clusters whose estimated width is no
-greater than the precision.
-<ins>If a maximum field width is not specified, the maximum field width is the
-greater of the minimum field width and the estimated field width.</ins>
+greater than the precision.</del><br/>
+<ins>The <em>precision</em> option is valid for floating-point and string types.
+For floating-point types, this option specifies the precision to be used for
+the floating-point presentation type.
+For string types, this option specifies the maximum number of characters or,
+for strings in a Unicode encoding, the number of extended grapheme clusters,
+to be formatted in terms of field width units.
+</ins>
+</blockquote>
+</p>
+
+<p>
+Add a new paragraph after
+<a href="http://eel.is/c++draft/format.string.std#14">22.14.2.2 [format.string.std] paragraph 14</a>:<br/>
+<em>Drafting note 7:</em> The wording for this paragraph closely follows
+paragraph 9.
+<blockquote class="stdins">
+If <em>nonnegative-integer</em> is used in a <em>precision</em>
+option, the value of the decimal integer is used as the value of the
+option.
 </blockquote>
 </p>
 
