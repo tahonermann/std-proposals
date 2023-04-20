@@ -24,6 +24,7 @@ WG21 Number        | Title | Revisions
 
 Drafts In Progress | Title
 ------------------ | -----
+[D2852R0][]        | Contract violation handling semantics for the contracts MVP
 [D2566R0][]        | Modules Build System Scenarios
 [DAAAAR0][]        | A survey of execution character encodings
 [DBBBBR0][]        | Poisoned values
@@ -67,6 +68,7 @@ Drafts In Progress | Title
 [P2071R0]: https://rawcdn.githack.com/tahonermann/std-proposals/987667432726b9d9b748084e0c0f0cc114e3b408/p2071r0.html
 [P2572R0]: https://rawcdn.githack.com/tahonermann/std-proposals/fd0f168775e74ff65fbf2a9ba8fc51e7f33b379a/p2572r0.html
 [P2572R1]: https://rawcdn.githack.com/tahonermann/std-proposals/c49eb9bbdd2082f343b0f76475e3a29c2219af1b/p2572r1.html
+[D2852R0]: https://rawcdn.githack.com/tahonermann/std-proposals/491da559058f5ff6986b8f27a2a9a6d220cb656a/d2852r0.html
 [DAAAAR0]: https://raw.githack.com/tahonermann/std-proposals/master/daaaar0-exec-char-encoding-survey.html
 [DBBBBR0]: https://raw.githack.com/tahonermann/std-proposals/master/dbbbbr0-poisoned-values.html
 [D2566R0]: https://raw.githack.com/tahonermann/std-proposals/master/d2566r0.html
