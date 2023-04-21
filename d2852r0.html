@@ -91,7 +91,7 @@ blockquote.stdnop
   </tr>
   <tr>
     <th>Date:</th>
-    <td>2023-04-20</td>
+    <td>2023-04-21</td>
   </tr>
   <tr>
     <th>Audience:</th>
@@ -165,19 +165,19 @@ recent SG21 telecons.
       </li>
     </ul>
   </li>
-</ul>
-Upcoming SG21 discussions will continue to focus on these topics and will
-include discussion of the following papers.
-<ul>
-  <li><a title="Unconditional contract violation handling of any kind is a serious problem"
-         href="https://wg21.link/p2838r0">P2838R0: Unconditional contract violation handling of any kind is a serious problem</a>
-      <sup><a title="Unconditional contract violation handling of any kind is a serious problem"
-              href="#ref_p2838r0">[P2838R0]</a></sup>
-  </li>
-  <li><a title="Contract-Violation Handlers"
-         href="https://wg21.link/p2811r1">P2811R1: Contract-Violation Handlers</a>
-      <sup><a title="Contract-Violation Handlers"
-              href="#ref_p2811r1">[P2811R1]</a></sup>
+  <li><a href="https://wiki.edg.com/bin/view/Wg21telecons2023/Teleconference2023-04-20">2023-04-20 SG21 telecon</a>
+    <ul>
+      <li><a title="Unconditional contract violation handling of any kind is a serious problem"
+             href="https://wg21.link/p2838r0">P2838R0: Unconditional contract violation handling of any kind is a serious problem</a>
+          <sup><a title="Unconditional contract violation handling of any kind is a serious problem"
+                  href="#ref_p2838r0">[P2838R0]</a></sup>
+      </li>
+      <li><a title="Contract-Violation Handlers"
+             href="https://wg21.link/p2811r1">P2811R1: Contract-Violation Handlers</a>
+          <sup><a title="Contract-Violation Handlers"
+                  href="#ref_p2811r1">[P2811R1]</a></sup>
+      </li>
+    </ul>
   </li>
 </ul>
 </p>
@@ -187,8 +187,6 @@ SG21 has not yet established consensus regarding:
 <ol>
   <li>which behaviors that occur during predicate evaluation are
       well-defined.</li>
-  <li>whether a user-defined violation handler should be invoked when a
-      contract predicate evaluation fails or evaluates to false.</li>
   <li>which behaviors that occur during execution of a violation handler are
       well-defined.</li>
 </ol>
@@ -217,9 +215,10 @@ the mechanics of their invocations; those concerns are covered by
    href="https://wg21.link/p2811r1">P2811R1</a><sup><a title="Contract-Violation Handlers"
                                                        href="#ref_p2811r1">[P2811R1]</a></sup>.
 Likewise, this paper does not discuss build modes, the details of contract
-checking enablement, or one-definition rule (ODR) concerns regarding mixed
-contract checking enablement across the translation units that comprise a
-program; those concerns are also left to other papers.
+checking enablement, optimization based on contract predicates or consequences
+thereof, or one-definition rule (ODR) concerns regarding mixed contract
+checking enablement across the translation units that comprise a program;
+those concerns are also left to other papers.
 </p>
 
 
@@ -235,16 +234,16 @@ with or without minor adjustments.
 
 <p>
 2. The implementation provided default contract violation handler is specified
-to unconditionally call <tt>std::abort()</tt> (after performing any
-implementation-defined actions such as generating diagnostics).
+to unconditionally call <tt>std::abort()</tt> after performing any
+implementation-defined actions such as generating diagnostics.
 </p>
 
 <p>
 3. A user-defined contract violation handler may call the implementation
-provided default contract violation handler (this enables a user-provided
-replacement handler to perform some actions and then defer to the
-implementation provided handler for implementation-specific generation
-of diagnostics).
+provided default contract violation handler.
+This ability enables a user-provided replacement handler to perform some
+actions and then defer to the implementation provided handler for
+implementation-specific generation of diagnostics.
 The mechanism by which this can be done is TBD since
 <a title="Contract-Violation Handlers"
    href="https://wg21.link/p2811r1">P2811R1</a><sup><a title="Contract-Violation Handlers"
@@ -275,6 +274,10 @@ invocation are specified as follows.
         and, if it returns, execution continues.</td>
   </tr>
   <tr>
+    <td>Predicate evaluation encounters undefined-behavior</td>
+    <td><b>undefined behavior</b>.</td>
+  </tr>
+  <tr>
     <td>Predicate evaluation throws.</td>
     <td><b>unspecified behavior</b>.</td>
   </tr>
@@ -282,10 +285,6 @@ invocation are specified as follows.
     <td>Predicate evaluation calls <tt>std::longjmp</tt></td>
     <td><b>well-defined</b>; execution continues as specified by
         <tt>std::longjmp</tt>.</td>
-  </tr>
-  <tr>
-    <td>Predicate evaluation encounters undefined-behavior</td>
-    <td><b>undefined behavior</b>.</td>
   </tr>
   <tr>
     <td>Violation handler terminates<br/>
