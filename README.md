@@ -13,6 +13,7 @@ Document Number    | Title | Formats
 
 WG21 Number        | Title | Revisions
 ------------------ | ----- | ----
+[P2852R0][]        | Contract violation handling semantics for the contracts MVP | [R0][P2852R0]
 [P2572R1][]        | `std::format()` fill character allowances | [R1][P2572R1] [R0][P2572R0]
 [P2071R0][]        | Named universal character escapes | [R0][P2071R0]<br/>Later revisions of this paper were authored by Steve Downey.
 [P2029R4][]        | Proposed resolution for core issues 411, 1656, and 2333; numeric and universal character escapes in character and string literals | [R4][P2029R4] [R3][P2029R3] [R2][P2029R2] [R1][P2029R1] [R0][P2029R0]
@@ -68,6 +69,7 @@ Drafts In Progress | Title
 [P2071R0]: https://rawcdn.githack.com/tahonermann/std-proposals/987667432726b9d9b748084e0c0f0cc114e3b408/p2071r0.html
 [P2572R0]: https://rawcdn.githack.com/tahonermann/std-proposals/fd0f168775e74ff65fbf2a9ba8fc51e7f33b379a/p2572r0.html
 [P2572R1]: https://rawcdn.githack.com/tahonermann/std-proposals/c49eb9bbdd2082f343b0f76475e3a29c2219af1b/p2572r1.html
+[P2852R0]: https://rawcdn.githack.com/tahonermann/std-proposals/1ee36ee8489be7814de72aeced2f7c6630124a57/p2852r0.html
 [D2852R0]: https://raw.githack.com/tahonermann/std-proposals/master/d2852r0.html
 [DAAAAR0]: https://raw.githack.com/tahonermann/std-proposals/master/daaaar0-exec-char-encoding-survey.html
 [DBBBBR0]: https://raw.githack.com/tahonermann/std-proposals/master/dbbbbr0-poisoned-values.html
