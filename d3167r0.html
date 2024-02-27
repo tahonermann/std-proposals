@@ -1,0 +1,382 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+
+<head>
+
+<title>
+Attributes for the result name in a postcondition assertion
+</title>
+
+<style type="text/css">
+
+pre {
+    display: inline;
+}
+
+table#header th,
+table#header td
+{
+    text-align: left;
+}
+
+table#references th,
+table#references td
+{
+    vertical-align: top;
+}
+
+#hideins:checked ~ * ins, #hideins:checked ~ * ins * { display:none; visibility:hidden }
+#hidedel:checked ~ * del, #hidedel:checked ~ * del * { display:none; visibility:hidden }
+
+ins, ins *
+{
+    text-decoration: underline;
+    color: #000000;
+    background-color:#C8FFC8
+}
+del, del *
+{
+    text-decoration: line-through;
+    color: #000000;
+    background-color:#FFA0A0
+}
+nop, nop *
+{
+    color: #000000;
+    background-color:#B0B0FF
+}
+
+blockquote
+{
+    color: #000000;
+    background-color: #F1F1F1;
+    border: 1px solid #D1D1D1;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+}
+blockquote.code
+{
+    white-space: pre;
+    font-family: monospace;
+}
+blockquote.stdins
+{
+    /* text-decoration: underline; */
+    color: #000000;
+    background-color: #C8FFC8;
+    border: 1px solid #B3EBB3;
+    padding: 0.5em;
+}
+blockquote.stddel
+{
+    text-decoration: line-through;
+    color: #000000;
+    background-color: #FFA0A0;
+    border: 1px solid #ECD7EC;
+    padding-left: 0.5empadding-right: 0.5em;
+}
+blockquote.stdnop
+{
+    color: #000000;
+    background-color: #B0B0FF;
+    border: 1px solid #ECD7EC;
+    padding-left: 0.5empadding-right: 0.5em;
+}
+</style>
+
+</head>
+
+
+<body style="max-width: 8.5in">
+
+<table id="header">
+  <tr>
+    <th>Document Number:</th>
+    <td>D3167R0 <em>Draft</em></td>
+  </tr>
+  <tr>
+    <th>Date:</th>
+    <td>2024-02-26</td>
+  </tr>
+  <tr>
+    <th>Audience:</th>
+    <td>SG21</td>
+  </tr>
+  <tr>
+    <th>Reply-to:</th>
+    <td>Tom Honermann &lt;tom@honermann.net&gt;</td>
+  </tr>
+</table>
+
+
+<h1>Attributes for the result name in a postcondition assertion</h1>
+
+
+<ul>
+  <li><a href="#introduction">Introduction</a></li>
+  <li><a href="#motivation">Motivation</a></li>
+  <li><a href="#implementation-exp">Implementation experience</a></li>
+  <li><a href="#ack">Acknowledgements</a></li>
+  <li><a href="#references">References</a></li>
+  <li><a href="#wording">Wording</a></li>
+</ul>
+
+
+<h1 id="introduction">Introduction</h1>
+
+<p>
+SG21 confirmed support for
+<a title="Attributes for contract assertions"
+   href="https://wg21.link/p3088r1">
+P3088R1 (Attributes for contract assertions)</a>
+<sup><a title="Attributes for contract assertions"
+        href="#ref_p3088r1">[P3088R1]</a></sup>
+during its
+<a href="https://wiki.edg.com/bin/view/Wg21telecons2024/Teleconference2024-02-15">2024-02-15 telecon</a>
+and the approved changes were subsequently added to
+<a title="Contracts for C++"
+   href="https://wg21.link/p2900r5">
+P2900R5 (Contracts for C++)</a>
+<sup><a title="Contracts for C++"
+        href="#ref_p2900r5">[P2900R5]</a></sup>.
+This established syntactic locations for attributes that appertain to
+contract assertions and the assertion statement as follows:
+<blockquote class="code">
+int f(int i, int j)
+  pre <b>[[foo]]</b> (i &gt; 0 &amp;&amp; j &gt; 0)
+  post <b>[[bar]]</b> (<b><span style="color:red">r</span></b>: r &gt; 0)
+{
+  <b>[[likely]]</b> contract_assert <b>[[baz]]</b> (i + j &lt; 10);
+  return i + j;
+}
+</blockquote>
+However, P3088R1 did not provide for an attribute to appertain to the
+result name optionally declared by a postcondition specifier; the
+<tt><b><span style="color:red">r</span></b></tt> declared in the example
+postcondition above.
+This proposal seeks to fill that gap by allowing an attribute to be
+specified in the result name introducer.
+<blockquote class="code">
+int g()
+  post (r <b>[[maybe_unused]]</b>: r &gt; 0);
+</blockquote>
+</p>
+
+
+<h1 id="motivation">Motivation</h1>
+
+<p>
+As evidenced by
+<a href="http://eel.is/c++draft/gram">annex A (Grammar summary)</a>
+in the C++ standard, an attribute may appertain to almost every kind of
+declared name or entity including:
+<ul>
+  <li>Type aliases (when declared with an <i>alias-declaration</i>)</li>
+  <li>Enumerations</li>
+  <li>Enumerators</li>
+  <li>Classes</li>
+  <li>Variables (including the unnamed object for structured bindings)</li>
+  <li>Structured bindings (if
+<a title="Attributes for Structured Bindings"
+   href="https://wg21.link/p0609r2">
+P0609R2</a>
+<sup><a title="Attributes for Structured Bindings"
+        href="#ref_p0609r2">[P0609R2]</a></sup>
+      is adopted)</li>
+  <li>Data members</li>
+  <li>Functions</li>
+  <li>Parameters (function parameters, template non-type parameters,
+      exception handlers)</li>
+  <li>Concepts</li>
+  <li>Labels</li>
+  <li>Namespaces</li>
+  <li>Modules</li>
+</ul>
+Exceptions include:
+<ul>
+  <li>Template type parameters</li>
+  <li>Template template parameters</li>
+  <li>Lambda captures</li>
+  <li>Namespace aliases</li>
+</ul>
+It is not clear why attributes are not supported for the items in the
+exceptions list; more investigation is needed to determine if these exclusions
+are intentional or a result of oversight.
+At first glance, it is not obvious why it should not be possible to declare
+template type parameters, template template parameters, and lambda captures as
+<tt>[[maybe_unused]]</tt> or to declare a namespace alias as
+<tt>[[deprecated]]</tt>.
+</p>
+
+<p>
+Absent compelling rationale otherwise, precedent suggests that attributes should
+be allowed to appertain to new kinds of declared names or entities.
+</p>
+
+
+<h1 id="implementation-exp">Implementation experience</h1>
+
+<p>
+None.
+</p>
+
+
+<h1 id="ack">Acknowledgements</h1>
+
+<p>
+Thanks to Timur Doumler and Joshua Berne for their previous work to enable
+attributes for contract assertions in
+<a title="Attributes for contract assertions"
+   href="https://wg21.link/p3088r1">
+P3088R1</a>
+<sup><a title="Attributes for contract assertions"
+        href="#ref_p3088r1">[P3088R1]</a></sup>
+and for the tremendous amount of time, energy, and expertise they have each
+contributed to SG21 and advancing contracts for C++.
+</p>
+
+
+<h1 id="references">References</h1>
+
+<table id="references">
+  <tr>
+    <td id="ref_p0609r2"><sup>[P0609R2]</sup></td>
+    <td>
+      "Attributes for Structured Bindings", P0609R2, 2023.<br/>
+      <a href="https://wg21.link/p0609r2">
+      https://wg21.link/p0609r2</a></td>
+  </tr>
+  <tr>
+    <td id="ref_p2900r5"><sup>[P2900R5]</sup></td>
+    <td>
+      "Contracts for C++", P2900R5, 2024.<br/>
+      <a href="https://wg21.link/p2900r5">
+      https://wg21.link/p2900r5</a></td>
+  </tr>
+  <tr>
+    <td id="ref_p3088r1"><sup>[P3088R1]</sup></td>
+    <td>
+      "Attributes for contract assertions", P3088R1, 2024.<br/>
+      <a href="https://wg21.link/p3088r1">
+      https://wg21.link/p3088r1</a></td>
+  </tr>
+</table>
+
+
+<h1 id="wording">Wording</h1>
+
+<p>
+These changes are relative to
+<a title="Contracts for C++"
+   href="https://wg21.link/p2900r5">
+P2900R5</a>
+<sup><a title="Contracts for C++"
+        href="#ref_p2900r5">[P2900R5]</a></sup>
+and
+<a title="Attributes for Structured Bindings"
+   href="https://wg21.link/p0609r2">
+P0609R2</a>
+<sup><a title="Attributes for Structured Bindings"
+        href="#ref_p0609r2">[P0609R2]</a></sup>.
+</p>
+
+<input type="checkbox" id="hideins">Hide inserted text</input><br/>
+<input type="checkbox" id="hidedel">Hide deleted text</input>
+
+<p>
+Modify [dcl.contract.func]:<br/>
+<em>Drafting note:</em> This depends on the addition of
+<i>attributed-identifier</i> from
+<a title="Attributes for Structured Bindings"
+   href="https://wg21.link/p0609r2">
+P0609R2</a>
+<sup><a title="Attributes for Structured Bindings"
+        href="#ref_p0609r2">[P0609R2]</a></sup>.
+<blockquote>
+<div style="margin-left: 1em;">
+<i>function-contract-specifier-seq</i> :
+<div style="margin-left: 1em;">
+<i>function-contract-specifier</i> <i>function-contract-specifier-seq</i>
+</div>
+</div>
+<br/>
+<div style="margin-left: 1em;">
+<i>function-contract-specifier</i> :
+<div style="margin-left: 1em;">
+<i>precondition-specifier</i>
+<i>postcondition-specifier</i>
+</div>
+</div>
+<br/>
+<div style="margin-left: 1em;">
+<i>precondition-specifier</i> :
+<div style="margin-left: 1em;">
+<tt>pre</tt> <i>attribute-specifier-seq<sub>opt</sub></i> <tt>(</tt> <i>conditional-expression</i> <tt>)</tt>
+</div>
+</div>
+<br/>
+<div style="margin-left: 1em;">
+<i>postcondition-specifier</i> :
+<div style="margin-left: 1em;">
+<tt>post</tt> <i>attribute-specifier-seq<sub>opt</sub></i> <tt>(</tt> <i>result-name-introducer<sub>opt</sub></i> conditional-expression <tt>)</tt>
+</div>
+</div>
+<br/>
+<div style="margin-left: 1em;">
+<i>result-name-introducer</i> :
+<div style="margin-left: 1em;">
+<i><ins>attributed-</ins>identifier</i> :
+</div>
+</div>
+<br/>
+A <em>function contract assertion</em> is a contract assertion
+([basic.contract]) associated with a function.
+Each <i>function-contract-specifier</i> of a
+<i>function-contract-specifier-seq</i> (if any) of an unspecified first
+declaration of a function introduces a corresponding function contract
+assertion for that function.
+The optional <i>attribute-specifier-seq</i><ins>
+following <tt>pre</tt> or <tt>post</tt></ins>
+appertains to the introduced
+contract assertion.<ins>
+The optional <i>attribute-specifier-seq</i> of the
+<i>attributed-identifier</i> in a <i>result-name-introducer</i> appertains
+to the introduced result name.</ins>
+[ <em>Note:</em> The <i>function-contract-specifier-seq</i> of a
+<i>lambda-declarator</i> applies to the call operator or operator template
+of the corresponding closure type ([expr.prim.lambda.closure]).
+&mdash; <em>end note</em> ]
+<br/>
+<br/>
+[ &hellip; ]
+</blockquote>
+</p>
+
+<p>
+Add a proposed modification to
+<a href="http://eel.is/c++draft/dcl.attr.unused#2">[dcl.attr.unused], paragraph 2</a>:<br/>
+<em>Drafting note:</em> This includes
+<nop>modifications from</nop>
+<a title="Attributes for Structured Bindings"
+   href="https://wg21.link/p0609r2">
+P0609R2</a>
+<sup><a title="Attributes for Structured Bindings"
+        href="#ref_p0609r2">[P0609R2]</a></sup>.
+<blockquote>
+The attribute may be applied to the declaration of a class,
+<a href="http://eel.is/c++draft/dcl.typedef#nt:typedef-name"><i>typedef-name</i></a>,
+variable (including a structured binding declaration),<nop>
+structured binding,</nop><ins>
+result name,</ins>
+non-static data member,
+function,
+enumeration,
+or enumerator,
+or to an
+<a href="http://eel.is/c++draft/lex.name#nt:identifier"><i>identifier</i></a> label
+(<a href="http://eel.is/c++draft/stmt.label">[stmt.label]</a>).
+</blockquote>
+</p>
+
+
+</body>
