@@ -96,7 +96,7 @@ blockquote.stdnop
   </tr>
   <tr>
     <th>Date:</th>
-    <td>2024-02-26</td>
+    <td>2024-02-28</td>
   </tr>
   <tr>
     <th>Audience:</th>
@@ -115,6 +115,7 @@ blockquote.stdnop
 <ul>
   <li><a href="#introduction">Introduction</a></li>
   <li><a href="#motivation">Motivation</a></li>
+  <li><a href="#proposal">Proposal</a></li>
   <li><a href="#implementation-exp">Implementation experience</a></li>
   <li><a href="#ack">Acknowledgements</a></li>
   <li><a href="#references">References</a></li>
@@ -151,7 +152,7 @@ int f(int i, int j)
 }
 </blockquote>
 However, P3088R1 did not provide for an attribute to appertain to the
-result name optionally declared by a postcondition specifier; the
+result name optionally declared in a postcondition specifier; the
 <tt><b><span style="color:red">r</span></b></tt> declared in the example
 postcondition above.
 This proposal seeks to fill that gap by allowing an attribute to be
@@ -174,7 +175,6 @@ declared name or entity including:
   <li>Type aliases (when declared with an <i>alias-declaration</i>)</li>
   <li>Enumerations</li>
   <li>Enumerators</li>
-  <li>Classes</li>
   <li>Variables (including the unnamed object for structured bindings)</li>
   <li>Structured bindings (if
 <a title="Attributes for Structured Bindings"
@@ -183,9 +183,10 @@ P0609R2</a>
 <sup><a title="Attributes for Structured Bindings"
         href="#ref_p0609r2">[P0609R2]</a></sup>
       is adopted)</li>
+  <li>Classes</li>
   <li>Data members</li>
   <li>Functions</li>
-  <li>Parameters (function parameters, template non-type parameters,
+  <li>Parameters (function parameters, non-type template parameters,
       exception handlers)</li>
   <li>Concepts</li>
   <li>Labels</li>
@@ -194,23 +195,119 @@ P0609R2</a>
 </ul>
 Exceptions include:
 <ul>
-  <li>Template type parameters</li>
+  <li>Namespace aliases</li>
+  <li>Type template parameters</li>
   <li>Template template parameters</li>
   <li>Lambda captures</li>
-  <li>Namespace aliases</li>
 </ul>
 It is not clear why attributes are not supported for the items in the
-exceptions list; more investigation is needed to determine if these exclusions
-are intentional or a result of oversight.
-At first glance, it is not obvious why it should not be possible to declare
-template type parameters, template template parameters, and lambda captures as
-<tt>[[maybe_unused]]</tt> or to declare a namespace alias as
-<tt>[[deprecated]]</tt>.
+exceptions list.
+The recommended practice for the <tt>[[deprecated]]</tt> attribute in
+<a href="http://eel.is/c++draft/dcl.attr.deprecated#4">[dcl.attr.deprecated]p4</a>
+seems applicable to namespace aliases:
+<blockquote class="quote">
+<em>Recommended practice:</em> Implementations should use the deprecated
+attribute to produce a diagnostic message in case the program refers to a name
+or entity other than to declare it, after a declaration that specifies the
+attribute.
+The diagnostic message should include the text provided within the
+<a href="http://eel.is/c++draft/dcl.attr.grammar#nt:attribute-argument-clause"><i>attribute-argument-clause</i></a>
+of any deprecated attribute applied to the name or entity.
+The value of a
+<a href="http://eel.is/c++draft/cpp.cond#nt:has-attribute-expression"><i>has-attribute-expression</i></a>
+for the deprecated attribute should be <tt>0</tt> unless the implementation can
+issue such diagnostic messages.
+</blockquote>
+Likewise, the recommended practice for the <tt>[[maybe_unused]]</tt> attribute
+in
+<a href="http://eel.is/c++draft/dcl.attr.unused#4">[dcl.attr.unused]p4</a>
+seems applicable to the other entities:
+<blockquote class="quote">
+<em>Recommended practice:</em> For an entity marked <tt>maybe_unused</tt>,
+implementations should not emit a warning that the entity or its structured
+bindings (if any) are used or unused.
+For a structured binding declaration not marked <tt>maybe_unused</tt>,
+implementations should not emit such a warning unless all of its structured
+bindings are unused.
+For a label to which <tt>maybe_unused</tt> is applied, implementations should
+not emit a warning that the label is used or unused.
+The value of a
+<a href="http://eel.is/c++draft/cpp.cond#nt:has-attribute-expression"><i>has-attribute-expression</i></a>
+for the <tt>maybe_unused</tt> attribute should be <tt>0</tt> if the attribute
+does not cause suppression of such warnings.
+</blockquote>
 </p>
 
 <p>
-Absent compelling rationale otherwise, precedent suggests that attributes should
-be allowed to appertain to new kinds of declared names or entities.
+The <tt>[[deprecated]]</tt> attribute was adopted for C++14 via
+<a title="[[deprecated]] attribute"
+   href="https://wg21.link/n3760">
+N3760</a>
+<sup><a title="[[deprecated]] attribute"
+        href="#ref_n3760">[N3760]</a></sup>.
+Neither that paper, its previous revision, or the minutes from EWG and CWG
+review during the following meetings demonstrate consideration for use of
+the attribute with a namespace alias.
+<ul>
+  <li><a href="https://wiki.edg.com/bin/view/Wg21portland2012/EvolutionWorkingGroup">EWG review of N3394 in Portland, 2012</a></li>
+  <li><a href="https://wiki.edg.com/bin/view/Wg21chicago2013/CoreWorkingGroup">CWG review of N3760 in Chicago, 2013</a></li>
+</ul>
+</p>
+
+<p>
+The <tt>[[maybe_unused]]</tt> attribute was adopted for C++17 via
+<a title="Wording for [[maybe_unused]] attribute."
+   href="https://wg21.link/p0212r1">
+P0212R1</a>
+<sup><a title="Wording for [[maybe_unused]] attribute."
+        href="#ref_p0212r1">[P0212R1]</a></sup>.
+Neither that paper, its previous revision, the rationale provided in the
+previous
+<a title="Proposal of [[unused]], [[nodiscard]] and [[fallthrough]] attributes."
+   href="https://wg21.link/p0068r0">
+P0068R0</a>
+<sup><a title="Proposal of [[unused]], [[nodiscard]] and [[fallthrough]] attributes."
+        href="#ref_p0068r0">[P0068R0]</a></sup>,
+or the minutes from EWG and CWG review during the following meetings
+demonstrate consideration for use of the attribute with a
+type template parameter,
+template template parameter, or
+lambda capture.
+<ul>
+  <li><a href="https://wiki.edg.com/bin/view/Wg21kona2015/P0068R0">EWG review of P0068R0 in Kona, 2015</a></li>
+  <li><a href="https://wiki.edg.com/bin/view/Wg21jacksonville/CoreWorkingGroup">CWG review of D0212R1 in Jacksonville, 2016</a></li>
+</ul>
+</p>
+
+<p>
+A search of both active and closed CWG issues failed to identify any existing
+issues that concern attribute appertainment for the excluded items.
+</p>
+
+<p>
+There does not appear to be a recorded rationale for omitting attribute support
+for the excluded items above.
+</p>
+
+<p>
+Absent compelling rationale otherwise, precedent indicates that new kinds of
+declared names or entities should allow for attribute appertainment and their
+respective decarations should therefore include syntactic locations for an
+attribute specifier sequence.
+</p>
+
+
+<h1 id="proposal">Proposal</h1>
+
+<p>
+<ul>
+  <li>Allow <i>attribute-specifier-seq</i> to optionally follow
+      <i>identifier</i> in a <i>result-name-introducer</i> with the effect that
+      the specified attributes (if any) appertain to the declared
+      result name.</li>
+  <li>Allow the <tt>[[maybe_unused]]</tt> attribute to appertain to a result
+      name.</li>
+</ul>
 </p>
 
 
@@ -218,6 +315,18 @@ be allowed to appertain to new kinds of declared names or entities.
 
 <p>
 None.
+The experimental implementation of
+<a title="Contracts for C++"
+   href="https://wg21.link/p2900r5">
+P2900R5</a>
+<sup><a title="Contracts for C++"
+        href="#ref_p2900r5">[P2900R5]</a></sup>
+in gcc hosted on
+<a href="https://godbolt.org">https://godbolt.org</a>
+does not currently diagnose an unused result name, nor does it allow an
+attribute specifier sequence to appear in a <i>result-name-introducer</i>
+as demonstrated at
+<a href="https://godbolt.org/z/339WEr7c3">https://godbolt.org/z/339WEr7c3</a>.
 </p>
 
 
@@ -235,10 +344,36 @@ and for the tremendous amount of time, energy, and expertise they have each
 contributed to SG21 and advancing contracts for C++.
 </p>
 
+<p>
+Additional thanks to Timur Doumler for suggesting much of the wording included
+in this proposal.
+</p>
+
 
 <h1 id="references">References</h1>
 
 <table id="references">
+  <tr>
+    <td id="ref_n3760"><sup>[N3760]</sup></td>
+    <td>
+      "[[deprecated]] attribute", N3760, 2013.<br/>
+      <a href="https://wg21.link/n3760">
+      https://wg21.link/n3760</a></td>
+  </tr>
+  <tr>
+    <td id="ref_p0068r0"><sup>[P0068R0]</sup></td>
+    <td>
+      "Proposal of [[unused]], [[nodiscard]] and [[fallthrough]] attributes.", P0068R0, 2015.<br/>
+      <a href="https://wg21.link/p0068r0">
+      https://wg21.link/p0068r0</a></td>
+  </tr>
+  <tr>
+    <td id="ref_p0212r1"><sup>[P0212R1]</sup></td>
+    <td>
+      "Wording for [[maybe_unused]] attribute.", P0212R1, 2016.<br/>
+      <a href="https://wg21.link/p0212r1">
+      https://wg21.link/p0212r1</a></td>
+  </tr>
   <tr>
     <td id="ref_p0609r2"><sup>[P0609R2]</sup></td>
     <td>
