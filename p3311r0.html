@@ -1,0 +1,543 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+
+<head>
+
+<title>
+An opt-in approach for integration of traditional assert facilities in C++ contracts
+</title>
+
+<style type="text/css">
+
+pre {
+    display: inline;
+}
+
+table#header th,
+table#header td
+{
+    text-align: left;
+}
+
+table#references th,
+table#references td
+{
+    vertical-align: top;
+}
+
+#hideins:checked ~ * ins, #hideins:checked ~ * ins * { display:none; visibility:hidden }
+#hidedel:checked ~ * del, #hidedel:checked ~ * del * { display:none; visibility:hidden }
+
+ins, ins *
+{
+    text-decoration: underline;
+    color: #000000;
+    background-color:#C8FFC8
+}
+del, del *
+{
+    text-decoration: line-through;
+    color: #000000;
+    background-color:#FFA0A0
+}
+nop, nop *
+{
+    color: #000000;
+    background-color:#B0B0FF
+}
+
+blockquote
+{
+    color: #000000;
+    background-color: #F1F1F1;
+    border: 1px solid #D1D1D1;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+}
+blockquote.code
+{
+    white-space: pre;
+    font-family: monospace;
+}
+blockquote.stdins
+{
+    /* text-decoration: underline; */
+    color: #000000;
+    background-color: #C8FFC8;
+    border: 1px solid #B3EBB3;
+    padding: 0.5em;
+}
+blockquote.stddel
+{
+    text-decoration: line-through;
+    color: #000000;
+    background-color: #FFA0A0;
+    border: 1px solid #ECD7EC;
+    padding-left: 0.5empadding-right: 0.5em;
+}
+blockquote.stdnop
+{
+    color: #000000;
+    background-color: #B0B0FF;
+    border: 1px solid #ECD7EC;
+    padding-left: 0.5empadding-right: 0.5em;
+}
+</style>
+
+</head>
+
+
+<body style="max-width: 8.5in">
+
+<table id="header">
+  <tr>
+    <th>Document Number:</th>
+    <td>P3311R0</td>
+  </tr>
+  <tr>
+    <th>Date:</th>
+    <td>2024-05-22</td>
+  </tr>
+  <tr>
+    <th>Audience:</th>
+    <td>SG21</td>
+  </tr>
+  <tr>
+    <th>Reply-to:</th>
+    <td>Tom Honermann &lt;tom@honermann.net&gt;</td>
+  </tr>
+</table>
+
+
+<h1>An opt-in approach for integration of traditional assert facilities in C++ contracts</h1>
+
+
+<ul>
+  <li><a href="#introduction">Introduction</a></li>
+  <li><a href="#motivation">Motivation</a></li>
+  <li><a href="#design">Design considerations</a>
+    <ul>
+      <li><a href="#design-handler">Invoking the contract violation handler</a></li>
+      <li><a href="#design-ndebug">Interaction with <tt>NDEBUG</tt></a></li>
+    </ul>
+  </li>
+  <li><a href="#proposal">Proposal</a>
+    <ul>
+      <li><a href="#proposal-traditional-semantics">Extend traditional semantics
+          to <tt>contract_assert</tt></a></li>
+      <li><a href="#proposal-assert-opt-in">Enable optional C++ contracts
+          integration for C assert</a></li>
+    </ul>
+  </li>
+  <li><a href="#implementation-exp">Implementation experience</a></li>
+  <li><a href="#ack">Acknowledgements</a></li>
+  <li><a href="#references">References</a></li>
+  <li><a href="#wording">Wording</a></li>
+</ul>
+
+
+<h1 id="introduction">Introduction</h1>
+
+<p>
+SG21 attained strong concensus to forward
+<a title="Contracts for C++"
+   href="https://wg21.link/p2900r6">
+P2900R6 (Contracts for C++)</a>
+<sup><a title="Contracts for C++"
+        href="#ref_p2900r6">[P2900R6]</a></sup>
+to EWG during the
+<a href="https://wiki.edg.com/bin/view/Wg21telecons2024/Teleconference2024-02-29">2024-02-29 SG21 telecon</a>
+as its design for a minimally viable solution for contracts in C++.
+This design does not integrate the traditional C assert facility, nor does it
+expose interfaces to enable other traditional or ad hoc assert facilities to
+integrate with the new contracts features.
+</p>
+
+<p>
+The P2900R6 design includes a new <tt>contract_assert</tt> statement that avoids
+many of the well-known pitfalls inherent in macro based traditional assert
+facilities.
+Despite considerable desire and effort to enable use of the <tt>assert</tt>
+identifier in the contracts design, no method to do so was identified that both
+avoided backward compatibility problems and used a syntax that gained
+consensus.
+<a title="assert Should Be A Keyword In C++26"
+   href="https://wg21.link/p2884r0">
+P2884R0 (<tt>assert</tt> Should Be A Keyword In C++26)</a>
+<sup><a title="assert Should Be A Keyword In C++26"
+        href="#ref_p2884r0">[P2884R0]</a></sup>
+attempted to promote <tt>assert</tt> to a keyword, but failed to get consensus.
+<a title="A natural syntax for Contracts"
+   href="https://wg21.link/p2961r2">
+P2961R2 (A natural syntax for Contracts)</a>
+<sup><a title="A natural syntax for Contracts"
+        href="#ref_p2961r2">[P2961R2]</a></sup>,
+was approved by SG21 during the
+<a href="https://wiki.edg.com/bin/view/Wg21kona2023/SG21">Kona, 2023 meeting</a>.
+Section 5.2, "The <tt>assert</tt> name clash", details the challenges faced with
+trying to repurpose that identifier.
+</p
+
+<p>
+As a core language feature, <tt>contract_assert</tt> does not provoke ODR
+violations due to <tt>NDEBUG</tt> being inconsistently defined across
+translation units, is not subject to being redefined during translation as is
+permissible for macros (note that <tt>contract_assert</tt> is proposed as a
+keyword and is therefore not available for use as an identifier), and is not
+confused by the presence of a comma that is not contained within a pair of
+balanced parenthesis (an issue addressed for C assert by
+<a title="Make assert() macro user friendly for C and C++"
+   href="https://wg21.link/p2264r7">
+P2264R7 (Make assert() macro user friendly for C and C++)</a>
+<sup><a title="Make assert() macro user friendly for C and C++"
+        href="#ref_p2264r7">[P2264R7]</a></sup>
+for C++26).
+<tt>contract_assert</tt> also guards against some cases of possibly unintended
+behavior that may otherwise occur when its associated
+<a href="http://eel.is/c++draft/expr.cond"><em>conditional-expression</em></a>
+is evaluated.
+It guards against possibly unintended mutation of some objects by implicitly
+applying a const qualifier to the result of
+<a href="http://eel.is/c++draft/expr.prim.id.general"><em>id-expression</em></a>s
+that name a parameter or variable with automatic storage duration and to the
+pointee type of
+<a href="http://eel.is/c++draft/expr.prim.this"><em>this</em> expression</a>s.
+It guards against unintended dependence on side effects by allowing an
+implementation to elide evaluation when the result of the evaluation can be
+predetermined or to perform the evaluation multiple times (with an expectation
+that multiple evaluations will make such side effects more noticeable).
+</p>
+
+<p>
+The differences between <tt>contract_assert</tt> and traditional assert
+facilities make it impossible to directly reimplement traditional assert
+facilities using <tt>contract_assert</tt> as currently proposed without imposing
+potentially extensive changes to code that uses those facilities.
+Further, the latter two behaviors (implicit application of a const qualifier
+and evaluation elision or duplication) have become contentious due to a lack of
+confidence that <tt>contract_assert</tt>, as currently proposed, suffices as
+a modern alternative to traditional assert facilities like C assert.
+</p>
+
+<p>
+Proposed are extensions to the P2900R6 design that are intended to enable
+existing assert facilities, including C assert, to be optionally integrated
+with C++ contracts, with minimal changes, such that assertion failures that
+occur through use of those facilities are also reported through the C++
+contract violation handler.
+In doing so, the author hopes to reduce the current contention over the design
+of <tt>contract_assert</tt> by allowing those that prefer the traditional
+evaluation and side effect guarantees to use interfaces that behave as they
+desire without compromising on the protections that <tt>contract_assert</tt>, as
+currently proposed, provides.
+</p>
+
+
+<h1 id="motivation">Motivation</h1>
+
+<p>
+Vast amounts of code have been written over the lifetime of the C and C++
+languages that utilize C assert or other traditional or ad hoc assertion
+facilities.
+It is not realistic to expect or require existing uses of traditional assert
+facilities to be rewritten to use C++ contracts when such code is migrated to
+C++26.
+The limitations and pitfalls of traditional assert facilities provides good
+motivation for a new modern facility.
+However, greater motivation for use of a new facility is produced if it enables
+integration with existing facilities (such integration also helps to reduce the
+negative consequences of the infamous
+<a href="https://xkcd.com/927">"there are N+1 competing standards"</a>
+situation).
+Specifically, the consequences of use of multiple assertion facilities, a
+persistent reality for many programmers, is reduced if assertion failures can
+be handled in a uniform way.
+</p>
+
+<p>
+While it is not feasible to unconditionally claim the <tt>assert</tt> identifier
+for use with C++ contracts without unacceptable backward compatibility impact,
+it is feasible to offer the ability for projects to opt-in to a mode that
+handles assertion failures in traditional <tt>assert()</tt> expressions by
+invoking the C++ contract violation handler.
+In the long term, perhaps with assistance from code modernization tools, such
+integration could become standard practice and eventually allow <tt>assert</tt>
+to be more fully integrated into C++ contracts.
+</p>
+
+
+<h1 id="design">Design considerations</h1>
+
+
+<h2 id="design-handler">Invoking the contract violation handler</h2>
+
+<p>
+There are two basic approaches to enable a traditional assert facility to
+invoke the contract violation handler.
+<ul>
+  <li>Expose an interface to call <tt>::handle_contract_violation()</tt> with
+      a user constructed <tt>std::contracts::contract_violation</tt> object,
+      or</li>
+  <li>Expose a core language feature that evaluates an arbitrary expression and
+      then calls <tt>::handle_contract_violation()</tt> with an appropriately
+      constructed <tt>std::contracts::contract_violation</tt> object if that
+      evaluation yields a false result.</li>
+</ul>
+</p>
+
+<p>
+Enabling user construction of <tt>std::contracts::contract_violation</tt>
+objects would require exposing a suitable constructor or factory function to
+specify property values to be returned by the various property access member
+functions.
+<tt>std::contracts::contract_violation</tt> is designed to allow these property
+values to be accessed from statically allocated memory associated with each
+contract assertion present in the program that has a potentially checked
+semantic.
+Support for user construction would require specifying an ownership model for
+user provided values.
+Further, it is currently implementation-defined whether the class is
+polymorphic; it could be an abstract class, but the property access member
+functions are non-virtual.
+Enabling user construction could provide flexibility for integration of
+traditional assert facilities with C++ contracts, but would also impose
+responsibility for appropriate selection of the <tt>contract_kind</tt>,
+<tt>contract_semantic</tt>, and <tt>detection_mode</tt> property values.
+</p>
+
+<p>
+<tt>contract_assert</tt> is a core language feature that is already capable of
+evaluating an expression and invoking the contract violation handler.
+The inability to use it to directly implement a traditional assert interface is
+superimposed by the express desire to avoid well known problems with those
+traditional interfaces.
+However, it is possible to relax those imposed restrictions.
+</p>
+
+<p>
+The grammar for the <tt>contract_assert</tt> statement was designed with
+future extension in mind.
+<blockquote class="quote">
+<em>assertion-statement :</em>
+<div style="margin-left: 1em;">
+<tt>contract_assert</tt> <em>attribute-specifier-seq<sub>opt</sub></em> <tt>(</tt> <em>conditional-expression</em> <tt>)</tt> <tt>;</tt>
+</div>
+</blockquote>
+</p>
+
+<p>
+While use of an attribute to opt-in to alternative semantics for the
+<tt>contract_assert</tt> statement would not require syntactic extension, such
+use would violate the WG21 ignorability policy for standard attributes.
+The ignorability policy prohibits a standard attribute from selecting a
+behavior that is not one of the permissible behaviors an implementation would be
+allowed to select in the absence of the attribute; an attribute cannot be used
+to relax constraints.
+</p>
+
+<p>
+Fortunately, there is room for context sensitive keywords to be used in between
+the <tt>contract_assert</tt> keyword and the opening parenthesis (either before
+or after the optional <em>attribute-specifier-seq</em>) or between the closing
+parenthesis and the semicolon.
+</p>
+
+
+<h2 id="design-ndebug">Interaction with <tt>NDEBUG</tt></h2>
+
+<p>
+C assert supports two translation modes.
+When the <tt>NDEBUG</tt> macro is defined, arguments to <tt>assert</tt>
+expressions are not evaluated; this is the traditional form of the
+<em>ignore</em> semantic (and a form that leads to ODR violations).
+When <tt>NDEBUG</tt> is not defined, <tt>assert</tt> exhibits behavior like
+that of the <em>enforce</em> semantic, but with more stringent requirements on
+how termination is performed; <tt>abort()</tt> is called and any further
+processing requires the installation of a signal handler for the
+<tt>SIGABRT</tt> signal.
+</p>
+
+<p>
+Since <tt>NDEBUG</tt> may be used to conditionally remove code that an
+<tt>assert</tt> expression depends on, it isn't possible, in general, to
+parse arguments passed to <tt>assert</tt> when <tt>NDEBUG</tt> is defined.
+It is therefore impossible to use <tt>NDEBUG</tt> as a proxy for a contract
+semantic; when <tt>NDEBUG</tt> is defined, no contract specification is
+present.
+However, when <tt>NDEBUG</tt> is not defined, then all contract semantics
+are applicable, though maintaining conformance with C standard requirements
+for the behavior of <tt>assert</tt> requires selecting the <em>enforce</em>
+semantic, writing the required information to the standard error stream,
+and calling <tt>abort()</tt>.
+</p>
+
+
+<h1 id="proposal">Proposal</h1>
+
+<h2 id="proposal-traditional-semantics">Extend traditional semantics to
+                                        <tt>contract_assert</tt></h2>
+
+<p>
+Add a new <tt>traditional_assert</tt> enumerator to
+<tt>std::contracts::contract_kind</tt>.
+</p>
+
+<p>
+Extend the <tt>contract_assert</tt> syntax to allow an optional
+context sensitive <tt>traditional</tt> keyword after <tt>contract_assert</tt>.
+<blockquote class="quote">
+<em>assertion-statement :</em>
+<div style="margin-left: 1em;">
+<tt>contract_assert</tt> <ins><tt>traditional</tt><sub><em>opt</em></sub> </ins><em>attribute-specifier-seq<sub>opt</sub></em> <tt>(</tt> <em>conditional-expression</em> <tt>)</tt> <tt>;</tt>
+</div>
+</blockquote>
+</p>
+
+<p>
+Modify the <tt>contract_assert</tt> behavior as follows when
+<tt>traditional</tt> is specified.
+<ul>
+  <li>Do not implicitly apply const qualification to parameters, variables
+      with automatic storage duration, or the pointee type of
+      <tt>this</tt>.</li>
+  <li>Evaluate the <em>conditional-expression</em> exactly one time each time
+      control reaches the <tt>contract_assert</tt> statement irregardless
+      of implementation-defined selection of contract semantics.</li>
+  <li>Propagate exceptions thrown during evaluation of the
+      <em>conditional-expression</em>; do not catch them and invoke the
+      violation handler.</li>
+  <li>If the <em>conditional-expression</em> evaluation yields a false result,
+      invoke the violation handler with a reference to a
+      <tt>std::contracts::contract_violation</tt> object for which
+      its <tt>detection_mode()</tt> member will return <tt>predicate_false</tt>,
+      its <tt>kind()</tt> member will return <tt>traditional_assert</tt>, and
+      its <tt>semantic()</tt> member will return <tt>enforce</tt>.</li>
+</ul>
+</p>
+
+<p>
+Extend the recommended practice for the default contract violation handler
+to implement the behavior required by the C standard for a failed assertion
+when invoked with a <tt>contract_violation</tt> object whose <tt>kind()</tt>
+member returns <tt>traditional_assert</tt>.
+This includes writing select information to the standard error stream and
+then calling <tt>abort()</tt>.
+</p>
+
+<p>
+Note that the above calls for the violation handler to be invoked with the
+<em>enforce</em> contract semantic in effect.
+This is required because there is no mechanism for the <tt>contract_assert</tt>
+statement to indicate whether the <em>conditional-expression</em> was
+evaluated, what its result was, or whether the violation handler was
+invoked and returned.
+Code following the <tt>contract_assert</tt> statement therefore has no
+information available to determine what action should be taken next.
+This limitation can be worked around by evaluating the assertion predicate
+separately and using the result value for the <em>conditional-expression</em>
+of the <tt>contract_assert</tt> statement, but this effectively hides the
+expression from the contracts implementation and prevents exposing
+it via the <tt>comment()</tt> member of
+<tt>std::contracts::contract_violation</tt>.
+Should motivation arise, additional extensions to enable use of an alternative
+contract semantic can be added at a later time.
+Selection of an alternate semantic could be enabled by parameterizing
+<tt>traditional</tt> with an argument enclosed in angle brackets (e.g.,
+<tt>traditional&lt;observe&gt;</tt>; use of parenthesis would be ambiguous due
+to the parenthesis that surround the <em>conditional-expression</em>).
+</p>
+
+
+<h2 id="proposal-assert-opt-in">Enable optional C++ contracts integration for C
+                                assert</h2>
+
+<p>
+Upon inclusion of the <tt>assert.h</tt> or <tt>cassert</tt> header, if
+the <tt>NDEBUG</tt> macro is not defined and the
+<tt>ASSERT_USES_CONTRACTS</tt> macro is defined,
+define the <tt>assert</tt> macro as follows.
+<blockquote class="code">
+#define assert(...) \
+  [&amp;] { contract_assert traditional (__VA_ARGS__); }()
+</blockquote>
+</p>
+
+<p>
+Note that it is not an error to define both <tt>NDEBUG</tt> and
+<tt>ASSERT_USES_CONTRACTS</tt>; when <tt>NDEBUG</tt> is defined,
+<tt>ASSERT_USES_CONTRACTS</tt> has no effect.
+The effects of the <tt>NDEBUG</tt> macro must take precedence to preserve
+backward compatibility with existing code.
+</p>
+
+
+<h1 id="implementation-exp">Implementation experience</h1>
+
+<p>
+None.
+</p>
+
+
+<h1 id="ack">Acknowledgements</h1>
+
+<p>
+Thanks to all SG21 participants for the tremendous amount of time, energy, and
+expertise that has been contributed towards advancing contracts for C++.
+</p>
+
+
+<h1 id="references">References</h1>
+
+<table id="references">
+  <tr>
+    <td id="ref_p2264r7"><sup>[P2264R7]</sup></td>
+    <td>
+      "Make assert() macro user friendly for C and C++", P2264R7, 2023.<br/>
+      <a href="https://wg21.link/p2264r7">
+      https://wg21.link/p2264r7</a></td>
+  </tr>
+  <tr>
+    <td id="ref_p2884r0"><sup>[P2884R0]</sup></td>
+    <td>
+      "<tt>assert</tt> Should Be A Keyword In C++26", P2884R0, 2023.<br/>
+      <a href="https://wg21.link/p2884r0">
+      https://wg21.link/p2884r0</a></td>
+  </tr>
+  <tr>
+    <td id="ref_p2900r6"><sup>[P2900R6]</sup></td>
+    <td>
+      "Contracts for C++", P2900R6, 2024.<br/>
+      <a href="https://wg21.link/p2900r6">
+      https://wg21.link/p2900r6</a></td>
+  </tr>
+  <tr>
+    <td id="ref_p2961r2"><sup>[P2961R2]</sup></td>
+    <td>
+      "A natural syntax for Contracts", P2961R2, 2023.<br/>
+      <a href="https://wg21.link/p2961r2">
+      https://wg21.link/p2961r2</a></td>
+  </tr>
+</table>
+
+
+<h1 id="wording">Wording</h1>
+
+<p>
+These changes are relative to
+<a title="Contracts for C++"
+   href="https://wg21.link/p2900r6">
+P2900R6</a>
+<sup><a title="Contracts for C++"
+        href="#ref_p2900r6">[P2900R6]</a></sup>.
+</p>
+
+<input type="checkbox" id="hideins">Hide inserted text</input><br/>
+<input type="checkbox" id="hidedel">Hide deleted text</input>
+
+<p>
+Wording will be provided in a future revision contingent on SG21 encouraging
+further work for the proposed direction.
+</p>
+
+
+</body>
