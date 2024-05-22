@@ -257,9 +257,9 @@ be handled in a uniform way.
 <p>
 While it is not feasible to unconditionally claim the <tt>assert</tt> identifier
 for use with C++ contracts without unacceptable backward compatibility impact,
-it is feasible to offer an option for projects to opt-in to a mode that results
-in assertion failures in traditional <tt>assert()</tt> expressions invoking
-the C++ contract violation handler.
+it is feasible to offer the ability for projects to opt-in to a mode that
+handles assertion failures in traditional <tt>assert()</tt> expressions by
+invoking the C++ contract violation handler.
 In the long term, perhaps with assistance from code modernization tools, such
 integration could become standard practice and eventually allow <tt>assert</tt>
 to be more fully integrated into C++ contracts.
@@ -317,7 +317,6 @@ However, it is possible to relax those imposed restrictions.
 <p>
 The grammar for the <tt>contract_assert</tt> statement was designed with
 future extension in mind.
-The current specification is:
 <blockquote class="quote">
 <em>assertion-statement :</em>
 <div style="margin-left: 1em;">
@@ -330,9 +329,10 @@ The current specification is:
 While use of an attribute to opt-in to alternative semantics for the
 <tt>contract_assert</tt> statement would not require syntactic extension, such
 use would violate the WG21 ignorability policy for standard attributes.
-The ignorability policy only permits a standard attribute to select from one
-of the permissible behaviors an implementation would be allowed to exhibit in
-the absence of the attribute; an attribute cannot be used to relax constraints.
+The ignorability policy prohibits a standard attribute from selecting a
+behavior that is not one of the permissible behaviors an implementation would be
+allowed to select in the absence of the attribute; an attribute cannot be used
+to relax constraints.
 </p>
 
 <p>
@@ -346,7 +346,7 @@ parenthesis and the semicolon.
 <h2 id="design-ndebug">Interaction with <tt>NDEBUG</tt></h2>
 
 <p>
-C assert supports two compilation modes.
+C assert supports two translation modes.
 When the <tt>NDEBUG</tt> macro is defined, arguments to <tt>assert</tt>
 expressions are not evaluated; this is the traditional form of the
 <em>ignore</em> semantic (and a form that leads to ODR violations).
@@ -366,8 +366,9 @@ semantic; when <tt>NDEBUG</tt> is defined, no contract specification is
 present.
 However, when <tt>NDEBUG</tt> is not defined, then all contract semantics
 are applicable, though maintaining conformance with C standard requirements
-for the behavior of <tt>assert</tt> requires selecting the <em>observe</em>
-semantic; this is discussed further in the proposal below.
+for the behavior of <tt>assert</tt> requires selecting the <em>enforce</em>
+semantic, writing the required information to the standard error stream,
+and calling <tt>abort()</tt>.
 </p>
 
 
@@ -403,39 +404,46 @@ Modify the <tt>contract_assert</tt> behavior as follows when
       control reaches the <tt>contract_assert</tt> statement irregardless
       of implementation-defined selection of contract semantics.</li>
   <li>Propagate exceptions thrown during evaluation of the
-      <em>conditional-expression</em>; do not translate these into calls to
-      the violation handler.</li>
+      <em>conditional-expression</em>; do not catch them and invoke the
+      violation handler.</li>
   <li>If the <em>conditional-expression</em> evaluation yields a false result,
       invoke the violation handler with a reference to a
       <tt>std::contracts::contract_violation</tt> object for which
       its <tt>detection_mode()</tt> member will return <tt>predicate_false</tt>,
       its <tt>kind()</tt> member will return <tt>traditional_assert</tt>, and
-      its <tt>semantic()</tt> member will return <tt>observe</tt>.</li>
+      its <tt>semantic()</tt> member will return <tt>enforce</tt>.</li>
 </ul>
 </p>
 
 <p>
 Extend the recommended practice for the default contract violation handler
-to not produce diagnostic output when invoked with a <tt>contract_violation</tt>
-object whose <tt>kind()</tt> member returns <tt>traditional_assert</tt>.
-This behavior is recommended so as to avoid interfering with diagnostics
-that are expected to be provided by the code containing the
-<tt>contract_assert</tt> statement.
+to implement the behavior required by the C standard for a failed assertion
+when invoked with a <tt>contract_violation</tt> object whose <tt>kind()</tt>
+member returns <tt>traditional_assert</tt>.
+This includes writing select information to the standard error stream and
+then calling <tt>abort()</tt>.
 </p>
 
 <p>
 Note that the above calls for the violation handler to be invoked with the
-<em>observe</em> contract semantic in effect.
-This is motivated by traditional assert facilities often having requirements to
-perform additional operations before terminating or to terminate in a specific
-manner.
-Termination enforcement is therefore delegated to code that follows the
-<tt>contract_assert</tt> statement.
-Should motivation arise, additional extensions to specify an alternative
+<em>enforce</em> contract semantic in effect.
+This is required because there is no mechanism for the <tt>contract_assert</tt>
+statement to indicate whether the <em>conditional-expression</em> was
+evaluated, what its result was, or whether the violation handler was
+invoked and returned.
+Code following the <tt>contract_assert</tt> statement therefore has no
+information available to determine what action should be taken next.
+This limitation can be worked around by evaluating the assertion predicate
+separately and using the result value for the <em>conditional-expression</em>
+of the <tt>contract_assert</tt> statement, but this effectively hides the
+expression from the contracts implementation and prevents exposing
+it via the <tt>comment()</tt> member of
+<tt>std::contracts::contract_violation</tt>.
+Should motivation arise, additional extensions to enable use of an alternative
 contract semantic can be added at a later time.
 Selection of an alternate semantic could be enabled by parameterizing
 <tt>traditional</tt> with an argument enclosed in angle brackets (e.g.,
-<tt>traditional&lt;enforce&gt;</tt>; use of parenthesis would be ambiguous due
+<tt>traditional&lt;observe&gt;</tt>; use of parenthesis would be ambiguous due
 to the parenthesis that surround the <em>conditional-expression</em>).
 </p>
 
@@ -447,14 +455,10 @@ to the parenthesis that surround the <em>conditional-expression</em>).
 Upon inclusion of the <tt>assert.h</tt> or <tt>cassert</tt> header, if
 the <tt>NDEBUG</tt> macro is not defined and the
 <tt>ASSERT_USES_CONTRACTS</tt> macro is defined,
-define the <tt>assert</tt> macro as follows where <tt>__assert()</tt> is an
-exposition only function that fulfills the requirements of the C standard to
-write information about the assertion failure to the standard error stream and
-then call <tt>abort()</tt>.
+define the <tt>assert</tt> macro as follows.
 <blockquote class="code">
 #define assert(...) \
-  ([&amp;] { contract_assert traditional (__VA_ARGS__); }(), \
-  __assert(#__VA_ARGS__, __FILE__, __LINE__))
+  [&amp;] { contract_assert traditional (__VA_ARGS__); }()
 </blockquote>
 </p>
 
