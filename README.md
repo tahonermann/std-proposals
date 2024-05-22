@@ -26,6 +26,7 @@ WG21 Number        | Title | Revisions
 
 Drafts In Progress | Title
 ------------------ | -----
+[D3311R0][]        | An opt-in approach for integration of traditional assert facilities in C++ contracts
 [D2566R0][]        | Modules Build System Scenarios
 [DAAAAR0][]        | A survey of execution character encodings
 [DBBBBR0][]        | Poisoned values
@@ -74,3 +75,4 @@ Drafts In Progress | Title
 [DAAAAR0]: https://raw.githack.com/tahonermann/std-proposals/master/daaaar0-exec-char-encoding-survey.html
 [DBBBBR0]: https://raw.githack.com/tahonermann/std-proposals/master/dbbbbr0-poisoned-values.html
 [D2566R0]: https://raw.githack.com/tahonermann/std-proposals/master/d2566r0.html
+[D3311R0]: https://raw.githack.com/tahonermann/std-proposals/master/d3311r0.html
