@@ -96,11 +96,11 @@ blockquote.stdnop
   </tr>
   <tr>
     <th>Date:</th>
-    <td>2024-06-01</td>
+    <td>2024-06-21</td>
   </tr>
   <tr>
     <th>Audience:</th>
-    <td>SG21</td>
+    <td>EWG</td>
   </tr>
   <tr>
     <th>Reply-to:</th>
@@ -206,7 +206,7 @@ N3760</a>
 <sup><a title="[[deprecated]] attribute"
         href="#ref_n3760">[N3760]</a></sup>.
 Neither that paper, its previous revision, nor the minutes from EWG and CWG
-review during the following meetings demonstrate consideration for use of
+review during the following meetings demonstrate consideration for the use of
 the attribute with a namespace alias.
 <ul>
   <li><a href="https://wiki.edg.com/bin/view/Wg21portland2012/EvolutionWorkingGroup">EWG review of N3394 in Portland, 2012</a></li>
@@ -302,7 +302,7 @@ namespace nsa2 [[deprecated]] = ns; // Rejected by Clang, EDG, gcc, and MSVC.
 <p>
 Per
 <a href="http://eel.is/c++draft/dcl.attr.unused">[dcl.attr.unused]</a>,
-the <tt>maybe-unused</tt> attribute it specified as applicable to non-static
+the <tt>maybe-unused</tt> attribute is specified as applicable to non-static
 data members.
 <blockquote class="quote">
 The attribute may be applied to the declaration of a class,
@@ -313,7 +313,7 @@ non-static data member, function, enumeration, or enumerator, or to an
 <a href="http://eel.is/c++draft/stmt.label">[stmt.label]</a>).
 </blockquote>
 A lambda capture is not formally a non-static data member, though references to
-a lambda capture are usally translated to an access of a non-static data member
+a lambda capture are usually translated to an access of a non-static data member
 of the closure type.
 As such, most attributes that may appertain to a non-static data member are
 likely to be applicable to lambda captures.
@@ -471,7 +471,7 @@ Default capture declarations consist solely of either the <tt>&amp;</tt> or
 <tt>=</tt> token.
 The choices for an attribute specifier sequence are easy; the sequence either
 goes before the token, after the token, or at either location.
-For consitency with the proposed position for explicit captures, placing the
+For consistency with the proposed position for explicit captures, placing the
 attribute specifier sequence after the token is proposed.
 </p>
 
