@@ -96,7 +96,7 @@ blockquote.stdnop
   </tr>
   <tr>
     <th>Date:</th>
-    <td>2024-06-21</td>
+    <td>2024-06-29</td>
   </tr>
   <tr>
     <th>Audience:</th>
@@ -145,7 +145,7 @@ declared name or entity including:
   <li>Structured bindings</li>
   <li>Classes</li>
   <li>Data members</li>
-  <li>Functions</li>
+  <li>Functions and function types</li>
   <li>Parameters (function parameters, non-type template parameters,
       exception handlers)</li>
   <li>Concepts</li>
@@ -246,7 +246,7 @@ issues that concern attribute appertainment for the excluded items.
 
 <p>
 There does not appear to be a recorded rationale for omitting attribute support
-for the excluded items above.
+for the excluded items.
 </p>
 
 <p>
@@ -448,6 +448,47 @@ the cognitive and implementation complexity of supporting multiple locations.
 <h2 id="design-captures">Lambda captures</h2>
 
 <p>
+A lambda capture serves two purposes; it grants access to a local variable
+from within a lambda expression and it notionally declares a non-static
+data member of the closure type.
+An attribute applied to a lambda capture can therefore be considered to
+appertain to either the capture itself or to the notional non-static data
+member.
+</p>
+
+<p>
+Consider the two lambda expressions in the following example.
+The first, <tt>l1</tt>, explicitly captures <tt>i</tt> but does not use it.
+The second, <tt>l2</tt>, has a default capture, but no variables are implicitly
+captured.
+Depending on one's intuition, the attribute might be intended to suppress a
+diagnostic about an unused capture as opposed to an unused capture declaration.
+<blockquote class="code">
+void f(int i) {
+  // Don't warn that 'i' is captured but not used?
+  auto l1 [i [[maybe_unused]] ] {
+    return 0;
+  };
+  // Don't warn that the default capture declaration was not used?
+  auto l2 [= [[maybe_unused]] ] {
+    return 0;
+  };
+}
+</blockquote>
+This proposal specifies that the attribute appertains to the notional
+non-static data member on the basis that doing so is more useful.
+For example, <tt>[[no_unique_address]]</tt> has a clear and unambiguous meaning
+for the notional non-static data member, but would otherwise be meaningless
+for a capture declaration.
+As explained below, this proposal locates the new attribute specifier sequence
+following each capture declaration.
+Should motivation arise for attributes that appertain directly to the capture
+declaration, it would be possible to add such support by additionally
+allowing for an attribute specifier sequence to precede each capture
+declaration.
+</p>
+
+<p>
 Lambda capture lists are similar to parameter declaration lists but differ in
 that implicitly captured entities are not individually declared; there is no
 notion of an unnamed capture in the same sense as an unnamed function parameter.
@@ -532,8 +573,10 @@ The following attribute appertainment changes are proposed:
 <ul>
   <li>Allow the <tt>[[deprecated]]</tt> attribute to appertain to a namespace
       alias.</li>
-  <li>Allow the <tt>[[maybe_unused]]</tt> attribute to appertain to a lambda
-      capture.</li>
+  <li>Allow the <tt>[[no_unique_address]]</tt> attribute to appertain to the
+      non-static data member, if any, corresponding to a lambda capture.</li>
+  <li>Allow the <tt>[[maybe_unused]]</tt> attribute to appertain to the
+      non-static data member, if any, corresponding to a lambda capture.</li>
   <li>Allow the <tt>[[maybe_unused]]</tt> attribute to appertain to type
       template parameters and template template parameters (in addition to
       non-type template parameters).</li>
@@ -572,6 +615,17 @@ struct S {
     [ this <font color="green">[[maybe_unused]]</font> ]{}();  // Ok, previously ill-formed.
     [ <font color="red">[[maybe_unused]]</font> *this ]{}(); // Ill-formed; invalid attribute location.
     [ *this <font color="green">[[maybe_unused]]</font> ]{}(); // Ok, previously ill-formed.
+
+    [ <font color="red">[[no_unique_address]]</font> = ]{}();     // Ill-formed; invalid attribute location.
+    [ = <font color="green">[[no_unique_address]]</font> ]{}();     // Ok, previously ill-formed.
+    [ <font color="red">[[no_unique_address]]</font> &amp; ]{}();     // Ill-formed; invalid attribute location.
+    [ &amp; <font color="green">[[no_unique_address]]</font> ]{}();     // Ok, previously ill-formed.
+    [ <font color="red">[[no_unique_address]]</font> p ]{}();     // Ill-formed; invalid attribute location.
+    [ p <font color="green">[[no_unique_address]]</font> ]{}();     // Ok, previously ill-formed.
+    [ <font color="red">[[no_unique_address]]</font> this ]{}();  // Ill-formed; invalid attribute location.
+    [ this <font color="green">[[no_unique_address]]</font> ]{}();  // Ok, previously ill-formed.
+    [ <font color="red">[[no_unique_address]]</font> *this ]{}(); // Ill-formed; invalid attribute location.
+    [ *this <font color="green">[[no_unique_address]]</font> ]{}(); // Ok, previously ill-formed.
   }
 };
 </blockquote>
@@ -728,7 +782,8 @@ of a
 <a href="http://eel.is/c++draft/expr.prim.lambda.capture#nt:simple-capture"><i>simple-capture</i></a>
 or
 <a href="http://eel.is/c++draft/expr.prim.lambda.capture#nt:init-capture"><i>init-capture</i></a>
-appertains to the captured entity.
+appertains to the unnamed non-static data member, if any, declared in the
+closure type for the captured entity (see below).
 </blockquote>
 </p>
 
@@ -803,6 +858,25 @@ or to an
 <a href="http://eel.is/c++draft/lex.name#nt:identifier"><i>identifier</i></a>
 label
 (<a href="http://eel.is/c++draft/stmt.label">[stmt.label]</a>).
+</blockquote>
+</p>
+
+<p>
+Modify
+<a href="http://eel.is/c++draft/dcl.attr.nouniqueaddr#1">[dcl.attr.nouniqueaddr], paragraph 1</a>:
+<blockquote>
+The
+<a href="http://eel.is/c++draft/dcl.attr.grammar#nt:attribute-token"><i>attribute-token</i></a>
+<tt>no_unique_address</tt>
+specifies that a non-static data member is a potentially-overlapping subobject
+(<a href="http://eel.is/c++draft/intro.object">[intro.object]</a>).
+No
+<a href="http://eel.is/c++draft/dcl.attr.grammar#nt:attribute-argument-clause"><i>attribute-argument-clause</i></a>
+shall be present.
+The attribute may
+<del>appertain</del><ins>be applied</ins>
+to a<ins> lambda capture or a</ins>
+non-static data member other than a bit-field.
 </blockquote>
 </p>
 
