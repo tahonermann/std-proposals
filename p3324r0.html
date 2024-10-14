@@ -1,0 +1,1083 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+
+<head>
+
+<title>
+Attributes for namespace aliases, template parameters, and lambda captures
+</title>
+
+<style type="text/css">
+
+pre {
+    display: inline;
+}
+
+table#header th,
+table#header td
+{
+    text-align: left;
+}
+
+table#references th,
+table#references td
+{
+    vertical-align: top;
+}
+
+#hideins:checked ~ * ins, #hideins:checked ~ * ins * { display:none; visibility:hidden }
+#hidedel:checked ~ * del, #hidedel:checked ~ * del * { display:none; visibility:hidden }
+
+ins, ins *
+{
+    text-decoration: underline;
+    color: #000000;
+    background-color:#C8FFC8
+}
+del, del *
+{
+    text-decoration: line-through;
+    color: #000000;
+    background-color:#FFA0A0
+}
+nop, nop *
+{
+    color: #000000;
+    background-color:#B0B0FF
+}
+
+blockquote
+{
+    color: #000000;
+    background-color: #F1F1F1;
+    border: 1px solid #D1D1D1;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+}
+blockquote.code
+{
+    white-space: pre;
+    font-family: monospace;
+}
+blockquote.stdins
+{
+    /* text-decoration: underline; */
+    color: #000000;
+    background-color: #C8FFC8;
+    border: 1px solid #B3EBB3;
+    padding: 0.5em;
+}
+blockquote.stddel
+{
+    text-decoration: line-through;
+    color: #000000;
+    background-color: #FFA0A0;
+    border: 1px solid #ECD7EC;
+    padding-left: 0.5empadding-right: 0.5em;
+}
+blockquote.stdnop
+{
+    color: #000000;
+    background-color: #B0B0FF;
+    border: 1px solid #ECD7EC;
+    padding-left: 0.5empadding-right: 0.5em;
+}
+</style>
+
+</head>
+
+
+<body style="max-width: 8.5in">
+
+<table id="header">
+  <tr>
+    <th>Document Number:</th>
+    <td>P3324R0</td>
+  </tr>
+  <tr>
+    <th>Date:</th>
+    <td>2024-10-14</td>
+  </tr>
+  <tr>
+    <th>Audience:</th>
+    <td>EWG</td>
+  </tr>
+  <tr>
+    <th>Reply-to:</th>
+    <td>Tom Honermann &lt;tom@honermann.net&gt;</td>
+  </tr>
+</table>
+
+
+<h1>Attributes for namespace aliases, template parameters, and lambda captures</h1>
+
+
+<ul>
+  <li><a href="#introduction">Introduction</a></li>
+  <li><a href="#motivation">Motivation</a></li>
+  <li><a href="#design">Design considerations</a>
+    <ul>
+      <li><a href="#design-namespace">Namespace alias definitions</a></li>
+      <li><a href="#design-templates">Template parameter declarations</a></li>
+      <li><a href="#design-captures">Lambda captures</a></li>
+    </ul>
+  </li>
+  <li><a href="#proposal">Proposal</a></li>
+  <li><a href="#implementation-exp">Implementation experience</a></li>
+  <li><a href="#ack">Acknowledgements</a></li>
+  <li><a href="#references">References</a></li>
+  <li><a href="#wording">Wording</a></li>
+</ul>
+
+
+<h1 id="introduction">Introduction</h1>
+
+<p>
+As evidenced by
+<a href="http://eel.is/c++draft/gram">annex A (Grammar summary)</a>
+in the C++ standard, an attribute may appertain to almost every kind of
+declared name or entity including:
+<ul>
+  <li>Type aliases</li>
+  <li>Enumerations</li>
+  <li>Enumerators</li>
+  <li>Variables (including the unnamed object for structured bindings)</li>
+  <li>Structured bindings</li>
+  <li>Classes</li>
+  <li>Data members</li>
+  <li>Functions and function types</li>
+  <li>Parameters (function parameters, non-type template parameters,
+      exception handlers)</li>
+  <li>Concepts</li>
+  <li>Labels</li>
+  <li>Namespaces</li>
+  <li>Modules</li>
+</ul>
+Exceptions include:
+<ul>
+  <li>Namespace aliases</li>
+  <li>Type template parameters</li>
+  <li>Template template parameters</li>
+  <li>Lambda captures</li>
+</ul>
+It is not clear why attributes are not supported for the items in the
+exceptions list.
+There are existing standard attributes that appear to be relevant to these
+items based on their specification or stated recommended practice.
+</p>
+
+<p>
+The recommended practice for the <tt>[[deprecated]]</tt> attribute in
+<a href="http://eel.is/c++draft/dcl.attr.deprecated#4">[dcl.attr.deprecated]p4</a>
+seems applicable to namespace aliases:
+<blockquote class="quote">
+<em>Recommended practice:</em> Implementations should use the
+<tt>deprecated</tt> attribute to produce a diagnostic message in case the
+program refers to a name or entity other than to declare it, after a declaration
+that specifies the attribute.
+The diagnostic message should include the text provided within the
+<a href="http://eel.is/c++draft/dcl.attr.grammar#nt:attribute-argument-clause"><i>attribute-argument-clause</i></a>
+of any <tt>deprecated</tt> attribute applied to the name or entity.
+The value of a
+<a href="http://eel.is/c++draft/cpp.cond#nt:has-attribute-expression"><i>has-attribute-expression</i></a>
+for the <tt>deprecated</tt> attribute should be <tt>0</tt> unless the
+implementation can issue such diagnostic messages.
+</p>
+
+<p>
+</blockquote>
+The recommended practice for the <tt>[[maybe_unused]]</tt> attribute in
+<a href="http://eel.is/c++draft/dcl.attr.unused#4">[dcl.attr.unused]p4</a>
+seems applicable to template parameters and lambda captures.
+<blockquote class="quote">
+<em>Recommended practice:</em> For an entity marked <tt>maybe_unused</tt>,
+implementations should not emit a warning that the entity or its structured
+bindings (if any) are used or unused.
+For a structured binding declaration not marked <tt>maybe_unused</tt>,
+implementations should not emit such a warning unless all of its structured
+bindings are unused.
+For a label to which <tt>maybe_unused</tt> is applied, implementations should
+not emit a warning that the label is used or unused.
+The value of a
+<a href="http://eel.is/c++draft/cpp.cond#nt:has-attribute-expression"><i>has-attribute-expression</i></a>
+for the <tt>maybe_unused</tt> attribute should be <tt>0</tt> if the attribute
+does not cause suppression of such warnings.
+</blockquote>
+</p>
+
+<p>
+</blockquote>
+The <tt>[[no_unique_address]]</tt> attribute applies to non-static data members
+and therefore seems applicable to unnamed non-static data members implicitly
+declared in lambda closure types for captured entities.
+From
+<a href="https://eel.is/c++draft/dcl.attr.nouniqueaddr#1">[dcl.attr.nouniqueaddr]p1</a>:
+<blockquote class="quote">
+The
+<a href="https://eel.is/c++draft/dcl.attr.grammar#nt:attribute-token"><i>attribute-token</i></a>
+<tt>no_unique_address</tt> specifies that a non-static data member is a
+potentially-overlapping subobject
+(<a href="https://eel.is/c++draft/intro.object">[intro.object]</a>).
+No
+<a href="https://eel.is/c++draft/dcl.attr.grammar#nt:attribute-argument-clause"><i>attribute-argument-clause</i></a>
+shall be present.  The attribute may appertain to a non-static data member
+other than a bit-field.
+</blockquote>
+</p>
+
+<p>
+The <tt>[[deprecated]]</tt> attribute was adopted for C++14 via
+<a title="[[deprecated]] attribute"
+   href="https://wg21.link/n3760">
+N3760</a>
+<sup><a title="[[deprecated]] attribute"
+        href="#ref_n3760">[N3760]</a></sup>.
+Neither that paper, its previous revision, nor the minutes from EWG and CWG
+review during the following meetings demonstrate consideration for the use of
+the attribute with a namespace alias.
+<ul>
+  <li><a href="https://wiki.edg.com/bin/view/Wg21portland2012/EvolutionWorkingGroup">EWG review of N3394 in Portland, 2012</a></li>
+  <li><a href="https://wiki.edg.com/bin/view/Wg21chicago2013/CoreWorkingGroup">CWG review of N3760 in Chicago, 2013</a></li>
+</ul>
+</p>
+
+<p>
+The <tt>[[maybe_unused]]</tt> attribute was adopted for C++17 via
+<a title="Wording for [[maybe_unused]] attribute."
+   href="https://wg21.link/p0212r1">
+P0212R1</a>
+<sup><a title="Wording for [[maybe_unused]] attribute."
+        href="#ref_p0212r1">[P0212R1]</a></sup>.
+Neither that paper, its previous revision, the rationale provided in the
+previous
+<a title="Proposal of [[unused]], [[nodiscard]] and [[fallthrough]] attributes."
+   href="https://wg21.link/p0068r0">
+P0068R0</a>
+<sup><a title="Proposal of [[unused]], [[nodiscard]] and [[fallthrough]] attributes."
+        href="#ref_p0068r0">[P0068R0]</a></sup>,
+nor the minutes from EWG and CWG review during the following meetings
+demonstrate consideration for use of the attribute with a
+type template parameter,
+template template parameter, or
+lambda capture.
+<ul>
+  <li><a href="https://wiki.edg.com/bin/view/Wg21kona2015/P0068R0">EWG review of P0068R0 in Kona, 2015</a></li>
+  <li><a href="https://wiki.edg.com/bin/view/Wg21jacksonville/CoreWorkingGroup">CWG review of D0212R1 in Jacksonville, 2016</a></li>
+</ul>
+</p>
+
+<p>
+The <tt>[[no_unique_address]]</tt> attribute was adopted for C++20 via
+<a title="Language support for empty objects"
+   href="https://wg21.link/p0840r2">
+P0840R2</a>
+<sup><a title="Language support for empty objects"
+        href="#ref_p0840r2">[P0840R2]</a></sup>.
+Neither that paper, the motivation provided in its original R0 revision, nor
+the minutes from EWG and CWG review during the following meetings demonstrate
+consideration for the use of the attribute with a lambda closure.
+<ul>
+  <li><a href="https://wiki.edg.com/bin/view/Wg21albuquerque/P0840R0">EWG review of P0840R0 in Albuquerque, 2017</a></li>
+  <li><a href="https://wiki.edg.com/bin/view/Wg21jacksonville2018/CoreWorkingGroup">CWG review of P0840R1 and D0840R2 in Jacksonville, 2018</a></li>
+</ul>
+</p>
+
+<p>
+A search of both active and closed CWG issues failed to identify any existing
+issues that concern attribute appertainment for the excluded items.
+</p>
+
+<p>
+There does not appear to be a recorded rationale for omitting attribute support
+for the excluded items.
+</p>
+
+<p>
+The C++ grammar permits an optional sequence of attributes in the declaration of
+a non-type template parameter by way of
+<a href="http://eel.is/c++draft/temp.param#nt:template-parameter"><i>template-parameter</i></a>
+and
+<a href="http://eel.is/c++draft/dcl.fct#nt:parameter-declaration"><i>parameter-declaration</i></a>.
+The latter directly permits an attribute sequence at the beginning of a
+parameter declaration and an attribute sequence is indirectly permitted
+following a parameter name by
+<a href="http://eel.is/c++draft/dcl.decl.general#nt:noptr-declarator"<i>noptr-declarator</i></a>.
+However, some implementations, Clang and EDG among them, diagnose an attribute
+that appertains to a non-type template parameter in at least some cases.
+The gcc and Microsoft Visual C++ compilers accept such attributes.
+<a href="https://godbolt.org/z/G61qK7oPc">https://godbolt.org/z/G61qK7oPc</a>.
+<blockquote class="code">
+template&lt;[[maybe_unused]] int nttp&gt; // Rejected by EDG and Clang, accepted by gcc and MSVC.
+void ft1();
+template&lt;int nttp [[maybe_unused]]&gt; // Rejected by EDG, accepted by Clang, gcc, and MSVC.
+void ft2();
+</blockquote>
+</p>
+
+
+<h1 id="motivation">Motivation</h1>
+
+<p>
+Per
+<a href="http://eel.is/c++draft/dcl.attr.deprecated#2">[dcl.attr.deprecated]p2</a>,
+the <tt>deprecated</tt> attribute is explicitly specified as being able to
+appertain to a namespace.
+<blockquote class="quote">
+The attribute may be applied to the declaration of a class, a
+<a href="http://eel.is/c++draft/dcl.typedef#nt:typedef-name">typedef-name</a>,
+a variable, a non-static data member, a function, a namespace, an enumeration,
+an enumerator, a concept, or a template specialization.
+</blockquote>
+The inability to apply the <tt>deprecated</tt> attribute to a namespace alias
+seems to be an oversight as there is no principled reason for namespace aliases
+to never be deprecated.
+At present, Clang, gcc, EDG, and Microsoft Visual C++ all reject an attribute
+sequence on a namespace alias either before the identifier at a position
+consistent with attributes on namespace declarations, or after the identifier.
+<a href="https://godbolt.org/z/8oqah7T15">https://godbolt.org/z/8oqah7T15</a>
+<blockquote class="code">
+namespace ns {}
+namespace [[deprecated]] nsa1 = ns; // Rejected by Clang, EDG, gcc, and MSVC.
+namespace nsa2 [[deprecated]] = ns; // Rejected by Clang, EDG, gcc, and MSVC.
+</blockquote>
+</p>
+
+<p>
+Per
+<a href="http://eel.is/c++draft/dcl.attr.unused#2">[dcl.attr.unused]p2</a>,
+the <tt>maybe_unused</tt> attribute is specified as applicable to non-static
+data members.
+<blockquote class="quote">
+The attribute may be applied to the declaration of a class,
+<a href="http://eel.is/c++draft/dcl.typedef#nt:typedef-name">typedef-name</a>,
+variable (including a structured binding declaration), structured binding,
+non-static data member, function, enumeration, or enumerator, or to an
+<a href="http://eel.is/c++draft/lex.name#nt:identifier">identifier</a> label (
+<a href="http://eel.is/c++draft/stmt.label">[stmt.label]</a>).
+</blockquote>
+Likewise for the <tt>no_unique_address</tt> attribute per
+<a href="https://eel.is/c++draft/dcl.attr.nouniqueaddr#1">[dcl.attr.nouniqueaddr]p1</a>:
+<blockquote class="quote">
+The
+<a href="https://eel.is/c++draft/dcl.attr.grammar#nt:attribute-token"><i>attribute-token</i></a>
+<tt>no_unique_address</tt> specifies that a non-static data member is a
+potentially-overlapping subobject
+(<a href="https://eel.is/c++draft/intro.object">[intro.object]</a>).
+No
+<a href="https://eel.is/c++draft/dcl.attr.grammar#nt:attribute-argument-clause"><i>attribute-argument-clause</i></a>
+shall be present.  The attribute may appertain to a non-static data member
+other than a bit-field.
+</blockquote>
+A lambda capture is not formally a non-static data member, though references to
+a lambda capture are usually translated to an access of a non-static data member
+of the closure type.
+As such, most attributes that may appertain to a non-static data member are
+likely to be applicable to lambda captures.
+For example, the <tt>maybe_unused</tt> attribute could be used to mark a
+lambda capture as intentionally unused.
+Such unused captures can be useful to acquire resources such as locks or to
+preserve the layout of a closure type when a previously needed capture is no
+longer needed.
+Likewise, the <tt>no_unique_address</tt> attribute could be used to request a
+more optimal class layout for a lambda closure type.
+</p>
+
+<p>
+At present, Clang issues a warning under <tt>-Wall</tt> for unused lambda
+captures.
+<a href="http://eel.is/c++draft/stmt.label">http://eel.is/c++draft/stmt.label</a>.
+Clang, gcc, EDG, and Microsoft Visual C++ all reject the following code.
+<a href="https://godbolt.org/z/4xq1YKodz">https://godbolt.org/z/4xq1YKodz</a>
+<blockquote class="code">
+namespace std {
+  struct mutex {};
+  template&lt;typename... Ts&gt;
+  struct scoped_lock {
+    scoped_lock(Ts...);
+  };
+}
+
+void f(int p1, int p2) {
+  std::mutex m1, m2;
+  [ [[maybe_unused]] p1 ]{}();
+  [ p2 [[maybe_unused]] ]{}();
+  [ [[maybe_unused]] l1 = std::scoped_lock(m1) ]{}();
+  [ l2 [[maybe_unused]] = std::scoped_lock(m2) ]{}();
+}
+</blockquote>
+</p>
+
+<p>
+None of Clang, gcc, EDG, or Microsoft Visual C++ currently issue warnings for
+unused template parameters and this is unlikely to change given how frequently
+template parameters are unused.
+However, for consistency and to allow for explicit documentation, it is
+reasonable to allow the <tt>maybe_unused</tt> attribute to appertain to all
+kinds of template parameters.
+<a href="https://godbolt.org/z/YbE9cTPvh">https://godbolt.org/z/YbE9cTPvh</a>
+<blockquote class="code">
+template&lt;[[maybe_unused]] int nttp&gt; // Rejected by EDG and Clang, accepted by gcc and MSVC.
+void ft1();
+template&lt;int nttp [[maybe_unused]]&gt; // Rejected by EDG, accepted by Clang, gcc, and MSVC.
+void ft2();
+template&lt;[[maybe_unused]] typename ttp&gt; // Rejected by Clang, EDG, gcc, and MSVC.
+void ft3();
+template&lt;typename ttp [[maybe_unused]]&gt; // Rejected by Clang, EDG, gcc, and MSVC.
+void ft4();
+template&lt;[[maybe_unused]] template&lt;typename&gt; class tttp&gt; // Rejected by Clang, EDG, gcc, and MSVC.
+void ft5();
+template&lt;template&lt;typename&gt; class tttp [[maybe_unused]]&gt; // Rejected by Clang, EDG, gcc, and MSVC.
+void ft6();
+</blockquote>
+</p>
+
+<p>
+Absent compelling rationale otherwise, precedent indicates that new kinds of
+declared names or entities should allow for attribute appertainment and their
+respective declarations should therefore include syntactic locations for an
+attribute specifier sequence.
+</p>
+
+
+<h1 id="design">Design considerations</h1>
+
+<p>
+There are various and conflicting precedents for where an attribute specifier
+sequence is syntactically placed in existing declarations.
+<ol>
+  <li>In general, an attribute specifier sequence immediately follows the
+      identifier in a declaration for an attributed entity.
+      Examples include declarations of type aliases, enumerators, variables,
+      structured bindings, data members, functions, parameters, concepts, and
+      modules.
+      Exceptions include label, class, and enum declarations and
+      namespace definitions.</li>
+  <li><a href="http://eel.is/c++draft/namespace.def.general#nt:namespace-definition"><i>namespace-definition</i></a>
+      does not permit an attribute specifier sequence following an identifier
+      (inconsistent with the general case) but does permit one following the
+      <tt>namespace</tt> keyword (presumably to allow an attribute to be
+      specified for an unnamed namespace definition).</li>
+  <li><a href="http://eel.is/c++draft/dcl.fct#nt:parameter-declaration"><i>parameter-declaration</i></a>
+      permits an attribute specifier sequence following a declarator ID
+      (consistent with the general case) and at the start of a parameter
+      declaration (presumably to allow an attribute to be specified for an
+      unnamed parameter declaration).</li>
+</ol>
+</p>
+
+
+<h2 id="design-namespace">Namespace alias definitions</h2>
+
+<p>
+Namespace alias definitions always include an identifier.
+This presents a choice of:
+<ol>
+  <li>following the precedent for namespace definitions and allowing an
+      attribute specifier sequence between the <tt>namespace</tt> keyword and
+      the identifier, or</li>
+  <li>following the general precedent and allowing an attribute specifier
+      sequence following the identifier, or</li>
+  <li>both.</li>
+</ol>
+No motivation for supporting both has been identified.
+Option 1 is proposed based on the rationale that consistency with namespace
+definitions is more important than consistency with a general rule that already
+has existing exceptions.
+</p>
+
+
+<h2 id="design-templates">Template parameter declarations</h2>
+
+<p>
+Type template parameters and template template parameters may be unnamed.
+This presents a choice of:
+<ol>
+  <li>following the precedent for non-type template parameters and function
+      parameters and allowing an attribute specifier sequence both at the
+      beginning of a declaration and following an identifier, or</li>
+  <li>allowing an attribute specifier sequence only at the beginning of a
+      declaration, or</li>
+  <li>allowing an attribute specifier sequence following an identifier with no
+      provision for specifying attributes for unnamed parameters.</li>
+</ol>
+Option 1 is proposed based on the rationale that consistency with non-type
+template parameters and function parameters is more important than avoiding
+the cognitive and implementation complexity of supporting multiple locations.
+</p>
+
+
+<h2 id="design-captures">Lambda captures</h2>
+
+<p>
+A lambda capture serves two purposes; it grants access to a local variable
+from within a lambda expression and it notionally declares a non-static
+data member of the closure type.
+An attribute applied to a lambda capture can therefore be considered to
+appertain to either the capture itself or to the notional non-static data
+member.
+</p>
+
+<p>
+Consider the two lambda expressions in the following example.
+The first, <tt>l1</tt>, explicitly captures <tt>i</tt> but does not use it.
+The second, <tt>l2</tt>, has a default capture, but no variables are implicitly
+captured.
+Depending on one's intuition, the attribute might be intended to suppress a
+diagnostic about an unused capture as opposed to an unused capture declaration.
+<blockquote class="code">
+void f(int i) {
+  // Don't warn that 'i' is captured but not used?
+  auto l1 [i [[maybe_unused]] ] {
+    return 0;
+  };
+  // Don't warn that the default capture declaration was not used?
+  auto l2 [= [[maybe_unused]] ] {
+    return 0;
+  };
+}
+</blockquote>
+This proposal specifies that the attribute appertains to the notional
+non-static data member on the basis that doing so is more useful.
+For example, <tt>[[no_unique_address]]</tt> has a clear and unambiguous meaning
+for the notional non-static data member, but would otherwise be meaningless
+for a capture declaration.
+As explained below, this proposal locates the new attribute specifier sequence
+following each capture declaration.
+Should motivation arise for attributes that appertain directly to the capture
+declaration, it would be possible to add such support by additionally
+allowing for an attribute specifier sequence to precede each capture
+declaration.
+</p>
+
+<p>
+Lambda capture lists are similar to parameter declaration lists but differ in
+that implicitly captured entities are not individually declared; there is no
+notion of an unnamed capture in the same sense as an unnamed function parameter.
+This presents a choice of:
+<ol>
+  <li>following the general precedent and allowing an attribute specifier
+      sequence following the identifier (or <tt>this</tt> keyword) in a simple
+      capture or init capture, or</li>
+  <li>following the precedent for function parameters and allowing an attribute
+      specifier sequence both at the beginning of a capture declaration and
+      following the identifier (or <tt>this</tt> keyword).</li>
+</ol>
+Option 1 is proposed based on the rationale that, since explicitly named
+capture declarations always include an identifier (or <tt>this</tt> keyword),
+the cognitive and implementation complexity of supporting multiple locations is
+not warranted.
+</p>
+
+<p>
+If it is accepted that an attribute on a lambda capture declaration appertains
+to the notional non-static data member, then it follows that an attribute on a
+default lambda capture declaration appertains individually to each of the
+notional non-static data members of the implicit captures; this is consistent
+with attributes specified with function parameter pack declarations.
+This could be useful to, for example, apply the <tt>[[no_unique_address]]</tt>
+attribute to all implicit captures.
+</p>
+
+<p>
+Default capture declarations consist solely of either the <tt>&amp;</tt> or
+<tt>=</tt> token.
+The choices for an attribute specifier sequence are easy; the sequence either
+goes before the token, after the token, or at either location.
+For consistency with the proposed position for explicit captures, placing the
+attribute specifier sequence after the token is proposed.
+</p>
+
+<p>
+Placing an attribute specifier sequence after <tt>*this</tt> could be a cause
+for confusion if programmers interpret it as applying to <tt>this</tt> as
+opposed to the intended meaning of it applying to the captured entity, the
+object denoted by <tt>*this</tt>.
+The remedy for such potential confusion would be to permit an attribute
+specifier sequence only at the beginning of each capture declaration.
+</p>
+
+
+<h1 id="proposal">Proposal</h1>
+
+<p>
+The following grammar changes are proposed:
+<ul>
+  <li>For namespace alias definitions:
+    <ul>
+      <li>Allow an attribute specifier sequence to appear immediately after the
+          <tt>namespace</tt> keyword
+          (consistent with namespace definitions).</li>
+    </ul>
+  </li>
+  <li>For type template parameters and template template parameters:
+    <ul>
+      <li>Allow an attribute specifier sequence to appear at the beginning of
+          the parameter declaration
+          (consistent with non-type template parameter and function parameter
+          declarations).</li>
+      <li>Allow an attribute specifier sequence to appear following an
+          identifier in the parameter declaration
+          (consistent with non-type template parameter and function parameter
+          declarations).</li>
+    </ul>
+  </li>
+  <li>For lambda captures:
+    <ul>
+      <li>Allow an attribute specifier sequence to appear following an
+          identifier in an explicit capture declaration, but not at the
+          beginning of one
+          (consistent with the general rule for attribute specifier
+          sequences).</li>
+      <li>Allow an attribute specifier sequence to appear following
+          <tt>this</tt> or <tt>*this</tt> in an explicit capture declaration,
+          but not at the beginning of one.</li>
+      <li>Allow an attribute specifier sequence to appear following
+          <tt>&amp;</tt> or <tt>=</tt> in a capture default declaration,
+          but not at the beginning of one.</li>
+    </ul>
+  </li>
+</ul>
+</p>
+
+<p>
+The following attribute appertainment changes are proposed:
+<ul>
+  <li>Allow the <tt>[[deprecated]]</tt> attribute to appertain to a namespace
+      alias.</li>
+  <li>Allow the <tt>[[maybe_unused]]</tt> attribute to appertain to the
+      non-static data member, if any, corresponding to a lambda capture.</li>
+  <li>Allow the <tt>[[maybe_unused]]</tt> attribute to appertain to type
+      template parameters and template template parameters (in addition to
+      non-type template parameters).</li>
+  <li>Allow the <tt>[[no_unique_address]]</tt> attribute to appertain to the
+      non-static data member, if any, corresponding to a lambda capture.</li>
+</ul>
+</p>
+
+<p>
+Taken together, these changes allow for the following:
+<blockquote class="code">
+namespace ns {}
+namespace <font color="green">[[deprecated]]</font> nsa1 = ns; // Ok, previously ill-formed.
+namespace nsa2 <font color="red">[[deprecated]]</font> = ns; // Ill-formed; invalid attribute location.
+
+template&lt;<font color="green">[[maybe_unused]]</font> int nttp&gt; // Ok.
+void ft1();
+template&lt;int nttp <font color="green">[[maybe_unused]]</font>&gt; // Ok.
+void ft2();
+template&lt;<font color="green">[[maybe_unused]]</font> typename ttp&gt; // Ok, previously ill-formed.
+void ft3();
+template&lt;typename ttp <font color="green">[[maybe_unused]]</font>&gt; // Ok, previously ill-formed.
+void ft4();
+template&lt;<font color="green">[[maybe_unused]]</font> template&lt;typename&gt; class tttp&gt; // Ok, previously ill-formed.
+void ft5();
+template&lt;template&lt;typename&gt; class tttp <font color="green">[[maybe_unused]]</font>&gt; // Ok, previously ill-formed.
+void ft6();
+
+struct S {
+  void mf(int p) {
+    [ <font color="red">[[maybe_unused]]</font> = ]{}();     // Ill-formed; invalid attribute location.
+    [ = <font color="green">[[maybe_unused]]</font> ]{}();     // Ok but pointless [[maybe_unused]], previously ill-formed.
+    [ <font color="red">[[maybe_unused]]</font> &amp; ]{}();     // Ill-formed; invalid attribute location.
+    [ &amp; <font color="green">[[maybe_unused]]</font> ]{}();     // Ok but pointless [[maybe_unused]], previously ill-formed.
+    [ <font color="red">[[maybe_unused]]</font> p ]{}();     // Ill-formed; invalid attribute location.
+    [ p <font color="green">[[maybe_unused]]</font> ]{}();     // Ok, previously ill-formed.
+    [ <font color="red">[[maybe_unused]]</font> this ]{}();  // Ill-formed; invalid attribute location.
+    [ this <font color="green">[[maybe_unused]]</font> ]{}();  // Ok, previously ill-formed.
+    [ <font color="red">[[maybe_unused]]</font> *this ]{}(); // Ill-formed; invalid attribute location.
+    [ *this <font color="green">[[maybe_unused]]</font> ]{}(); // Ok, previously ill-formed.
+
+    [ <font color="red">[[no_unique_address]]</font> = ]{}();     // Ill-formed; invalid attribute location.
+    [ = <font color="green">[[no_unique_address]]</font> ]{}();     // Ok, previously ill-formed.
+    [ <font color="red">[[no_unique_address]]</font> &amp; ]{}();     // Ill-formed; invalid attribute location.
+    [ &amp; <font color="green">[[no_unique_address]]</font> ]{}();     // Ok, previously ill-formed.
+    [ <font color="red">[[no_unique_address]]</font> p ]{}();     // Ill-formed; invalid attribute location.
+    [ p <font color="green">[[no_unique_address]]</font> ]{}();     // Ok, previously ill-formed.
+    [ <font color="red">[[no_unique_address]]</font> this ]{}();  // Ill-formed; invalid attribute location.
+    [ this <font color="green">[[no_unique_address]]</font> ]{}();  // Ok, previously ill-formed.
+    [ <font color="red">[[no_unique_address]]</font> *this ]{}(); // Ill-formed; invalid attribute location.
+    [ *this <font color="green">[[no_unique_address]]</font> ]{}(); // Ok, previously ill-formed.
+  }
+};
+</blockquote>
+</p>
+
+<h1 id="implementation-exp">Implementation experience</h1>
+
+<p>
+None.
+</p>
+
+
+<h1 id="ack">Acknowledgements</h1>
+
+<p>
+Thanks to Aaron Ballman for vetting my expectation that attributes should be
+allowed on approximately everything and for providing feedback for multiple
+drafts of this proposal.
+</p>
+
+
+<h1 id="references">References</h1>
+
+<table id="references">
+  <tr>
+    <td id="ref_n3760"><sup>[N3760]</sup></td>
+    <td>
+      "[[deprecated]] attribute", N3760, 2013.<br/>
+      <a href="https://wg21.link/n3760">
+      https://wg21.link/n3760</a></td>
+  </tr>
+  <tr>
+    <td id="ref_n4981"><sup>[N4988]</sup></td>
+    <td>
+      "Working Draft, Standard for Programming Language C++", N4988, 2024.<br/>
+      <a href="https://wg21.link/n4988">
+      https://wg21.link/n4988</a></td>
+  </tr>
+  <tr>
+    <td id="ref_p0068r0"><sup>[P0068R0]</sup></td>
+    <td>
+      "Proposal of [[unused]], [[nodiscard]] and [[fallthrough]] attributes.", P0068R0, 2015.<br/>
+      <a href="https://wg21.link/p0068r0">
+      https://wg21.link/p0068r0</a></td>
+  </tr>
+  <tr>
+    <td id="ref_p0212r1"><sup>[P0212R1]</sup></td>
+    <td>
+      "Wording for [[maybe_unused]] attribute.", P0212R1, 2016.<br/>
+      <a href="https://wg21.link/p0212r1">
+      https://wg21.link/p0212r1</a></td>
+  </tr>
+  <tr>
+    <td id="ref_p0840r2"><sup>[P0840R2]</sup></td>
+    <td>
+      "Language support for empty objects", P0840R2, 2018.<br/>
+      <a href="https://wg21.link/p0840r2">
+      https://wg21.link/p0840r2</a></td>
+  </tr>
+</table>
+
+
+<h1 id="wording">Wording</h1>
+
+<p>
+These changes are relative to
+<a title="Working Draft, Standard for Programming Language C++"
+   href="https://wg21.link/n4988">
+N4988</a>
+<sup><a title="Working Draft, Standard for Programming Language C++"
+        href="#ref_n4988">[N4988]</a></sup>.
+</p>
+
+<input type="checkbox" id="hideins">Hide inserted text</input><br/>
+<input type="checkbox" id="hidedel">Hide deleted text</input>
+
+<p>
+Modify
+<a href="http://eel.is/c++draft/expr.prim.lambda.capture">[expr.prim.lambda.capture]</a>:
+<blockquote>
+  <div style="margin-left: 1em; white-space: nowrap;">
+    <a href="http://eel.is/c++draft/expr.prim.lambda.capture#nt:lambda-capture"><i>lambda-capture</i></a>:
+      <div style="margin-left: 1em; white-space: nowrap;">
+        <a href="http://eel.is/c++draft/expr.prim.lambda.capture#nt:capture-default"><i>capture-default</i></a>
+      <br/>
+        <a href="http://eel.is/c++draft/expr.prim.lambda.capture#nt:capture-list"><i>capture-list</i></a>
+      <br/>
+        <a href="http://eel.is/c++draft/expr.prim.lambda.capture#nt:capture-default"><i>capture-default</i></a>
+        <tt>,</tt>
+        <a href="http://eel.is/c++draft/expr.prim.lambda.capture#nt:capture-list"><i>capture-list</i></a>
+      </div>
+  <br/>
+    <a href="http://eel.is/c++draft/expr.prim.lambda.capture#nt:capture-default"><i>capture-default</i></a>:
+      <div style="margin-left: 1em; white-space: nowrap;">
+        <tt>&amp;</tt>
+        <ins><a href="http://eel.is/c++draft/dcl.attr.grammar#nt:attribute-specifier-seq"><i>attribute-specifier-seq</i></a><sub>opt</sub></ins>
+      <br/>
+        <tt>=</tt>
+        <ins><a href="http://eel.is/c++draft/dcl.attr.grammar#nt:attribute-specifier-seq"><i>attribute-specifier-seq</i></a><sub>opt</sub></ins>
+      </div>
+  <br/>
+    <a href="http://eel.is/c++draft/expr.prim.lambda.capture#nt:capture-list"><i>capture-list</i></a>:
+      <div style="margin-left: 1em; white-space: nowrap;">
+        <a href="http://eel.is/c++draft/expr.prim.lambda.capture#nt:capture"><i>capture</i></a>
+      <br/>
+        <a href="http://eel.is/c++draft/expr.prim.lambda.capture#nt:capture-list"><i>capture-list</i></a>
+        <tt>,</tt>
+        <a href="http://eel.is/c++draft/expr.prim.lambda.capture#nt:capture"><i>capture</i></a>
+      </div>
+  <br/>
+    <a href="http://eel.is/c++draft/expr.prim.lambda.capture#nt:capture"><i>capture</i></a>:
+      <div style="margin-left: 1em; white-space: nowrap;">
+        <a href="http://eel.is/c++draft/expr.prim.lambda.capture#nt:simple-capture"><i>simple-capture</i></a>
+      <br/>
+        <a href="http://eel.is/c++draft/expr.prim.lambda.capture#nt:init-capture"><i>init-capture</i></a>
+      </div>
+  <br/>
+    <a href="http://eel.is/c++draft/expr.prim.lambda.capture#nt:simple-capture"><i>simple-capture</i></a>:
+      <div style="margin-left: 1em; white-space: nowrap;">
+        <del><a href="http://eel.is/c++draft/lex.name#nt:identifier"><i>identifier</i></a></del><ins><a href="http://eel.is/c++draft/dcl.pre#nt:attributed-identifier"><i>attributed-identifier</i></a></ins>
+        <tt>...</tt><sub>opt</sub>
+      <br/>
+        <tt>&amp;</tt>
+        <del><a href="http://eel.is/c++draft/lex.name#nt:identifier"><i>identifier</i></a></del><ins><a href="http://eel.is/c++draft/dcl.pre#nt:attributed-identifier"><i>attributed-identifier</i></a></ins>
+        <tt>...</tt><sub>opt</sub>
+      <br/>
+        <tt>this</tt>
+        <ins><a href="http://eel.is/c++draft/dcl.attr.grammar#nt:attribute-specifier-seq"><i>attribute-specifier-seq</i></a><sub>opt</sub></ins>
+      <br/>
+        <tt>*</tt> <tt>this</tt>
+        <ins><a href="http://eel.is/c++draft/dcl.attr.grammar#nt:attribute-specifier-seq"><i>attribute-specifier-seq</i></a><sub>opt</sub></ins>
+      </div>
+  <br/>
+    <a href="http://eel.is/c++draft/expr.prim.lambda.capture#nt:init-capture"><i>init-capture</i></a>:
+      <div style="margin-left: 1em; white-space: nowrap;">
+        <tt>...</tt><sub>opt</sub>
+        <del><a href="http://eel.is/c++draft/lex.name#nt:identifier"><i>identifier</i></a></del><ins><a href="http://eel.is/c++draft/dcl.pre#nt:attributed-identifier"><i>attributed-identifier</i></a></ins>
+        <a href="http://eel.is/c++draft/dcl.init.general#nt:initializer"><i>initializer</i></a>
+      <br/>
+        <tt>&amp;</tt>
+        <tt>...</tt><sub>opt</sub>
+        <del><a href="http://eel.is/c++draft/lex.name#nt:identifier"><i>identifier</i></a></del><ins><a href="http://eel.is/c++draft/dcl.pre#nt:attributed-identifier"><i>attributed-identifier</i></a></ins>
+        <a href="http://eel.is/c++draft/dcl.init.general#nt:initializer"><i>initializer</i></a>
+      </div>
+  </div>
+</blockquote>
+</p>
+
+<p>
+Add an additional paragraph following
+<a href="http://eel.is/c++draft/expr.prim.lambda.capture#1">[expr.prim.lambda.capture], paragraph 1</a>:
+<blockquote class="stdins">
+The optional
+<a href="http://eel.is/c++draft/dcl.attr.grammar#nt:attribute-specifier-seq"><i>attribute-specifier-seq</i></a>
+in a
+<a href="http://eel.is/c++draft/expr.prim.lambda.capture#nt:capture-default"><i>capture-default</i></a>
+or
+<a href="http://eel.is/c++draft/expr.prim.lambda.capture#nt:simple-capture"><i>simple-capture</i></a>
+or in an
+<a href="http://eel.is/c++draft/dcl.pre#nt:attributed-identifier"><i>attributed-identifier</i></a>
+of a
+<a href="http://eel.is/c++draft/expr.prim.lambda.capture#nt:simple-capture"><i>simple-capture</i></a>
+or
+<a href="http://eel.is/c++draft/expr.prim.lambda.capture#nt:init-capture"><i>init-capture</i></a>
+appertains to the unnamed non-static data member, if any, declared in the
+closure type for the captured entity (see below).
+</blockquote>
+</p>
+
+<p>
+Modify
+<a href="http://eel.is/c++draft/namespace.alias#1">[namespace.alias], paragraph 1</a>:
+<blockquote>
+A
+<a href="http://eel.is/c++draft/namespace.alias#nt:namespace-alias-definition"><i>namespace-alias-definition</i></a>
+declares an alternate name for a namespace according to the following grammar:
+<br/><br/>
+  <div style="margin-left: 1em; white-space: nowrap;">
+    <a href="http://eel.is/c++draft/namespace.alias#nt:namespace-alias"><i>namespace-alias</i></a>:
+      <div style="margin-left: 1em; white-space: nowrap;">
+        <a href="http://eel.is/c++draft/lex.name#nt:identifier"><i>identifier</i></a>
+      </div>
+  <br/>
+    <a href="http://eel.is/c++draft/namespace.alias#nt:namespace-alias-definition"><i>namespace-alias-definition</i></a>:
+      <div style="margin-left: 1em; white-space: nowrap;">
+        <tt>namespace</tt>
+        <ins><a href="http://eel.is/c++draft/dcl.attr.grammar#nt:attribute-specifier-seq"><i>attribute-specifier-seq</i></a><sub>opt</sub></ins>
+        <a href="http://eel.is/c++draft/lex.name#nt:identifier"><i>identifier</i></a>
+        <tt>=</tt>
+        <a href="http://eel.is/c++draft/namespace.alias#nt:qualified-namespace-specifier"><i>qualified-namespace-specifier</i></a>
+        <tt>;</tt>
+      </div>
+  <br/>
+    <a href="http://eel.is/c++draft/namespace.alias#nt:qualified-namespace-specifier"><i>qualified-namespace-specifier</i></a>:
+      <div style="margin-left: 1em; white-space: nowrap;">
+        <a href="http://eel.is/c++draft/expr.prim.id.qual#nt:nested-name-specifier"><i>nested-name-specifier</i></a><sub>opt</sub>
+        <a href="http://eel.is/c++draft/namespace.def.general#nt:namespace-name"><i>namespace-name</i></a>
+      </div>
+  </div>
+</blockquote>
+</p>
+
+<p>
+Add an additional paragraph following
+<a href="http://eel.is/c++draft/namespace.alias#2">[namespace.alias], paragraph 2</a>:
+<blockquote class="stdins">
+The optional
+<a href="http://eel.is/c++draft/dcl.attr.grammar#nt:attribute-specifier-seq"><i>attribute-specifier-seq</i></a><sub>opt</sub>
+in a
+<a href="http://eel.is/c++draft/namespace.alias#nt:namespace-alias-definition"><i>namespace-alias-definition</i></a>
+appertains to the namespace alias being defined.
+</blockquote>
+</p>
+
+<p>
+Modify
+<a href="http://eel.is/c++draft/dcl.attr.deprecated#2">[dcl.attr.deprecated], paragraph 2</a>:
+<blockquote>
+The attribute may be applied to the declaration of a class, a
+<a href="http://eel.is/c++draft/dcl.typedef#nt:typedef-name">typedef-name</a>,
+a variable, a non-static data member, a function, a namespace,
+<ins>a namespace alias, </ins>an enumeration,
+an enumerator, a concept, or a template specialization.
+</blockquote>
+</p>
+
+<p>
+Modify
+<a href="http://eel.is/c++draft/dcl.attr.unused#2">[dcl.attr.unused], paragraph 2</a>:
+<blockquote>
+The attribute may be applied to the declaration of a class,
+<a href="http://eel.is/c++draft/dcl.typedef#nt:typedef-name">typedef-name</a>,
+variable (including a structured binding declaration), structured binding,
+non-static data member,
+<ins>lambda capture, </ins>function,
+<ins>function parameter, template parameter, </ins>enumeration, or enumerator,
+or to an
+<a href="http://eel.is/c++draft/lex.name#nt:identifier"><i>identifier</i></a>
+label
+(<a href="http://eel.is/c++draft/stmt.label">[stmt.label]</a>).
+</blockquote>
+</p>
+
+<p>
+Modify
+<a href="http://eel.is/c++draft/dcl.attr.nouniqueaddr#1">[dcl.attr.nouniqueaddr], paragraph 1</a>:
+<blockquote>
+The
+<a href="http://eel.is/c++draft/dcl.attr.grammar#nt:attribute-token"><i>attribute-token</i></a>
+<tt>no_unique_address</tt>
+specifies that a non-static data member is a potentially-overlapping subobject
+(<a href="http://eel.is/c++draft/intro.object">[intro.object]</a>).
+No
+<a href="http://eel.is/c++draft/dcl.attr.grammar#nt:attribute-argument-clause"><i>attribute-argument-clause</i></a>
+shall be present.
+The attribute may
+<del>appertain</del><ins>be applied</ins>
+to a<ins> lambda capture or a</ins>
+non-static data member other than a bit-field.
+</blockquote>
+</p>
+
+<p>
+Modify
+<a href="http://eel.is/c++draft/temp.param#1">[temp.param], paragraph 1</a>:
+<blockquote>
+The syntax for
+<a href="http://eel.is/c++draft/temp.param#nt:template-parameter"><i>template-parameter</i></a>s
+is:
+<br/><br/>
+  <div style="margin-left: 1em; white-space: nowrap;">
+    <a href="http://eel.is/c++draft/temp.param#nt:template-parameter"><i>template-parameter</i></a>:
+      <div style="margin-left: 1em; white-space: nowrap;">
+        <a href="http://eel.is/c++draft/temp.param#nt:type-parameter"><i>type-parameter</i></a>
+      <br/>
+        <a href="http://eel.is/c++draft/dcl.fct#nt:parameter-declaration"><i>parameter-declaration</i></a>
+      </div>
+  <br/>
+    <a href="http://eel.is/c++draft/temp.param#nt:type-parameter"><i>type-parameter:</i></a>
+      <div style="margin-left: 1em; white-space: nowrap;">
+        <ins><a href="http://eel.is/c++draft/dcl.attr.grammar#nt:attribute-specifier-seq"><i>attribute-specifier-seq</i></a><sub>opt</sub></ins>
+        <a href="http://eel.is/c++draft/temp.param#nt:type-parameter-key"><i>type-parameter-key</i></a>
+        <tt>...</tt><sub>opt</sub>
+        <del><a href="http://eel.is/c++draft/lex.name#nt:identifier"><i>identifier</i></a></del><ins><a href="http://eel.is/c++draft/dcl.pre#nt:attributed-identifier"><i>attributed-identifier</i></a></ins><sub>opt</sub>
+      <br/>
+        <ins><a href="http://eel.is/c++draft/dcl.attr.grammar#nt:attribute-specifier-seq"><i>attribute-specifier-seq</i></a><sub>opt</sub></ins>
+        <a href="http://eel.is/c++draft/temp.param#nt:type-parameter-key"><i>type-parameter-key</i></a>
+        <del><a href="http://eel.is/c++draft/lex.name#nt:identifier"><i>identifier</i></a></del><ins><a href="http://eel.is/c++draft/dcl.pre#nt:attributed-identifier"><i>attributed-identifier</i></a></ins><sub>opt</sub>
+        <tt>=</tt>
+        <a href="http://eel.is/c++draft/dcl.name#nt:type-id"><i>type-id</i></a>
+      <br/>
+        <ins><a href="http://eel.is/c++draft/dcl.attr.grammar#nt:attribute-specifier-seq"><i>attribute-specifier-seq</i></a><sub>opt</sub></ins>
+        <a href="http://eel.is/c++draft/temp.param#nt:type-constraint"><i>type-constraint</i></a>
+        <tt>...</tt><sub>opt</sub>
+        <del><a href="http://eel.is/c++draft/lex.name#nt:identifier"><i>identifier</i></a></del><ins><a href="http://eel.is/c++draft/dcl.pre#nt:attributed-identifier"><i>attributed-identifier</i></a></ins><sub>opt</sub>
+      <br/>
+        <ins><a href="http://eel.is/c++draft/dcl.attr.grammar#nt:attribute-specifier-seq"><i>attribute-specifier-seq</i></a><sub>opt</sub></ins>
+        <a href="http://eel.is/c++draft/temp.param#nt:type-constraint"><i>type-constraint</i></a>
+        <del><a href="http://eel.is/c++draft/lex.name#nt:identifier"><i>identifier</i></a></del><ins><a href="http://eel.is/c++draft/dcl.pre#nt:attributed-identifier"><i>attributed-identifier</i></a></ins><sub>opt</sub>
+        <tt>=</tt>
+        <a href="http://eel.is/c++draft/dcl.name#nt:type-id"><i>type-id</i></a>
+      <br/>
+        <ins><a href="http://eel.is/c++draft/dcl.attr.grammar#nt:attribute-specifier-seq"><i>attribute-specifier-seq</i></a><sub>opt</sub></ins>
+        <a href="http://eel.is/c++draft/temp.pre#nt:template-head"><i>template-head</i></a>
+        <a href="http://eel.is/c++draft/temp.param#nt:type-parameter-key"><i>type-parameter-key</i></a>
+        <tt>...</tt><sub>opt</sub>
+        <del><a href="http://eel.is/c++draft/lex.name#nt:identifier"><i>identifier</i></a></del><ins><a href="http://eel.is/c++draft/dcl.pre#nt:attributed-identifier"><i>attributed-identifier</i></a></ins><sub>opt</sub>
+      <br/>
+        <ins><a href="http://eel.is/c++draft/dcl.attr.grammar#nt:attribute-specifier-seq"><i>attribute-specifier-seq</i></a><sub>opt</sub></ins>
+        <a href="http://eel.is/c++draft/temp.pre#nt:template-head"><i>template-head</i></a>
+        <a href="http://eel.is/c++draft/temp.param#nt:type-parameter-key"><i>type-parameter-key</i></a>
+        <del><a href="http://eel.is/c++draft/lex.name#nt:identifier"><i>identifier</i></a></del><ins><a href="http://eel.is/c++draft/dcl.pre#nt:attributed-identifier"><i>attributed-identifier</i></a></ins><sub>opt</sub>
+        <tt>=</tt>
+        <a href="http://eel.is/c++draft/expr.prim.id.general#nt:id-expression"><i>id-expression</i></a>
+      </div>
+  <br/>
+    <a href="http://eel.is/c++draft/temp.param#nt:type-parameter-key"><i>type-parameter-key</i></a>:
+      <div style="margin-left: 1em; white-space: nowrap;">
+        <tt>class</tt>
+      <br/>
+        <tt>typename</tt>
+      </div>
+  <br/>
+    <a href="http://eel.is/c++draft/temp.param#nt:type-constraint"><i>type-constraint</i></a>:
+      <div style="margin-left: 1em; white-space: nowrap;">
+        <a href="http://eel.is/c++draft/expr.prim.id.qual#nt:nested-name-specifier"><i>nested-name-specifier</i></a><sub>opt</sub>
+        <a href="http://eel.is/c++draft/temp.concept#nt:concept-name"><i>concept-name</i></a>
+      <br/>
+        <a href="http://eel.is/c++draft/expr.prim.id.qual#nt:nested-name-specifier"><i>nested-name-specifier</i></a><sub>opt</sub>
+        <a href="http://eel.is/c++draft/temp.concept#nt:concept-name"><i>concept-name</i></a>
+        <tt>&lt;</tt>
+        <a href="http://eel.is/c++draft/temp.names#nt:template-argument-list"><i>template-argument-list</i></a><sub>opt</sub>
+        <tt>&gt;</tt>
+      </div>
+  </div>
+<br/>
+The component names of a
+<a href="http://eel.is/c++draft/temp.param#nt:type-constraint"><i>type-constraint</i></a>
+are its
+<a href="http://eel.is/c++draft/temp.concept#nt:concept-name"><i>concept-name</i></a>
+and those of its
+<a href="http://eel.is/c++draft/expr.prim.id.qual#nt:nested-name-specifier"><i>nested-name-specifier</i></a>
+(if any).
+<br/><br/>
+[<em>Note 1</em>: The <tt>&gt;</tt> token following the
+<a href="http://eel.is/c++draft/temp.pre#nt:template-parameter-list"><i>template-parameter-list</i></a>
+of a
+<a href="http://eel.is/c++draft/temp.param#nt:type-parameter"><i>type-parameter</i></a>
+can be the product of replacing a <tt>&gt;&gt;</tt> token by two consecutive
+<tt>&gt;</tt> tokens
+(<a href="http://eel.is/c++draft/temp.names">[temp.names]</a>).
+&mdash; <em>end note</em>]
+</blockquote>
+</p>
+
+<p>
+Add an additional paragraph following
+<a href="http://eel.is/c++draft/temp.param#2">[temp.param], paragraph 2</a>:
+<blockquote class="stdins">
+The optional
+<a href="http://eel.is/c++draft/dcl.attr.grammar#nt:attribute-specifier-seq"><i>attribute-specifier-seq</i></a>
+in a
+<a href="http://eel.is/c++draft/temp.param#nt:type-parameter"><i>type-parameter</i></a>
+or in an
+<a href="http://eel.is/c++draft/dcl.pre#nt:attributed-identifier"><i>attributed-identifier</i></a>
+of a
+<a href="http://eel.is/c++draft/temp.param#nt:type-parameter"><i>type-parameter</i></a>
+appertains to the type parameter being declared.
+</blockquote>
+</p>
+
+<p>
+Modify Annex A, "Grammar summary",
+<a href="http://eel.is/c++draft/gram">[gram]</a>
+to reflect the grammar changes to
+<a href="http://eel.is/c++draft/expr.prim.lambda.capture">[expr.prim.lambda.capture]</a>,
+<a href="http://eel.is/c++draft/namespace.alias">[namespace.alias]</a>,
+and
+<a href="http://eel.is/c++draft/temp.param">[temp.param]</a>
+shown above.
+</p>
+
+
+</body>
