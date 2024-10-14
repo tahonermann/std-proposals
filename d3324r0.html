@@ -162,6 +162,11 @@ Exceptions include:
 </ul>
 It is not clear why attributes are not supported for the items in the
 exceptions list.
+There are existing standard attributes that appear to be relevant to these
+items based on their specification or stated recommended practice.
+</p>
+
+<p>
 The recommended practice for the <tt>[[deprecated]]</tt> attribute in
 <a href="http://eel.is/c++draft/dcl.attr.deprecated#4">[dcl.attr.deprecated]p4</a>
 seems applicable to namespace aliases:
@@ -177,11 +182,13 @@ The value of a
 <a href="http://eel.is/c++draft/cpp.cond#nt:has-attribute-expression"><i>has-attribute-expression</i></a>
 for the <tt>deprecated</tt> attribute should be <tt>0</tt> unless the
 implementation can issue such diagnostic messages.
+</p>
+
+<p>
 </blockquote>
-Likewise, the recommended practice for the <tt>[[maybe_unused]]</tt> attribute
-in
+The recommended practice for the <tt>[[maybe_unused]]</tt> attribute in
 <a href="http://eel.is/c++draft/dcl.attr.unused#4">[dcl.attr.unused]p4</a>
-seems applicable to the other entities:
+seems applicable to template parameters and lambda captures.
 <blockquote class="quote">
 <em>Recommended practice:</em> For an entity marked <tt>maybe_unused</tt>,
 implementations should not emit a warning that the entity or its structured
@@ -195,6 +202,26 @@ The value of a
 <a href="http://eel.is/c++draft/cpp.cond#nt:has-attribute-expression"><i>has-attribute-expression</i></a>
 for the <tt>maybe_unused</tt> attribute should be <tt>0</tt> if the attribute
 does not cause suppression of such warnings.
+</blockquote>
+</p>
+
+<p>
+</blockquote>
+The <tt>[[no_unique_address]]</tt> attribute applies to non-static data members
+and therefore seems applicable to unnamed non-static data members implicitly
+declared in lambda closure types for captured entities.
+From
+<a href="https://eel.is/c++draft/dcl.attr.nouniqueaddr#1">[dcl.attr.nouniqueaddr]p1</a>:
+<blockquote class="quote">
+The
+<a href="https://eel.is/c++draft/dcl.attr.grammar#nt:attribute-token"><i>attribute-token</i></a>
+<tt>no_unique_address</tt> specifies that a non-static data member is a
+potentially-overlapping subobject
+(<a href="https://eel.is/c++draft/intro.object">[intro.object]</a>).
+No
+<a href="https://eel.is/c++draft/dcl.attr.grammar#nt:attribute-argument-clause"><i>attribute-argument-clause</i></a>
+shall be present.  The attribute may appertain to a non-static data member
+other than a bit-field.
 </blockquote>
 </p>
 
@@ -236,6 +263,22 @@ lambda capture.
 <ul>
   <li><a href="https://wiki.edg.com/bin/view/Wg21kona2015/P0068R0">EWG review of P0068R0 in Kona, 2015</a></li>
   <li><a href="https://wiki.edg.com/bin/view/Wg21jacksonville/CoreWorkingGroup">CWG review of D0212R1 in Jacksonville, 2016</a></li>
+</ul>
+</p>
+
+<p>
+The <tt>[[no_unique_address]]</tt> attribute was adopted for C++20 via
+<a title="Language support for empty objects"
+   href="https://wg21.link/p0840r2">
+P0840R2</a>
+<sup><a title="Language support for empty objects"
+        href="#ref_p0840r2">[P0840R2]</a></sup>.
+Neither that paper, the motivation provided in its original R0 revision, nor
+the minutes from EWG and CWG review during the following meetings demonstrate
+consideration for the use of the attribute with a lambda closure.
+<ul>
+  <li><a href="https://wiki.edg.com/bin/view/Wg21albuquerque/P0840R0">EWG review of P0840R0 in Albuquerque, 2017</a></li>
+  <li><a href="https://wiki.edg.com/bin/view/Wg21jacksonville2018/CoreWorkingGroup">CWG review of P0840R1 and D0840R2 in Jacksonville, 2018</a></li>
 </ul>
 </p>
 
@@ -286,8 +329,8 @@ a variable, a non-static data member, a function, a namespace, an enumeration,
 an enumerator, a concept, or a template specialization.
 </blockquote>
 The inability to apply the <tt>deprecated</tt> attribute to a namespace alias
-seems to be an oversight that should be corrected as there is no principled
-reason for namespace aliases to never be deprecated.
+seems to be an oversight as there is no principled reason for namespace aliases
+to never be deprecated.
 At present, Clang, gcc, EDG, and Microsoft Visual C++ all reject an attribute
 sequence on a namespace alias either before the identifier at a position
 consistent with attributes on namespace declarations, or after the identifier.
@@ -301,8 +344,8 @@ namespace nsa2 [[deprecated]] = ns; // Rejected by Clang, EDG, gcc, and MSVC.
 
 <p>
 Per
-<a href="http://eel.is/c++draft/dcl.attr.unused">[dcl.attr.unused]</a>,
-the <tt>maybe-unused</tt> attribute is specified as applicable to non-static
+<a href="http://eel.is/c++draft/dcl.attr.unused#2">[dcl.attr.unused]p2</a>,
+the <tt>maybe_unused</tt> attribute is specified as applicable to non-static
 data members.
 <blockquote class="quote">
 The attribute may be applied to the declaration of a class,
@@ -311,6 +354,19 @@ variable (including a structured binding declaration), structured binding,
 non-static data member, function, enumeration, or enumerator, or to an
 <a href="http://eel.is/c++draft/lex.name#nt:identifier">identifier</a> label (
 <a href="http://eel.is/c++draft/stmt.label">[stmt.label]</a>).
+</blockquote>
+Likewise for the <tt>no_unique_address</tt> attribute per
+<a href="https://eel.is/c++draft/dcl.attr.nouniqueaddr#1">[dcl.attr.nouniqueaddr]p1</a>:
+<blockquote class="quote">
+The
+<a href="https://eel.is/c++draft/dcl.attr.grammar#nt:attribute-token"><i>attribute-token</i></a>
+<tt>no_unique_address</tt> specifies that a non-static data member is a
+potentially-overlapping subobject
+(<a href="https://eel.is/c++draft/intro.object">[intro.object]</a>).
+No
+<a href="https://eel.is/c++draft/dcl.attr.grammar#nt:attribute-argument-clause"><i>attribute-argument-clause</i></a>
+shall be present.  The attribute may appertain to a non-static data member
+other than a bit-field.
 </blockquote>
 A lambda capture is not formally a non-static data member, though references to
 a lambda capture are usually translated to an access of a non-static data member
@@ -322,6 +378,11 @@ lambda capture as intentionally unused.
 Such unused captures can be useful to acquire resources such as locks or to
 preserve the layout of a closure type when a previously needed capture is no
 longer needed.
+Likewise, the <tt>no_unique_address</tt> attribute could be used to request a
+more optimal class layout for a lambda closure type.
+</p>
+
+<p>
 At present, Clang issues a warning under <tt>-Wall</tt> for unused lambda
 captures.
 <a href="http://eel.is/c++draft/stmt.label">http://eel.is/c++draft/stmt.label</a>.
@@ -508,6 +569,16 @@ not warranted.
 </p>
 
 <p>
+If it is accepted that an attribute on a lambda capture declaration appertains
+to the notional non-static data member, then it follows that an attribute on a
+default lambda capture declaration appertains individually to each of the
+notional non-static data members of the implicit captures; this is consistent
+with attributes specified with function parameter pack declarations.
+This could be useful to, for example, apply the <tt>[[no_unique_address]]</tt>
+attribute to all implicit captures.
+</p>
+
+<p>
 Default capture declarations consist solely of either the <tt>&amp;</tt> or
 <tt>=</tt> token.
 The choices for an attribute specifier sequence are easy; the sequence either
@@ -519,7 +590,7 @@ attribute specifier sequence after the token is proposed.
 <p>
 Placing an attribute specifier sequence after <tt>*this</tt> could be a cause
 for confusion if programmers interpret it as applying to <tt>this</tt> as
-opposed to the intended meaning of it applying to the captured entity; the
+opposed to the intended meaning of it applying to the captured entity, the
 object denoted by <tt>*this</tt>.
 The remedy for such potential confusion would be to permit an attribute
 specifier sequence only at the beginning of each capture declaration.
@@ -573,13 +644,13 @@ The following attribute appertainment changes are proposed:
 <ul>
   <li>Allow the <tt>[[deprecated]]</tt> attribute to appertain to a namespace
       alias.</li>
-  <li>Allow the <tt>[[no_unique_address]]</tt> attribute to appertain to the
-      non-static data member, if any, corresponding to a lambda capture.</li>
   <li>Allow the <tt>[[maybe_unused]]</tt> attribute to appertain to the
       non-static data member, if any, corresponding to a lambda capture.</li>
   <li>Allow the <tt>[[maybe_unused]]</tt> attribute to appertain to type
       template parameters and template template parameters (in addition to
       non-type template parameters).</li>
+  <li>Allow the <tt>[[no_unique_address]]</tt> attribute to appertain to the
+      non-static data member, if any, corresponding to a lambda capture.</li>
 </ul>
 </p>
 
@@ -641,8 +712,9 @@ None.
 <h1 id="ack">Acknowledgements</h1>
 
 <p>
-Thanks to Aaron Ballman for vetting my expectations that attributes should be
-allowed on approximately everything.
+Thanks to Aaron Ballman for vetting my expectation that attributes should be
+allowed on approximately everything and for providing feedback for multiple
+drafts of this proposal.
 </p>
 
 
@@ -676,6 +748,13 @@ allowed on approximately everything.
       "Wording for [[maybe_unused]] attribute.", P0212R1, 2016.<br/>
       <a href="https://wg21.link/p0212r1">
       https://wg21.link/p0212r1</a></td>
+  </tr>
+  <tr>
+    <td id="ref_p0840r2"><sup>[P0840R2]</sup></td>
+    <td>
+      "Language support for empty objects", P0840R2, 2018.<br/>
+      <a href="https://wg21.link/p0840r2">
+      https://wg21.link/p0840r2</a></td>
   </tr>
 </table>
 
